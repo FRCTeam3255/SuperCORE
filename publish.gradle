@@ -6,7 +6,7 @@ def pubVersion = '0.0.1'
 def outputsFolder = file("$buildDir/allOutputs")
 def versionFile = file("$outputsFolder/version.txt")
 def artifactGroupId = 'com.frcteam3255'
-def baseArtifactId = 'SuperCORE'
+def baseArtifactId = 'supercore'
 def javaBaseName = "_GROUP_com_vendor_frc_ID_${baseArtifactId}_CLS"
 
 task outputVersions() {

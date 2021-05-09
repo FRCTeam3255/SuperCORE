@@ -1,0 +1,17 @@
+{
+    "fileName": "SuperCORE.json",
+    "name": "SuperCORE",
+    "version": "${pubVersion}",
+    "uuid": "f82a9412-6f53-4bc0-960c-6895a5236f57",
+    "mavenUrls": [],
+    "jsonUrl": "",
+    "javaDependencies": [
+        {
+            "groupId": "${artifactGroupId}",
+            "artifactId": "${baseArtifactId}",
+            "version": "${pubVersion}"
+        }
+    ],
+    "jniDependencies": [],
+    "cppDependencies": []
+}

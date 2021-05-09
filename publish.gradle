@@ -1,0 +1,145 @@
+apply plugin: 'maven-publish'
+
+ext.licenseFile = files("$rootDir/LICENSE.txt")
+
+def pubVersion = '0.0.1'
+def outputsFolder = file("$buildDir/allOutputs")
+def versionFile = file("$outputsFolder/version.txt")
+def artifactGroupId = 'com.frcteam3255'
+def baseArtifactId = 'SuperCORE'
+def javaBaseName = "_GROUP_com_vendor_frc_ID_${baseArtifactId}_CLS"
+
+task outputVersions() {
+    description = 'Prints the versions of wpilib to a file for use by the downstream packaging project'
+    group = 'Build'
+    outputs.files(versionFile)
+
+    doFirst {
+        buildDir.mkdir()
+        outputsFolder.mkdir()
+    }
+
+    doLast {
+        versionFile.write pubVersion
+    }
+}
+
+task libraryBuild() {}
+
+build.dependsOn outputVersions
+
+task copyAllOutputs(type: Copy) {
+    destinationDir outputsFolder
+}
+
+build.dependsOn copyAllOutputs
+copyAllOutputs.dependsOn outputVersions
+
+ext.addTaskToCopyAllOutputs = { task ->
+    copyAllOutputs.dependsOn task
+    copyAllOutputs.inputs.file task.archivePath
+    copyAllOutputs.from task.archivePath
+}
+
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+task outputJar(type: Jar, dependsOn: classes) {
+    archiveBaseName = javaBaseName
+    destinationDirectory = outputsFolder
+    from sourceSets.main.output
+}
+
+task outputSourcesJar(type: Jar, dependsOn: classes) {
+    archiveBaseName = javaBaseName
+    destinationDirectory = outputsFolder
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+task outputJavadocJar(type: Jar, dependsOn: javadoc) {
+    archiveBaseName = javaBaseName
+    destinationDirectory = outputsFolder
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+artifacts {
+    archives sourcesJar
+    archives javadocJar
+    archives outputJar
+    archives outputSourcesJar
+    archives outputJavadocJar
+}
+
+addTaskToCopyAllOutputs(outputSourcesJar)
+addTaskToCopyAllOutputs(outputJavadocJar)
+addTaskToCopyAllOutputs(outputJar)
+
+build.dependsOn outputSourcesJar
+build.dependsOn outputJavadocJar
+build.dependsOn outputJar
+
+libraryBuild.dependsOn build
+
+def releasesRepoUrl = "$buildDir/repos/releases"
+
+publishing {
+    repositories {
+        maven {
+
+            url = releasesRepoUrl
+        }
+    }
+}
+
+task cleanReleaseRepo(type: Delete) {
+    delete releasesRepoUrl
+}
+
+tasks.matching {it != cleanReleaseRepo}.all {it.dependsOn cleanReleaseRepo}
+
+model {
+    publishing {
+        publications {
+            java(MavenPublication) {
+                artifact jar
+                artifact sourcesJar
+                artifact javadocJar
+
+                artifactId = "${baseArtifactId}"
+                groupId artifactGroupId
+                version pubVersion
+            }
+        }
+    }
+}
+
+def photonlibFileInput = file("src/generate/SuperCORE.json")
+ext.photonlibFileOutput = file("$buildDir/generated/vendordeps/SuperCORE.json")
+
+task generateVendorJson() {
+    description = "Generates the vendor JSON file"
+    group = "SuperCORE"
+
+    outputs.file photonlibFileOutput
+    inputs.file photonlibFileInput
+
+    doLast {
+        println "Writing version ${pubVersion} to $photonlibFileOutput"
+
+        if (photonlibFileOutput.exists()) {
+            photonlibFileOutput.delete()
+        }
+        def read = photonlibFileInput.text.replace('${pubVersion}', pubVersion).replace('${baseArtifactId}', baseArtifactId).replace('${artifactGroupId}', artifactGroupId)
+        photonlibFileOutput.write(read)
+    }
+}

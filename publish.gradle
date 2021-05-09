@@ -95,8 +95,12 @@ def releasesRepoUrl = "$buildDir/repos/releases"
 publishing {
     repositories {
         maven {
-
-            url = releasesRepoUrl
+            name = "GitHubPackages"
+            url = "https://maven.pkg.github.com/FRCTeam3255/SuperCORE"
+            credentials {
+                username = System.getenv("GITHUB_ACTOR")
+                password = System.getenv("GITHUB_TOKEN")
+            }
         }
     }
 }

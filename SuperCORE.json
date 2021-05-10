@@ -6,7 +6,7 @@
     "mavenUrls": [
         "https://maven.pkg.github.com/FRCTeam3255/frcteam3255/com.frcteam3255.supercore/"
     ],
-    "jsonUrl": "",
+    "jsonUrl": "https://raw.githubusercontent.com/FRCTeam3255/SuperCORE/main/SuperCORE.json",
     "javaDependencies": [
         {
             "groupId": "com.frcteam3255",

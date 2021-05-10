@@ -1,7 +1,7 @@
 {
     "fileName": "SuperCORE.json",
     "name": "SuperCORE",
-    "version": "${pubVersion}",
+    "version": "0.0.1",
     "uuid": "f82a9412-6f53-4bc0-960c-6895a5236f57",
     "mavenUrls": [
         "https://maven.pkg.github.com/FRCTeam3255/frcteam3255/com.frcteam3255.supercore/"
@@ -9,9 +9,9 @@
     "jsonUrl": "",
     "javaDependencies": [
         {
-            "groupId": "${artifactGroupId}",
-            "artifactId": "${baseArtifactId}",
-            "version": "${pubVersion}"
+            "groupId": "com.frcteam3255",
+            "artifactId": "supercore",
+            "version": "0.0.1"
         }
     ],
     "jniDependencies": [],

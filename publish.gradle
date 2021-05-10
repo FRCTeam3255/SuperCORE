@@ -96,11 +96,15 @@ publishing {
     repositories {
         maven {
             name = "GitHubPackages"
-            url = "https://maven.pkg.github.com/FRCTeam3255/SuperCORE"
+            url = "https://maven.pkg.github.com/frcteam3255/supercore"
             credentials {
                 username = System.getenv("GITHUB_ACTOR")
                 password = System.getenv("GITHUB_TOKEN")
             }
+        }
+        maven {
+            name = "Local"
+            url = releasesRepoUrl
         }
     }
 }
@@ -127,23 +131,23 @@ model {
     }
 }
 
-def photonlibFileInput = file("src/generate/SuperCORE.json")
-ext.photonlibFileOutput = file("$buildDir/generated/vendordeps/SuperCORE.json")
+def fileInput = file("src/generate/SuperCORE.json")
+ext.fileOutput = file("SuperCORE.json")
 
 task generateVendorJson() {
     description = "Generates the vendor JSON file"
     group = "SuperCORE"
 
-    outputs.file photonlibFileOutput
-    inputs.file photonlibFileInput
+    outputs.file fileOutput
+    inputs.file fileInput
 
     doLast {
-        println "Writing version ${pubVersion} to $photonlibFileOutput"
+        println "Writing version ${pubVersion} to $fileOutput"
 
-        if (photonlibFileOutput.exists()) {
-            photonlibFileOutput.delete()
+        if (fileOutput.exists()) {
+            fileOutput.delete()
         }
-        def read = photonlibFileInput.text.replace('${pubVersion}', pubVersion).replace('${baseArtifactId}', baseArtifactId).replace('${artifactGroupId}', artifactGroupId)
-        photonlibFileOutput.write(read)
+        def read = fileInput.text.replace('${pubVersion}', pubVersion).replace('${baseArtifactId}', baseArtifactId).replace('${artifactGroupId}', artifactGroupId)
+        fileOutput.write(read)
     }
 }

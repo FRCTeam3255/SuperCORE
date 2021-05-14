@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <metadata>
-  <groupId>com.FRCTeam3255</groupId>
+  <groupId>com.frcteam3255</groupId>
   <artifactId>SuperCORE</artifactId>
   <versioning>
     <latest>0.0.1</latest>
@@ -8,6 +8,6 @@
     <versions>
       <version>0.0.1</version>
     </versions>
-    <lastUpdated>20210514042928</lastUpdated>
+    <lastUpdated>20210514043226</lastUpdated>
   </versioning>
 </metadata>

@@ -5,7 +5,7 @@ ext.licenseFile = files("$rootDir/LICENSE.txt")
 def pubVersion = '0.0.1'
 def outputsFolder = file("$buildDir/allOutputs")
 def versionFile = file("$outputsFolder/version.txt")
-def artifactGroupId = 'com.FRCTeam3255'
+def artifactGroupId = 'com.frcteam3255'
 def baseArtifactId = 'SuperCORE'
 def javaBaseName = "_GROUP_com_vendor_frc_ID_${baseArtifactId}_CLS"
 

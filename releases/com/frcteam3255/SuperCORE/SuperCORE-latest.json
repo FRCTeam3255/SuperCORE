@@ -9,7 +9,7 @@
     "jsonUrl": "https://github.com/FRCTeam3255/SuperCORE/raw/main/src/main/releases/com/frcteam3255/SuperCORE/SuperCORE-latest.json",
     "javaDependencies": [
         {
-            "groupId": "com.FRCTeam3255",
+            "groupId": "com.frcteam3255",
             "artifactId": "SuperCORE",
             "version": "0.0.1"
         }

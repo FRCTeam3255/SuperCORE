@@ -4,9 +4,9 @@
     "version": "0.0.1",
     "uuid": "f82a9412-6f53-4bc0-960c-6895a5236f57",
     "mavenUrls": [
-        "https://github.com/FRCTeam3255/SuperCORE/raw/main/src/main/releases/"
+        "https://frcteam3255.github.io/SuperCORE/releases/"
     ],
-    "jsonUrl": "https://github.com/FRCTeam3255/SuperCORE/raw/main/src/main/releases/com/frcteam3255/SuperCORE/SuperCORE-latest.json",
+    "jsonUrl": "https://frcteam3255.github.io/SuperCORE/releases/com/frcteam3255/SuperCORE/SuperCORE-latest.json",
     "javaDependencies": [
         {
             "groupId": "com.frcteam3255",

@@ -1,26 +1,13 @@
----
-# Front matter
----
+<!DOCTYPE html>
+<html>
 
-<!doctype html>
-<html lang="en-GB">
+<head>
+	<title>HTML Meta Tag</title>
+	<meta http-equiv="refresh" content="0; url = releases/com/frcteam3255/supercore/" />
+</head>
 
 <body>
-
-    <ul class="portfolio">
-        {% for repo in site.github.public_repositories limit:28 %}
-
-        {% if repo.fork != true %}
-        <li class="repo">
-
-            <a href="{{ repo.homepage }}">{{ repo.name }}</a>
-
-        </li>
-        {% endif %}
-
-        {% endfor %}
-    </ul>
-
+	<p>Redirecting to another URL</p>
 </body>
 
 </html>

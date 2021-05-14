@@ -10,7 +10,7 @@
     "javaDependencies": [
         {
             "groupId": "com.frcteam3255",
-            "artifactId": "SuperCORE",
+            "artifactId": "supercore",
             "version": "0.0.1"
         }
     ],

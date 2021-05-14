@@ -3,8 +3,8 @@ for DIR in $(find ./releases -type d); do
   (
     echo -e "<body>
 	<h1>SuperCORE Maven Repo</h1>
-	<h2><a href=\"/\">Home</a>
-		<a href=\"/releases/com/frcteam3255/supercore/\">Releases</a>
+	<h2><a href=\"/SuperCORE/\">Home</a>
+		<a href=\"/SuperCORE/releases/com/frcteam3255/supercore/\">Releases</a>
 		<a href=\"https://github.com/FRCTeam3255/SuperCORE\">Source</a>
 	</h2>
 	<hr />

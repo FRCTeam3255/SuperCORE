@@ -1,4 +1,5 @@
 #!/bin/bash
+# Creates web directory for releases
 for DIR in $(find ./releases -type d); do
   (
     echo "<body>

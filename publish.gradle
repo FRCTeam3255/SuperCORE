@@ -1,16 +1,12 @@
 apply plugin: 'maven-publish'
-
-def pubVersion = '0.0.2'
-def releasesRepoUrl = "releases"
-def vendorFileInput = file("src/generate/SuperCORE.json")
-def groupName = 'frcteam3255'
-def groupTLD = 'com'
+apply from: 'config.gradle'
 
 // ========== Auto Gen Variables ========== //
 def baseArtifactId = "${rootProject.name.toLowerCase()}"
 def artifactGroupId = "${groupTLD}.${groupName}"
 def jsonUrl = "${releasesRepoUrl}/${groupTLD}/${groupName}/${baseArtifactId}"
-
+def vendorFileOutput = file("${jsonUrl}/${pubVersion}/${rootProject.name}-${pubVersion}.json")
+def vendorFileOutputLatest = file("${jsonUrl}/${rootProject.name}-latest.json")
 
 // ========== Building ========== //
 task libraryBuild() {}
@@ -64,29 +60,26 @@ model {
 
 
 // ========== Publishing ========== //
-ext.fileOutput = file("${jsonUrl}/${pubVersion}/${rootProject.name}-${pubVersion}.json")
-ext.fileOutputLatest = file("${jsonUrl}/${rootProject.name}-latest.json")
-
 task generateVendorJson() {
     description = "Generates the WPILib vendor JSON file"
     group = "supercore"
 
-    outputs.file fileOutput
+    outputs.file vendorFileOutput
     inputs.file vendorFileInput
 
     doLast {
-        println "Writing version ${pubVersion} to $fileOutput"
+        println "Writing version ${pubVersion} to $vendorFileOutput"
 
-        if (fileOutput.exists()) {
-            fileOutput.delete()
+        if (vendorFileOutput.exists()) {
+            vendorFileOutput.delete()
         }
         def read = vendorFileInput.text.replace('${pubVersion}', pubVersion).replace('${baseArtifactId}', baseArtifactId).replace('${artifactGroupId}', artifactGroupId)
-        fileOutput.write(read)
+        vendorFileOutput.write(read)
 
-        if (fileOutputLatest.exists()) {
-            fileOutputLatest.delete()
+        if (vendorFileOutputLatest.exists()) {
+            vendorFileOutputLatest.delete()
         }
-        fileOutputLatest.write(read)
+        vendorFileOutputLatest.write(read)
     }
 }
 

@@ -1,57 +1,31 @@
 apply plugin: 'maven-publish'
 
-ext.licenseFile = files("$rootDir/LICENSE.txt")
-
 def pubVersion = '0.0.2'
-def outputsFolder = file("$buildDir/allOutputs")
-def versionFile = file("$outputsFolder/version.txt")
-def artifactGroupId = 'com.frcteam3255'
-def baseArtifactId = 'supercore'
-def javaBaseName = "_GROUP_com_vendor_frc_ID_${baseArtifactId}_CLS"
-def vendorFileInput = file("src/generate/SuperCORE.json")
 def releasesRepoUrl = "releases"
-def jsonUrl = "releases/com/frcteam3255/${baseArtifactId}"
+def vendorFileInput = file("src/generate/SuperCORE.json")
+def groupName = 'frcteam3255'
+def groupTLD = 'com'
 
+// ========== Auto Gen Variables ========== //
+def baseArtifactId = "${rootProject.name.toLowerCase()}"
+def artifactGroupId = "${groupTLD}.${groupName}"
+def jsonUrl = "${releasesRepoUrl}/${groupTLD}/${groupName}/${baseArtifactId}"
+
+
+// ========== Building ========== //
 task libraryBuild() {}
 
 task sourcesJar(type: Jar, dependsOn: classes) {
+    group='building'
     classifier = 'sources'
     from sourceSets.main.allSource
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
+    group='building'
     classifier = 'javadoc'
     from javadoc.destinationDir
 }
-
-task outputJar(type: Jar, dependsOn: classes) {
-    destinationDirectory = outputsFolder
-    from sourceSets.main.output
-}
-
-task outputSourcesJar(type: Jar, dependsOn: classes) {
-    destinationDirectory = outputsFolder
-    classifier = 'sources'
-    from sourceSets.main.allSource
-}
-
-task outputJavadocJar(type: Jar, dependsOn: javadoc) {
-    destinationDirectory = outputsFolder
-    classifier = 'javadoc'
-    from javadoc.destinationDir
-}
-
-artifacts {
-    archives sourcesJar
-    archives javadocJar
-    archives outputJar
-    archives outputSourcesJar
-    archives outputJavadocJar
-}
-
-build.dependsOn outputSourcesJar
-build.dependsOn outputJavadocJar
-build.dependsOn outputJar
 
 libraryBuild.dependsOn build
 
@@ -88,12 +62,14 @@ model {
     }
 }
 
-ext.fileOutput = file("${jsonUrl}/${pubVersion}/SuperCORE-${pubVersion}.json")
-ext.fileOutputLatest = file("${jsonUrl}/SuperCORE-latest.json")
+
+// ========== Publishing ========== //
+ext.fileOutput = file("${jsonUrl}/${pubVersion}/${rootProject.name}-${pubVersion}.json")
+ext.fileOutputLatest = file("${jsonUrl}/${rootProject.name}-latest.json")
 
 task generateVendorJson() {
-    description = "Generates the vendor JSON file"
-    group = "SuperCORE"
+    description = "Generates the WPILib vendor JSON file"
+    group = "supercore"
 
     outputs.file fileOutput
     inputs.file vendorFileInput
@@ -116,13 +92,14 @@ task generateVendorJson() {
 
 task createWebFolders(type: Exec) {
     group = 'supercore'
+    description = 'Creates index.html files to make releases navigatable.'
     executable "sh"
     args "-c","source create_dir.sh"
 }
 
 tasks.register('publishSuperCORE') {
     group = 'supercore'
-    description = 'Publishes all Maven publications to the external Maven repository.'
+    description = 'Publishes all Maven publications to the listed Maven repository.'
     dependsOn clean
     dependsOn tasks.withType(PublishToMavenRepository).matching {
         it.repository == publishing.repositories.Local
@@ -133,7 +110,7 @@ tasks.register('publishSuperCORE') {
 
 tasks.register('cleanPublishSuperCORE') {
     group = 'supercore'
-    description = 'Cleans releases and publishes all Maven publications to the external Maven repository.'
+    description = 'Cleans releases and publishes all Maven publications to the listed Maven repository.'
     dependsOn tasks.cleanReleaseRepo
     dependsOn tasks.publishSuperCORE
 }

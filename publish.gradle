@@ -8,6 +8,7 @@ def versionFile = file("$outputsFolder/version.txt")
 def artifactGroupId = 'com.frcteam3255'
 def baseArtifactId = 'supercore'
 def javaBaseName = "_GROUP_com_vendor_frc_ID_${baseArtifactId}_CLS"
+def vendorFileInput = file("src/generate/SuperCORE.json")
 
 task outputVersions() {
     description = 'Prints the versions of wpilib to a file for use by the downstream packaging project'
@@ -126,7 +127,6 @@ model {
     }
 }
 
-def fileInput = file("src/generate/SuperCORE.json")
 ext.fileOutput = file("${jsonUrl}/${pubVersion}/SuperCORE-${pubVersion}.json")
 ext.fileOutputLatest = file("${jsonUrl}/SuperCORE-latest.json")
 
@@ -135,7 +135,7 @@ task generateVendorJson() {
     group = "SuperCORE"
 
     outputs.file fileOutput
-    inputs.file fileInput
+    inputs.file vendorFileInput
 
     doLast {
         println "Writing version ${pubVersion} to $fileOutput"
@@ -143,7 +143,7 @@ task generateVendorJson() {
         if (fileOutput.exists()) {
             fileOutput.delete()
         }
-        def read = fileInput.text.replace('${pubVersion}', pubVersion).replace('${baseArtifactId}', baseArtifactId).replace('${artifactGroupId}', artifactGroupId)
+        def read = vendorFileInput.text.replace('${pubVersion}', pubVersion).replace('${baseArtifactId}', baseArtifactId).replace('${artifactGroupId}', artifactGroupId)
         fileOutput.write(read)
 
         if (fileOutputLatest.exists()) {
@@ -167,4 +167,11 @@ tasks.register('publishSuperCORE') {
     }
     dependsOn tasks.generateVendorJson
     finalizedBy tasks.createWebFolders
+}
+
+tasks.register('cleanPublishSuperCORE') {
+    group = 'supercore'
+    description = 'Cleans releases and publishes all Maven publications to the external Maven repository.'
+    dependsOn tasks.cleanReleaseRepo
+    dependsOn tasks.publishSuperCORE
 }

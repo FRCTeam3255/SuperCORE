@@ -162,6 +162,7 @@ task createWebFolders(type: Exec) {
 tasks.register('publishSuperCORE') {
     group = 'supercore'
     description = 'Publishes all Maven publications to the external Maven repository.'
+    dependsOn clean
     dependsOn tasks.withType(PublishToMavenRepository).matching {
         it.repository == publishing.repositories.Local
     }

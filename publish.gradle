@@ -4,9 +4,9 @@ apply from: 'config.gradle'
 // ========== Auto Gen Variables ========== //
 def baseArtifactId = "${rootProject.name.toLowerCase()}"
 def artifactGroupId = "${groupTLD}.${groupName}"
-def jsonUrl = "${releasesRepoUrl}/${groupTLD}/${groupName}/${baseArtifactId}"
-def vendorFileOutput = file("${jsonUrl}/${pubVersion}/${rootProject.name}-${pubVersion}.json")
-def vendorFileOutputLatest = file("${jsonUrl}/${rootProject.name}-latest.json")
+def releaseDir = "${releasesRepoUrl}/${groupTLD}/${groupName}/${baseArtifactId}"
+def vendorFileOutput = file("${releaseDir}/${pubVersion}/${rootProject.name}-${pubVersion}.json")
+def vendorFileOutputLatest = file("${releaseDir}/${rootProject.name}-latest.json")
 
 // ========== Building ========== //
 task libraryBuild() {}
@@ -37,7 +37,7 @@ publishing {
 task cleanReleaseRepo(type: Delete) {
     group = 'supercore'
     delete releasesRepoUrl
-    delete jsonUrl
+    delete releaseDir
 }
 
 // tasks.matching {it != cleanReleaseRepo}.all {it.dependsOn cleanReleaseRepo}
@@ -87,7 +87,7 @@ task createWebFolders(type: Exec) {
     group = 'supercore'
     description = 'Creates index.html files to make releases navigatable.'
     executable "sh"
-    args "-c","source create_dir.sh"
+    args "-c","source create_webdir.sh"
 }
 
 tasks.register('publishSuperCORE') {
@@ -98,6 +98,7 @@ tasks.register('publishSuperCORE') {
         it.repository == publishing.repositories.Local
     }
     dependsOn tasks.generateVendorJson
+    finalizedBy tasks.publishJavaDoc
     finalizedBy tasks.createWebFolders
 }
 
@@ -106,4 +107,20 @@ tasks.register('cleanPublishSuperCORE') {
     description = 'Cleans releases and publishes all Maven publications to the listed Maven repository.'
     dependsOn tasks.cleanReleaseRepo
     dependsOn tasks.publishSuperCORE
+}
+
+task publishJavaDoc(){
+    group = 'supercore'
+    description ='Adds Java Docs to release.'
+    doLast {
+        println "Copying ${buildDir}/docs/javadoc into ${releaseDir}/${pubVersion}/"
+        copy {
+            from "${buildDir}/docs/javadoc"
+            into "${releaseDir}/${pubVersion}/javadoc"
+        }
+        copy {
+            from "${buildDir}/docs/javadoc"
+            into "${releaseDir}/javadoc-latest"
+        }
+    }
 }

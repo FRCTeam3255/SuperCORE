@@ -153,6 +153,12 @@ task generateVendorJson() {
     }
 }
 
+task createWebFolders(type: Exec) {
+    group = 'supercore'
+    executable "sh"
+    args "-c","source create_dir.sh"
+}
+
 tasks.register('publishSuperCORE') {
     group = 'supercore'
     description = 'Publishes all Maven publications to the external Maven repository.'
@@ -160,4 +166,5 @@ tasks.register('publishSuperCORE') {
         it.repository == publishing.repositories.Local
     }
     dependsOn tasks.generateVendorJson
+    finalizedBy tasks.createWebFolders
 }

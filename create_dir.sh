@@ -1,7 +1,7 @@
 #!/bin/bash
 for DIR in $(find ./releases -type d); do
   (
-    echo -e "<body>
+    echo "<body>
 	<h1>SuperCORE Maven Repo</h1>
 	<h2><a href=\"/SuperCORE/\">Home</a>
 		<a href=\"/SuperCORE/releases/com/frcteam3255/supercore/\">Releases</a>
@@ -10,8 +10,8 @@ for DIR in $(find ./releases -type d); do
 	<hr />
 	<pre>"
     ls -1pa "${DIR}" | grep -v "^\./$" | grep -v "index.html" | awk '{ printf "<a href=\"%s\">%s</a>\n",$1,$1 }' 
-    echo -e "</pre>\n</body>\n</html>"
-    echo -e "<footer>
+    echo "</pre>\n</body>\n</html>"
+    echo "<footer>
 	<hr />
 	<pre>
 Created by <a href=\"https://supernurds.com\" target=\"_blank\">FRC Team 3255 - SuperNURDs</a>

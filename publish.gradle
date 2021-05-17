@@ -86,6 +86,7 @@ task generateVendorJson() {
 task createWebFolders(type: Exec) {
     group = 'supercore'
     description = 'Creates index.html files to make releases navigatable.'
+    println "Creating web folders."
     executable "sh"
     args "-c","source create_webdir.sh"
 }
@@ -98,8 +99,8 @@ tasks.register('publishSuperCORE') {
         it.repository == publishing.repositories.Local
     }
     dependsOn tasks.generateVendorJson
-    finalizedBy tasks.publishJavaDoc
     finalizedBy tasks.createWebFolders
+    finalizedBy tasks.publishJavaDoc
 }
 
 tasks.register('cleanPublishSuperCORE') {

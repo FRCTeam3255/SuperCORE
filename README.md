@@ -6,3 +6,7 @@
 2. Type "Manage vendor libraries" into the prompt and hit enter
 3. Select "Install new libraries (online)"
 4. Copy and paste the following link into the prompt: `https://frcteam3255.github.io/SuperCORE/releases/com/frcteam3255/supercore/SuperCORE-latest.json`
+
+## Documentation
+
+[Java Docs](https://frcteam3255.github.io/SuperCORE/releases/com/frcteam3255/supercore/javadoc-latest/)

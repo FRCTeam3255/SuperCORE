@@ -1,4 +1,4 @@
-SuperCore Installation Instructions:
+SuperCORE Installation Instructions:
 
     1. In Visual Studio Code press Ctl + shift + p
     2. Type "Manage vendor libraries" into the prompt and hit enter

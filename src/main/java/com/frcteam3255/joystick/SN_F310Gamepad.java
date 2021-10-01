@@ -13,11 +13,11 @@ import edu.wpi.first.wpilibj2.command.button.*;
 
 public class SN_F310Gamepad extends Joystick {
     /** Joystick Button 1 */
-	public Button btn_X = new JoystickButton(this, 1);
+	public Button btn_A = new JoystickButton(this, 1);
 	/** Joystick Button 2 */
-	public Button btn_A = new JoystickButton(this, 2);
+	public Button btn_B = new JoystickButton(this, 2);
 	/** Joystick Button 3 */
-	public Button btn_B = new JoystickButton(this, 3);
+	public Button btn_X = new JoystickButton(this, 3);
 	/** Joystick Button 4 */
 	public Button btn_Y = new JoystickButton(this, 4);
 	/** Joystick Button 5 */

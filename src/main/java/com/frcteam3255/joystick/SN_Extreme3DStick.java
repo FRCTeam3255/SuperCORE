@@ -80,4 +80,12 @@ public class SN_Extreme3DStick extends Joystick {
 		return (((getRawAxis(AXIS_DIAL) * -1) + 1) / 2);
 	}
 
+	/**
+	 * @param axisId id number of controller axis, viewable in this file if needed
+	 * @return position value of RawAxis(axisId)
+	 */
+	public double getAxisVar(int axisId) {
+		return getRawAxis(axisId);
+	}
+
 }

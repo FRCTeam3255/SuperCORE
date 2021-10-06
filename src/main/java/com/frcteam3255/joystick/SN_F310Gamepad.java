@@ -140,12 +140,20 @@ public class SN_F310Gamepad extends Joystick {
     public double getAxisRSX() {
         return getRawAxis(AXIS_RS_X);
     }
-
+ 
     /**
      * @return inverted position value of RawAxis({@value #AXIS_RS_Y})
      */
     public double getAxisRSY() {
         return -getRawAxis(AXIS_RS_Y);
-    }
+	}
+	
+	/**
+	 * @param axisId id number of controller axis, viewable in this file if needed
+	 * @return position value of RawAxis(axisId)
+	 */
+	public double getAxisVar(int axisId) {
+		return getRawAxis(axisId);
+	}
 
 } 

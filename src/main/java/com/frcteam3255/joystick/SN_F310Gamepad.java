@@ -156,9 +156,7 @@ public class SN_F310Gamepad extends Joystick {
 	 */
 	public double getAxisVar(SN_IntPreference axisId) {
 
-		int intAxisId = axisId.getValue();
-
-		return getRawAxis(intAxisId);
+		return getRawAxis(axisId.getValue());
 	}
 
 } 

@@ -60,10 +60,10 @@ public class SN_DualActionStick extends Joystick {
 	private static final int AXIS_TANK_LEFT = 1;
 	private static final int AXIS_TANK_RIGHT = 5;
 
-	private static final int AXIS_LS_X = 0;
-    private static final int AXIS_LS_Y = 1;
-    private static final int AXIS_RS_X = 2;
-    private static final int AXIS_RS_Y = 3;
+	private static final int AXIS_LEFT_STICK_X = 0;
+    private static final int AXIS_LEFT_STICK_Y = 1;
+    private static final int AXIS_RIGHT_STICK_X = 2;
+    private static final int AXIS_RIGHT_STICK_Y = 3;
 
 	/**
 	 * Logitech F310 Gamepad with 12 Buttons and custom Axes
@@ -115,30 +115,30 @@ public class SN_DualActionStick extends Joystick {
 	// Get Axis
 
     /**
-     * @return position value of RawAxis({@value #AXIS_LS_X})
+     * @return position value of RawAxis({@value #AXIS_LEFT_STICK_X})
      */
-    public double getAxisLSX() {
-        return getRawAxis(AXIS_LS_X);
+    public double getLeftStickX() {
+        return getRawAxis(AXIS_LEFT_STICK_X);
     }
 
     /**
-     * @return inverted position value of RawAxis({@value #AXIS_LS_Y})
+     * @return inverted position value of RawAxis({@value #AXIS_LEFT_STICK_Y})
      */
-    public double getAxisLSY() {
-        return -getRawAxis(AXIS_LS_Y);
+    public double getLeftStickY() {
+        return -getRawAxis(AXIS_LEFT_STICK_Y);
     }
 
     /**
-     * @return position value of RawAxis({@value #AXIS_RS_X})
+     * @return position value of RawAxis({@value #AXIS_RIGHT_STICK_X})
      */
-    public double getAxisRSX() {
-        return getRawAxis(AXIS_RS_X);
+    public double getRightStickX() {
+        return getRawAxis(AXIS_RIGHT_STICK_X);
     }
 
     /**
-     * @return inverted position value of RawAxis({@value #AXIS_RS_Y})
+     * @return inverted position value of RawAxis({@value #AXIS_RIGHT_STICK_Y})
      */
-    public double getAxisRSY() {
-        return -getRawAxis(AXIS_RS_Y);
+    public double getRightStickY() {
+        return -getRawAxis(AXIS_RIGHT_STICK_Y);
 	}
 }

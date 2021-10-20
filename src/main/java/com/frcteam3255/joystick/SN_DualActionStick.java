@@ -7,6 +7,8 @@
 
 package com.frcteam3255.joystick;
 
+import com.frcteam3255.preferences.SN_IntPreference;
+
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.button.*;
 
@@ -105,5 +107,13 @@ public class SN_DualActionStick extends Joystick {
 	 */
 	public double getTankRight() {
 		return -getRawAxis(AXIS_TANK_RIGHT);
+	}
+
+	/**
+	 * @param axisId id number of controller axis, viewable in this file if needed
+	 * @return position value of RawAxis(axisId)
+	 */
+	public double getAxisVar(SN_IntPreference axisId) {
+		return getRawAxis(axisId.getValue());
 	}
 }

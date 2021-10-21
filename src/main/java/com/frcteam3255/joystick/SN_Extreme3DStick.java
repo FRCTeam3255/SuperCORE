@@ -83,7 +83,8 @@ public class SN_Extreme3DStick extends Joystick {
 	}
 
 	/**
-	 * @param axisId id number of controller axis, viewable in this file if needed
+	 * @param axisId
+	 *            id number of controller axis, viewable in this file if needed
 	 * @return position value of RawAxis(axisId)
 	 */
 	public double getAxisVar(SN_IntPreference axisId) {

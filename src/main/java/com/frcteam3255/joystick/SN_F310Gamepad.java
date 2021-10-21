@@ -6,15 +6,15 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.button.*;
 
 /**
- * Custom Joystick for the Logitech F310 
+ * Custom Joystick for the Logitech F310
  * <p>
- * When the switch on the back of the controller is flipped to the
- * X setting, the triggers register as analog inputs.
- * This custom joystick utilizes those analog triggers.
+ * When the switch on the back of the controller is flipped to the X setting,
+ * the triggers register as analog inputs. This custom joystick utilizes those
+ * analog triggers.
  */
 
 public class SN_F310Gamepad extends Joystick {
-    /** Joystick Button 1 */
+	/** Joystick Button 1 */
 	public Button btn_A = new JoystickButton(this, 1);
 	/** Joystick Button 2 */
 	public Button btn_B = new JoystickButton(this, 2);
@@ -50,26 +50,26 @@ public class SN_F310Gamepad extends Joystick {
 	private static final int AXIS_ARCADE_STRAFE = 0;
 
 	private static final int AXIS_TANK_LEFT = 1;
-    private static final int AXIS_TANK_RIGHT = 5;
-    
-    private static final int AXIS_LS_X = 0;
-    private static final int AXIS_LS_Y = 1;
-    private static final int AXIS_LT = 2;
-    private static final int AXIS_RT = 3;
-    private static final int AXIS_RS_X = 4;
-    private static final int AXIS_RS_Y = 5;
+	private static final int AXIS_TANK_RIGHT = 5;
 
-    /** 
+	private static final int AXIS_LS_X = 0;
+	private static final int AXIS_LS_Y = 1;
+	private static final int AXIS_LT = 2;
+	private static final int AXIS_RT = 3;
+	private static final int AXIS_RS_X = 4;
+	private static final int AXIS_RS_Y = 5;
+
+	/**
 	 * Logitech F310 Gamepad
 	 *
 	 * @param port
 	 *            The port on the Driver Station that the joystick is plugged into.
 	 */
-    public SN_F310Gamepad(final int port) {
-        super(port);
-    }
+	public SN_F310Gamepad(final int port) {
+		super(port);
+	}
 
-    // Arcade Drive
+	// Arcade Drive
 	/**
 	 * @return inverted position value of RawAxis({@value #AXIS_ARCADE_MOVE})
 	 */
@@ -104,54 +104,55 @@ public class SN_F310Gamepad extends Joystick {
 	 */
 	public double getTankRight() {
 		return -getRawAxis(AXIS_TANK_RIGHT);
-    }
-    
-    // Get Axis
-
-    /**
-     * @return position value of RawAxis({@value #AXIS_LS_X})
-     */
-    public double getAxisLSX() {
-        return getRawAxis(AXIS_LS_X);
-    }
-
-    /**
-     * @return inverted position value of RawAxis({@value #AXIS_LS_Y})
-     */
-    public double getAxisLSY() {
-        return -getRawAxis(AXIS_LS_Y);
-    }
-
-    /**
-     * @return position value of RawAxis({@value #AXIS_LT})
-     */
-    public double getAxisLT() {
-        return getRawAxis(AXIS_LT);
-    }
-
-    /**
-     * @return position value of RawAxis({@value #AXIS_RT})
-     */
-    public double getAxisRT() {
-        return getRawAxis(AXIS_RT);
-    }
-
-    /**
-     * @return position value of RawAxis({@value #AXIS_RS_X})
-     */
-    public double getAxisRSX() {
-        return getRawAxis(AXIS_RS_X);
-    }
- 
-    /**
-     * @return inverted position value of RawAxis({@value #AXIS_RS_Y})
-     */
-    public double getAxisRSY() {
-        return -getRawAxis(AXIS_RS_Y);
 	}
-	
+
+	// Get Axis
+
 	/**
-	 * @param axisId SN_IntPreference
+	 * @return position value of RawAxis({@value #AXIS_LS_X})
+	 */
+	public double getAxisLSX() {
+		return getRawAxis(AXIS_LS_X);
+	}
+
+	/**
+	 * @return inverted position value of RawAxis({@value #AXIS_LS_Y})
+	 */
+	public double getAxisLSY() {
+		return -getRawAxis(AXIS_LS_Y);
+	}
+
+	/**
+	 * @return position value of RawAxis({@value #AXIS_LT})
+	 */
+	public double getAxisLT() {
+		return getRawAxis(AXIS_LT);
+	}
+
+	/**
+	 * @return position value of RawAxis({@value #AXIS_RT})
+	 */
+	public double getAxisRT() {
+		return getRawAxis(AXIS_RT);
+	}
+
+	/**
+	 * @return position value of RawAxis({@value #AXIS_RS_X})
+	 */
+	public double getAxisRSX() {
+		return getRawAxis(AXIS_RS_X);
+	}
+
+	/**
+	 * @return inverted position value of RawAxis({@value #AXIS_RS_Y})
+	 */
+	public double getAxisRSY() {
+		return -getRawAxis(AXIS_RS_Y);
+	}
+
+	/**
+	 * @param axisId
+	 *            SN_IntPreference
 	 * @return position value of axis
 	 */
 	public double getAxisVar(SN_IntPreference axisId) {
@@ -159,4 +160,4 @@ public class SN_F310Gamepad extends Joystick {
 		return getRawAxis(axisId.getValue());
 	}
 
-} 
+}

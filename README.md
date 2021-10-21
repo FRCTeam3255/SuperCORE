@@ -1,4 +1,4 @@
-# SuperCORE 
+# SuperCORE
 
 ## Installation Instructions:
 

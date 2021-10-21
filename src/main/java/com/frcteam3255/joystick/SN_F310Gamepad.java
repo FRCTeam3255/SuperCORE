@@ -1,5 +1,7 @@
 package com.frcteam3255.joystick;
 
+import com.frcteam3255.preferences.SN_IntPreference;
+
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.button.*;
 
@@ -140,12 +142,21 @@ public class SN_F310Gamepad extends Joystick {
     public double getAxisRSX() {
         return getRawAxis(AXIS_RS_X);
     }
-
+ 
     /**
      * @return inverted position value of RawAxis({@value #AXIS_RS_Y})
      */
     public double getAxisRSY() {
         return -getRawAxis(AXIS_RS_Y);
-    }
+	}
+	
+	/**
+	 * @param axisId SN_IntPreference
+	 * @return position value of axis
+	 */
+	public double getAxisVar(SN_IntPreference axisId) {
+
+		return getRawAxis(axisId.getValue());
+	}
 
 } 

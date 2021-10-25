@@ -15,7 +15,9 @@ These are tasks that need to be done every year, so instead of just rewriting al
 3. Select "Install new libraries (online)"
 4. Copy and paste the following link into the prompt: `https://frcteam3255.github.io/SuperCORE/releases/com/frcteam3255/supercore/SuperCORE-latest.json`
 
-## Supported Controlers:
+## Features:
+
+### Supported Controlers:
 
 * Logitech F310 Gamepad
     * SN_DualActionStick
@@ -25,7 +27,7 @@ These are tasks that need to be done every year, so instead of just rewriting al
 * Custom Arduino Switchboard
     * SN_SwitchboardStick
 
-## Utilities
+### Utilities
 
 * Alternative debug output
     * SN_Debug
@@ -35,7 +37,7 @@ These are tasks that need to be done every year, so instead of just rewriting al
 * Turn CSVs into Motion Profiles
     * SN_MotionProfile
 
-## Robot Preferences
+### Robot Preferences
  Using the SuperCORE preferences gives the ability to swtich between using the hardcoded values and the Network Tables values.
 
 ## Competetion

@@ -27,13 +27,22 @@ These are tasks that need to be done every year, so instead of just rewriting al
 
 ## Utilities
 
-* Alternative debug output; replaces System.out.println()
-    * SN_Debug:
+* Alternative debug output
+    * SN_Debug
+    * All SN_Debug message output can be disabled very easily
 * Linear Interpolation
     * SN_Math
 * Turn CSVs into Motion Profiles
     * SN_MotionProfile
 
+## Robot Preferences
+ Using the SuperCORE preferences gives the ability to swtich between using the hardcoded values and the Network Tables values.
+
+## Competetion
+ It is recommended during a competition that:
+* all SN_Debug messages be disabled, making other important error messages more visible.
+* hardcoded Robot Preferences are used.
+    * This makes the behavior of the Robot based only on the code that the robot is running, and not on any other external factors, like the system that is running the drivers station software
 
 ## Documentation
 

@@ -3,10 +3,10 @@
 SuperCORE is a vendor library for FRC projects. SuperCORE has several uses:
 
 * handles controllers
-* modified RobotPreferences
-* custom utilities 
+* adds improved RobotPreferences
+* various custom utilities
 
-These are tasks that need to be done every year, so instead of just rewriting all the code (or copying it from last year's project) SuperCORE was created as a vendor library to make it as quick and easy as possible to get a new robot functional.
+These are tasks that need to be done every year, so instead of just rewriting all the code, or copying it from last year's project, SuperCORE was created as a vendor library to make it as quick and easy as possible to get a new robot functional.
 
 ## Installation Instructions:
 

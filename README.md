@@ -13,7 +13,7 @@ These are tasks that need to be done every year, so instead of just rewriting al
 1. In Visual Studio Code press Ctrl + shift + p
 2. Type "Manage vendor libraries" into the prompt and hit enter
 3. Select "Install new libraries (online)"
-4. Copy and paste the following link into the prompt: `https://frcteam3255.github.io/SuperCORE/releases/com/frcteam3255/supercore/SuperCORE-latest.json`
+4. Copy and paste the following link into the prompt: `https://SuperNURDs.com/installSuperCORE`
 
 ## Features:
 

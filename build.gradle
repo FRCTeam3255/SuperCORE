@@ -9,7 +9,7 @@
 plugins {
     // Apply the java-library plugin to add support for Java Library
     id 'java'
-    id "edu.wpi.first.GradleRIO" version "2021.2.2"
+    id "edu.wpi.first.GradleRIO" version "2022.1.1"
     id 'com.diffplug.spotless' version '5.5.0'
 }
 
@@ -20,8 +20,8 @@ repositories {
 dependencies {
 
     // This dependency is used internally, and not exposed to consumers on their own compile classpath.
-    implementation wpi.deps.wpilib()
-    implementation wpi.deps.vendor.java()
+    implementation wpi.java.deps.wpilib()
+    implementation wpi.java.vendor.java()
 }
 
 apply from: "publish.gradle"

@@ -10,7 +10,7 @@ public class SN_LED {
         Blue, BlueViolet, Violet, White, Gray, DarkGray, Black 
     }
 
-    public double getBlinkinSolidColor(BlinkinSolidColors color) {
+    public double getBlinkinSolidColorValue(BlinkinSolidColors color) {
 
         switch (color) {
             case HotPink: return 0.57;

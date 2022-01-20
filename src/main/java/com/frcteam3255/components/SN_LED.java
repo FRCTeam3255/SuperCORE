@@ -1,9 +1,8 @@
 package com.frcteam3255.components;
 
-import edu.wpi.first.wpilibj.Spark;
+import edu.wpi.first.wpilibj.motorcontrol.Spark;
 
 public class SN_LED extends Spark{
-
 
     public SN_LED(int channel) {
         super(channel);

@@ -1,6 +1,13 @@
-package com.frcteam3255.utils;
+package com.frcteam3255.components;
 
-public class SN_LED {
+import edu.wpi.first.wpilibj.Spark;
+
+public class SN_LED extends Spark{
+
+
+    public SN_LED(int channel) {
+        super(channel);
+    }
 
     private enum BlinkinFixedPalettePatterns {
         RainbowRainbowPalette, RainbowPartyPalette, RainbowOceanPalette, RainbowLavePalette, RainbowForestPalette,
@@ -62,7 +69,7 @@ public class SN_LED {
 
     }
 
-    public double getBlinkinSolidColorValue(BlinkinSolidColors color) {
+    private double getBlinkinValues(BlinkinPatterns color) {
 
         switch (color) {
             case HotPink:
@@ -114,4 +121,7 @@ public class SN_LED {
         }
     }
 
+    public void setBlinkin(BlinkinPatterns a_color) {
+        this.set(getBlinkinValues(a_color));
+    }
 }

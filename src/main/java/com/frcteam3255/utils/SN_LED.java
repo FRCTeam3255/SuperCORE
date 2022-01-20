@@ -2,7 +2,7 @@ package com.frcteam3255.utils;
 
 public class SN_LED {
 
-    public enum BlinkinFixedPalettePatterns {
+    private enum BlinkinFixedPalettePatterns {
         RainbowRainbowPalette, RainbowPartyPalette, RainbowOceanPalette, RainbowLavePalette, RainbowForestPalette,
         RainbowWithGlitter, Confetti, ShotRed, ShotBlue, ShotWhite, SinelonRainbowPalette, SinelonPartyPalette,
         SineloneOceanPalette, SinelonLavaPalette, SinelonForestPalette, BPMRainbowPalette, BPMPartyPalette,
@@ -14,22 +14,22 @@ public class SN_LED {
         StrobeBlue, StrobeGold, StrobeWhite
     }
 
-    public enum BlinkinColor1Patterns {
+    private enum BlinkinColor1Patterns {
         EndToEndBlendToBlackC1P, LarsonScannerC1P, LightChaseC1P, HeartbeatSlowC1P,
         HeartbeatMediumC1P, HeartbeatFastC1P, BreathSlowC1P, BreathFastC1P, ShotC1P, StrobeC1P
     }
 
-    public enum BlinkinColor2Patterns {
+    private enum BlinkinColor2Patterns {
         EndToEndBlendToBlackC2P, LarsonScannerC2P, LightChaseC2P, HeartbeatSlowC2P,
         HeartbeatMediumC2P, HeartbeatFastC2P, BreathSlowC2P, BreathFastC2P, ShotC2P, StrobeC2P
     }
 
-    public enum BlinkinColor1and2Pattern {
+    private enum BlinkinColor1and2Pattern {
         SparkleColor1onColor2, SparkleColor2onColor1, ColorGradient, Color1and2, BPMColor1and2, EndtoEndBlendColor1to2,
         EndtoEndBlend, Color1andColor2noblending, TwinklesColor1and2, ColorWavesColor1and2, SinelonColor1and2
     }
 
-    public enum BlinkinSolidColors {
+    private enum BlinkinSolidColors {
         HotPink, DarkRed, Red, RedOrange, Orange,
         Gold, Yellow, LawnGreen, Lime, DarkGreen,
         Green, BlueGreen, Aqua, SkyBlue, DarkBlue,

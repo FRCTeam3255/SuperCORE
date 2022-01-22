@@ -3,20 +3,21 @@ package com.frcteam3255.components;
 import edu.wpi.first.wpilibj.motorcontrol.Spark;
 
 /**
- * Custom REV Blinkin framework making it easier to set colors and patters over PWM
+ * Custom REV Blinkin framework making it easier to set colors and patters over
+ * PWM
  * <p>
- * Use {@link #setBlinkin(BlinkinPatterns)} with the {@link #BlinkinPatterns} enum which contains every available color and pattern for the REV Blinkin 
+ * Use {@link #setBlinkin(BlinkinPatterns)} with the {@link #BlinkinPatterns}
+ * enum which contains every available color and pattern for the REV Blinkin
  */
 
 public class SN_LED extends Spark {
 
-
-    /**
-     * The REV Blinkin
-     * 
-     * @param channel
-     *               The PWM port the Blinkin is plugged into
-     */
+	/**
+	 * The REV Blinkin
+	 *
+	 * @param channel
+	 *            The PWM port the Blinkin is plugged into
+	 */
 	public SN_LED(int channel) {
 		super(channel);
 	}
@@ -41,8 +42,7 @@ public class SN_LED extends Spark {
 		HotPink, DarkRed, Red, RedOrange, Orange, Gold, Yellow, LawnGreen, Lime, DarkGreen, Green, BlueGreen, Aqua, SkyBlue, DarkBlue, Blue, BlueViolet, Violet, White, Gray, DarkGray, Black
 	}
 
-
-    /** Enum containing every REV Blinkin pattern */
+	/** Enum containing every REV Blinkin pattern */
 	public enum BlinkinPatterns {
 		RainbowRainbowPalette, RainbowPartyPalette, RainbowOceanPalette, RainbowLavePalette, RainbowForestPalette, RainbowWithGlitter, Confetti, ShotRed, ShotBlue, ShotWhite, SinelonRainbowPalette, SinelonPartyPalette, SineloneOceanPalette, SinelonLavaPalette, SinelonForestPalette, BPMRainbowPalette, BPMPartyPalette, BPMOceanPalette, BPMLavaPalette, BPMForestPalette, FireMedium, FireLarge, TwinklesRainbowPalette, TwinklesPartyPalette, TwinklesOceanPalette, TwinklesLavaPalette, TwinklesForestPalette, ColorWavesRainbowPalette, ColorWavesPartyPalette, ColorWavesOceanPalette, ColorWavesLavaPalette, ColorWavesForestPalette, LarsonScannerRed, LarsonScannerGray, LightChaseRed, LightCaseBlue, LightChaseGray, HeartbeatRed, HeartbeatBlue, HeartbeatWhite, HeartbeatGray, BreathRed, BreathBlue, BreathGray, StrobeRed, StrobeBlue, StrobeGold, StrobeWhite,
 
@@ -108,7 +108,7 @@ public class SN_LED extends Spark {
 		}
 	}
 
-    /** Sets SN_Blinkin to the specified value */
+	/** Sets SN_Blinkin to the specified value */
 	public void setBlinkin(BlinkinPatterns a_color) {
 		this.set(getBlinkinValues(a_color));
 	}

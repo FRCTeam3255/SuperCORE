@@ -6,7 +6,7 @@ import edu.wpi.first.wpilibj.motorcontrol.Spark;
  * Custom REV Blinkin framework making it easier to set colors and patters over
  * PWM
  * <p>
- * Use {@link #setBlinkin(BlinkinPatterns)} with the {@link #BlinkinPatterns}
+ * Use {@link #setBlinkin(BlinkinPatterns)} with the {@link BlinkinPatterns}
  * enum which contains every available color and pattern for the REV Blinkin
  */
 
@@ -108,7 +108,12 @@ public class SN_LED extends Spark {
 		}
 	}
 
-	/** Sets SN_Blinkin to the specified value */
+	/**
+	 * Sets SN_Blinkin to the specified value
+	 *
+	 * @param a_color
+	 *            Pattern to assign module to display
+	 */
 	public void setBlinkin(BlinkinPatterns a_color) {
 		this.set(getBlinkinValues(a_color));
 	}

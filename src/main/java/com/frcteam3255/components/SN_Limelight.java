@@ -46,12 +46,12 @@ public class SN_Limelight {
 	}
 
 	public enum LEDMode {
-		current, off, blink, on
+		pipeline, off, blink, on
 	}
 
-	private double getLEDMode(LEDMode a_ledMode) {
-		switch (a_ledMode) {
-			case current :
+	private double getLEDMode(LEDMode a_LEDMode) {
+		switch (a_LEDMode) {
+			case pipeline :
 				return 0;
 			case off :
 				return 1;
@@ -65,26 +65,26 @@ public class SN_Limelight {
 	}
 
 	/**
-	 * @param a_ledMode
+	 * @param a_LEDMode
 	 *            Sets the LED Mode on the Limelight
 	 */
-	public void setLedMode(LEDMode a_ledMode) {
-		double b_ledMode = getLEDMode(a_ledMode);
+	public void setLEDMode(LEDMode a_LEDMode) {
+		double b_LEDMode = getLEDMode(a_LEDMode);
 
-		table.getEntry("ledMode").setDouble(b_ledMode);
+		table.getEntry("ledMode").setDouble(b_LEDMode);
 	}
 
 	/**
 	 * Decreases exposure, enables vision processing
 	 */
-	public void setCamVisionProcessor() {
+	public void setVideoFeedProcessed() {
 		table.getEntry("camMode").setDouble(0);
 	}
 
 	/**
 	 * Increases exposure, disables vision processing
 	 */
-	public void setCamDriverCamera() {
+	public void setVideoFeedNoProcessing() {
 		table.getEntry("camMode").setDouble(1);
 	}
 

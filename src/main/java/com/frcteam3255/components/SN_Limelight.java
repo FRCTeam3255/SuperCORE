@@ -75,19 +75,19 @@ public class SN_Limelight {
 	}
 
 	public LEDMode getLEDMode() {
-		switch((int) table.getEntry("ledMode").getDouble(0)) {
-			case 0:
+		switch ((int) table.getEntry("ledMode").getDouble(0)) {
+			case 0 :
 				return LEDMode.pipeline;
-			case 1:
+			case 1 :
 				return LEDMode.off;
-			case 2:
+			case 2 :
 				return LEDMode.blink;
-			case 3:
+			case 3 :
 				return LEDMode.on;
-			default:
+			default :
 				return LEDMode.pipeline;
 
-		} 
+		}
 	}
 
 	/**

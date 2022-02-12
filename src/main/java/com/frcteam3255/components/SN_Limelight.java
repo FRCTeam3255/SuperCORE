@@ -49,7 +49,7 @@ public class SN_Limelight {
 		pipeline, off, blink, on
 	}
 
-	private double getLEDMode(LEDMode a_LEDMode) {
+	private double getLEDModeFromEnum(LEDMode a_LEDMode) {
 		switch (a_LEDMode) {
 			case pipeline :
 				return 0;
@@ -69,9 +69,25 @@ public class SN_Limelight {
 	 *            Sets the LED Mode on the Limelight
 	 */
 	public void setLEDMode(LEDMode a_LEDMode) {
-		double b_LEDMode = getLEDMode(a_LEDMode);
+		double b_LEDMode = getLEDModeFromEnum(a_LEDMode);
 
 		table.getEntry("ledMode").setDouble(b_LEDMode);
+	}
+
+	public LEDMode getLEDMode() {
+		switch((int) table.getEntry("ledMode").getDouble(0)) {
+			case 0:
+				return LEDMode.pipeline;
+			case 1:
+				return LEDMode.off;
+			case 2:
+				return LEDMode.blink;
+			case 3:
+				return LEDMode.on;
+			default:
+				return LEDMode.pipeline;
+
+		} 
 	}
 
 	/**

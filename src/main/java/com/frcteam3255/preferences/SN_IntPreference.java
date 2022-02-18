@@ -39,4 +39,6 @@ public class SN_IntPreference extends SN_Preferences {
 		return Preferences.getInstance().getInt(m_name, m_defaultValue);
 	}
 
+	public static final SN_IntPreference zero = new SN_IntPreference("zero", 0);
+
 }

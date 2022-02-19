@@ -90,6 +90,14 @@ public class SN_Limelight {
 		}
 	}
 
+	public void toggleLEDs() {
+		if (getLEDMode() == LEDMode.off) {
+			setLEDMode(LEDMode.on);
+		} else {
+			setLEDMode(LEDMode.off);
+		}
+	}
+
 	/**
 	 * Decreases exposure, enables vision processing
 	 */

@@ -38,8 +38,4 @@ public class SN_DoublePreference extends SN_Preferences {
 		}
 		return Preferences.getInstance().getDouble(m_name, m_defaultValue);
 	}
-
-	public static final SN_DoublePreference zero = new SN_DoublePreference("zero", 0);
-
-
 }

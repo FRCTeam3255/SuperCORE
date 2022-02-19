@@ -1,4 +1,4 @@
-ext.pubVersion = '0.0.7'
+ext.pubVersion = '0.0.8'
 ext.releasesRepoUrl = "releases"
 ext.vendorFileInput = file("src/generate/SuperCORE.json")
 ext.groupName = 'frcteam3255'

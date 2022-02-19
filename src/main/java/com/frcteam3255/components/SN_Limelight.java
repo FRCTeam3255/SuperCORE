@@ -90,6 +90,9 @@ public class SN_Limelight {
 		}
 	}
 
+	/**
+	 * Toggles the LEDs status from off to on, and every other state to off
+	 */
 	public void toggleLEDs() {
 		if (getLEDMode() == LEDMode.off) {
 			setLEDMode(LEDMode.on);

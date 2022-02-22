@@ -40,8 +40,8 @@ public class SN_Math {
 		return output;
 	}
 
-	public static final double TALONFX_ENCODER_PULSES_PER_COUNT = 2048;
-	public static final double QUAD_ENCODER_PULSES_PER_COUNT = 4096;
+	public static final int TALONFX_ENCODER_PULSES_PER_COUNT = 2048;
+	public static final int QUAD_ENCODER_PULSES_PER_COUNT = 4096;
 
 	/**
 	 * Converts Velocity to RPM

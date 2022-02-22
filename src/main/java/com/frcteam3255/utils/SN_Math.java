@@ -39,7 +39,7 @@ public class SN_Math {
 		}
 		return output;
 	}
-	
+
 	public static final double TALONFX_ENCODER_PULSES_PER_COUNT = 2048;
 	public static final double QUAD_ENCODER_PULSES_PER_COUNT = 4096;
 
@@ -62,10 +62,10 @@ public class SN_Math {
 			return rpm;
 		} catch (ArithmeticException e) {
 			System.err.println("pulsesPerCount can not be 0");
-			return 0;
+			throw e;
 		}
 	}
-	
+
 	/**
 	 * Converts RPM to velocity
 	 *

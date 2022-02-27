@@ -26,6 +26,28 @@ public class SN_DoubleSolenoid extends DoubleSolenoid {
 		reverseValue = Value.kReverse;
 	}
 
+	/**
+	 * Wrapper for the WPILib DoubleSolenoid
+	 * <p>
+	 * Adds custom methods like {@link #setDeployed()} and {@link #getDeployed()}
+	 *
+	 * @param a_module
+	 *            The CAN ID of the Pneumatics module to use. Leave blank to use
+	 *            default ID, 0
+	 * @param a_moduleType
+	 *            CTRE Pneumatics Control Module or REV Pneumatics Hub
+	 * @param a_forwardChannel
+	 *            The forward channel of the solenoid on the Pneumatics Module
+	 * @param a_reverseChannel
+	 *            The reverse channel of the solenoid on the Pneumatics Module
+	 */
+	public SN_DoubleSolenoid(int a_module, PneumaticsModuleType a_moduleType, int a_forwardChannel,
+			int a_reverseChannel) {
+		super(a_module, a_moduleType, a_forwardChannel, a_reverseChannel);
+		forwardValue = Value.kForward;
+		reverseValue = Value.kReverse;
+	}
+
 	private Value getValue() {
 		return this.get();
 	}

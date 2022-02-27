@@ -8,7 +8,6 @@ public class SN_DoubleSolenoid extends DoubleSolenoid {
 	Value forwardValue;
 	Value reverseValue;
 
-	
 	/**
 	 * Wrapper for the WPILib DoubleSolenoid
 	 * <p>

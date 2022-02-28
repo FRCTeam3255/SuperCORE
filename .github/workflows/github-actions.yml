@@ -29,6 +29,12 @@ jobs:
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
 
+    # Formats code
+    - name: Apply Formatting
+      run: ./gradlew :spotlessApply
+
+    - uses: EndBug/add-and-commit@v8 # You can change this to use a specific version.
+
     # Runs a single command using the runners shell
     - name: Compile and run tests on robot code
       run: ./gradlew build

@@ -1,7 +1,7 @@
 package com.frcteam3255.components;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
-import edu.wpi.first.wpilibj.PneumaticsModuleType;
+	import edu.wpi.first.wpilibj.PneumaticsModuleType;
 
 public class SN_DoubleSolenoid extends DoubleSolenoid {
 

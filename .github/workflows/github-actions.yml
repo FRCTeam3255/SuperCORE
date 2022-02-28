@@ -33,7 +33,7 @@ jobs:
     - name: Apply Formatting
       run: ./gradlew :spotlessApply
 
-    - uses: EndBug/add-and-commit@v8 # You can change this to use a specific version.
+    - uses: stefanzweifel/git-auto-commit-action@v4
 
     # Runs a single command using the runners shell
     - name: Compile and run tests on robot code

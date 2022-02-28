@@ -1,5 +1,7 @@
 # SuperCORE
 
+![GitHub release (latest SemVer including pre-releases)](https://img.shields.io/github/v/release/FRCTeam3255/SuperCORE?include_prereleases&label=latest)
+
 SuperCORE is a vendor library for FRC projects. SuperCORE has several uses:
 
 * handles controllers

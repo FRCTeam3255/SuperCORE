@@ -39,8 +39,10 @@ jobs:
     - name: Publish New Version
       run: ./gradlew :publishSuperCORE
 
+    - name: Reset config.gradle file
+      run: git checkout config.gradle
+
     - uses: stefanzweifel/git-auto-commit-action@v4
       with:
         commit_message: Published ${{github.ref_name}}
-        branch: main
-
+        branch: releases

@@ -66,30 +66,18 @@ public class SN_DoubleSolenoid extends DoubleSolenoid {
 		return !isDeployed();
 	}
 
-	private void rawSetDeployed() {
-		this.set(forwardValue);
-	}
-
-	private void rawSetReverse() {
-		this.set(reverseValue);
-	}
-
 	/**
 	 * Deploys the solenoid
 	 */
 	public void setDeployed() {
-		if (!isDeployed()) {
-			rawSetDeployed();
-		}
+		this.set(forwardValue);
 	}
 
 	/**
 	 * Retracts the solenoid
 	 */
 	public void setRetracted() {
-		if (isDeployed()) {
-			rawSetReverse();
-		}
+		this.set(reverseValue);
 	}
 
 	/**
@@ -105,8 +93,14 @@ public class SN_DoubleSolenoid extends DoubleSolenoid {
 		}
 	}
 
-	public void invert() {
-		if (forwardValue == Value.kForward) {
+	/**
+	 * Inverts the forward and reverse direction of the solenoid
+	 *
+	 * @param a_inverted
+	 *            The state of inversion, true is inverted
+	 */
+	public void setInverted(boolean a_inverted) {
+		if (a_inverted) {
 			forwardValue = Value.kReverse;
 			reverseValue = Value.kForward;
 		} else {

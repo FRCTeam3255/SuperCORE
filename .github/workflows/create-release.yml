@@ -46,3 +46,4 @@ jobs:
       with:
         commit_message: Published ${{github.ref_name}}
         branch: releases
+        push_options: '--force'

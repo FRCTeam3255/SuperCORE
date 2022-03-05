@@ -45,7 +45,6 @@ jobs:
     - name: Reset config.gradle file
       run: git checkout config.gradle
 
-    - name: Checkout release branch
     - uses: actions/checkout@v2
       with:
         ref: 'releases'

@@ -11,7 +11,7 @@ public class SN_DoubleSolenoid extends DoubleSolenoid {
 	/**
 	 * Wrapper for the WPILib DoubleSolenoid
 	 * <p>
-	 * Adds custom methods like {@link #setDeployed()} and {@link #getDeployed()}
+	 * Adds custom methods like {@link #setDeployed()}
 	 *
 	 * @param a_moduleType
 	 *            CTRE Pneumatics Control Module or REV Pneumatics Hub
@@ -29,7 +29,7 @@ public class SN_DoubleSolenoid extends DoubleSolenoid {
 	/**
 	 * Wrapper for the WPILib DoubleSolenoid
 	 * <p>
-	 * Adds custom methods like {@link #setDeployed()} and {@link #getDeployed()}
+	 * Adds custom methods like {@link #setDeployed()}
 	 *
 	 * @param a_module
 	 *            The CAN ID of the Pneumatics module to use. Leave blank to use

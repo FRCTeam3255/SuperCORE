@@ -36,11 +36,20 @@ jobs:
         echo Version Number: $version
         sed -i.bak -r "s/[0-9]+.[0-9].[0-9]/$version/" config.gradle
 
+    - name: Get existing releases
+      run: git checkout releases  -- releases/
+
     - name: Publish New Version
       run: ./gradlew :publishSuperCORE
 
     - name: Reset config.gradle file
       run: git checkout config.gradle
+
+    - name: Checkout release branch
+    - uses: actions/checkout@v2
+      with:
+        ref: 'releases'
+        clean: 'false'
 
     - uses: stefanzweifel/git-auto-commit-action@v4
       with:

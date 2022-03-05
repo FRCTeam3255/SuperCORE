@@ -162,8 +162,8 @@ src/main/java/frc/
 # End of https://www.gitignore.io/api/c++,java,linux,macos,gradle,windows,visualstudiocode
 .vscode/launch.json
 
-# Add releases
-!releases/**
+# remove releases
+releases/**
 
 # Ignore backup config
 config.gradle.bak

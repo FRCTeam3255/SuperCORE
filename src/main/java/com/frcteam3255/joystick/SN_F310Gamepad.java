@@ -46,7 +46,7 @@ public class SN_F310Gamepad extends Joystick {
 	public POVButton POV_NorthWest = new POVButton(this, 315);
 
 	private static final int AXIS_ARCADE_MOVE = 1;
-	private static final int AXIS_ARCADE_ROTATE = 2;
+	private static final int AXIS_ARCADE_ROTATE = 4;
 	private static final int AXIS_ARCADE_STRAFE = 0;
 
 	private static final int AXIS_TANK_LEFT = 1;

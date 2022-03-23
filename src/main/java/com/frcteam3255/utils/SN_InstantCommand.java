@@ -23,10 +23,10 @@ public class SN_InstantCommand extends InstantCommand {
 	 *
 	 * @param toRun
 	 *            the Runnable to run
+	 * @param runsWhenDisabled
+	 *            whether the command should runnable when the robot is disabled
 	 * @param requirements
 	 *            the subsystems required by this command
-	 * @param boolean
-	 *            whether the command should runnable when the robot is disabled
 	 */
 	public SN_InstantCommand(Runnable toRun, boolean runsWhenDisabled, Subsystem... requirements) {
 		super(toRun, requirements);

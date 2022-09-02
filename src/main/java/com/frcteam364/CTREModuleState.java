@@ -24,10 +24,17 @@ public class CTREModuleState {
     return new SwerveModuleState(targetSpeed, Rotation2d.fromDegrees(targetAngle));
   }
 
-  /**
-     * @param scopeReference Current Angle
-     * @param newAngle Target Angle
-     * @return Closest angle within scope
+    /**
+     * Takes the current angle and the target angle and outputs a new target angle that is within +/- 180 degrees of the current angle.
+     * 
+     * The difference of the current angle of the module and the desired angle could be greater than 360 degrees, and thats a problem, and this function solves it.
+     * 
+     * Note that this is simply helping the optimize function. This function only gets the angle within +/- 180 degrees, NOT +/- 90 degrees which is what the optimize function does.
+     * 
+     * 
+     * @param scopeReference Current Angle in Degrees
+     * @param newAngle Target Angle in Degrees
+     * @return Closest angle within scope in Degrees
      */
     private static double placeInAppropriate0To360Scope(double scopeReference, double newAngle) {
       double lowerBound;

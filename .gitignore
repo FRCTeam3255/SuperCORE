@@ -164,3 +164,6 @@ src/main/java/frc/
 
 # Add releases
 !releases/**
+
+# Remove src
+src/**

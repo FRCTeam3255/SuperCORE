@@ -167,3 +167,10 @@ src/main/java/frc/
 
 # Remove src
 src/**
+
+# Add needed files
+!config.gradle.bak
+!index.html
+
+# Ingnore everything else
+**

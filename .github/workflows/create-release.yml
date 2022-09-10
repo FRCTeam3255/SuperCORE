@@ -41,7 +41,7 @@ jobs:
     
     
     - name: Checkout existing releases from releases branch
-      run: git checkout releases releases -f
+      run: git checkout origin/releases releases -f
 
     - name: Publish New Version
       run: ./gradlew :publishSuperCORE

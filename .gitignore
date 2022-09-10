@@ -171,6 +171,3 @@ src/**
 # Add needed files
 !config.gradle.bak
 !index.html
-
-# Ingnore everything else
-**

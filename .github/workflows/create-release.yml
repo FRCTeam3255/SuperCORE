@@ -39,18 +39,11 @@ jobs:
     - name: Config checkout
       run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
 
-    - uses: sergeidyga/checkout-dirs@v1
+    - name: Checkout files
+      uses: Bhacaz/checkout-files@v2
       with:
-        # Space-separated directories to checkout
-        # [required]
-        dirs: 'releases'
-        # Repository name
-        # [optional] defaults to ${{ github.repository }}
-        repository: ''
-        # Ref to checkout
-        # [optional] defaults to ${{ github.ref_name }}
-        ref: 'releases'
-
+        branch: releases
+        files: releases
 
     - name: Publish New Version
       run: ./gradlew :publishSuperCORE

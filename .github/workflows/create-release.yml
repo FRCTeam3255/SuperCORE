@@ -38,12 +38,10 @@ jobs:
 
     - name: Config checkout
       run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
-
-    - name: Checkout files
-      uses: Bhacaz/checkout-files@v2
-      with:
-        branch: releases
-        files: releases
+    
+    
+    - name: Checkout existing releases from releases branch
+      run: git checkout releases releases -f
 
     - name: Publish New Version
       run: ./gradlew :publishSuperCORE

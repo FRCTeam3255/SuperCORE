@@ -36,6 +36,9 @@ jobs:
         echo Version Number: $version
         sed -i.bak -r "s/[0-9]+.[0-9].[0-9]/$version/" config.gradle
 
+    - name: Config checkout
+      run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+
     - name: Get existing releases
       run: git checkout releases  -- releases/
 

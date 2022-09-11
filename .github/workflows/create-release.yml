@@ -33,7 +33,7 @@ jobs:
         ref: 'releases'
         clean: 'false'
 
-    - use: Print files
+    - name: Print files
       run: ls
 
     # Formats code

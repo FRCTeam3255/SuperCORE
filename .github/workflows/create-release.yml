@@ -39,6 +39,7 @@ jobs:
 
     - name: Move releases folder up a level
       run: |
+        mkdir releases
         mv releases_branch/releases/* ./releases
         rm -rf releases_branch
 

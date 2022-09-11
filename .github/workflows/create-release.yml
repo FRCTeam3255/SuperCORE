@@ -32,10 +32,19 @@ jobs:
       with:
         ref: 'releases'
         clean: 'false'
+        path: 'releases_branch'
 
     - name: Print files
       run: ls
 
+    - name: Move releases folder up a level
+      run: |
+        mv releases_branch/releases/* ./releases
+        rm -rf releases_branch
+
+    - name: Print files
+      run: ls
+    
     # Formats code
     - name: Set version
       run: |
@@ -50,6 +59,10 @@ jobs:
     - name: Publish New Version
       run: ./gradlew :publishSuperCORE
 
+    - uses: actions/checkout@v2
+      with:
+        ref: 'releases'
+        clean: 'false'
 
     - uses: stefanzweifel/git-auto-commit-action@v4
       with:

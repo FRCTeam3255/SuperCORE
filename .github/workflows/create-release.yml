@@ -57,12 +57,18 @@ jobs:
     - name: Publish New Version
       run: ./gradlew :publishSuperCORE
 
-    - name: Move changes to releases branch
+    - name: Stash changes before checkout
       run: |
         git add --force releases/
         git stash
-        git checkout releases
-        git checkout stash -- releases
+    
+    - uses: actions/checkout@v2
+      with:
+        ref: 'releases'
+        clean: 'false'
+        
+    - name: Apply Stash
+      run: git checkout stash -- releases
 
     - uses: stefanzweifel/git-auto-commit-action@v4
       with:

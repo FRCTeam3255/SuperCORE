@@ -59,6 +59,7 @@ jobs:
 
     - name: Stash changes before checkout
       run: |
+        git config --global --add safe.directory /__w/SuperCORE/SuperCORE
         git add --force releases/
         git stash
     

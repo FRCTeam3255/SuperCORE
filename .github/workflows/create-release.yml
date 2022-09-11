@@ -59,7 +59,7 @@ jobs:
 
     - name: Move changes to releases branch
       run: |
-        git add .
+        git add --force releases/
         git stash
         git checkout releases
         git checkout stash -- releases

@@ -87,7 +87,7 @@ task createWebFolders(type: Exec) {
     group = 'supercore'
     description = 'Creates index.html files to make releases navigatable.'
     println "Creating web folders."
-    executable "sh"
+    executable "bash"
     args "-c","source create_webdir.sh"
 }
 

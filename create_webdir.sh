@@ -13,7 +13,9 @@ if [[ "$DIR" != *"javadoc"* ]]; then
 	<hr />
 	<pre>"
     ls -1pa "${DIR}" | grep -v "^\./$" | grep -v "index.html" | awk '{ printf "<a href=\"%s\">%s</a>\n",$1,$1 }' 
-    echo "</pre>\n</body>\n</html>"
+    echo "</pre>"
+    echo "</body>"
+	echo "</html>"
     echo "<footer>
 	<hr />
 	<pre>

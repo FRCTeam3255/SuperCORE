@@ -54,16 +54,15 @@ jobs:
         echo Version Number: $version
         sed -i.bak -r "s/[0-9]+.[0-9].[0-9]/$version/" config.gradle
 
-    - name: Config checkout
-      run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
-
     - name: Publish New Version
       run: ./gradlew :publishSuperCORE
 
-    - uses: actions/checkout@v2
-      with:
-        ref: 'releases'
-        clean: 'false'
+    - name: Move changes to releases branch
+      run: |
+        git add .
+        git stash
+        git checkout releases
+        git checkout stash -- releases
 
     - uses: stefanzweifel/git-auto-commit-action@v4
       with:

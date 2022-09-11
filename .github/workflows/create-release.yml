@@ -28,6 +28,14 @@ jobs:
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
 
+    - uses: actions/checkout@v2
+      with:
+        ref: 'releases'
+        clean: 'false'
+
+    - use: Print files
+      run: ls
+
     # Formats code
     - name: Set version
       run: |
@@ -38,18 +46,10 @@ jobs:
 
     - name: Config checkout
       run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
-    
-    
-    - name: Checkout existing releases from releases branch
-      run: git checkout origin/releases releases -f
 
     - name: Publish New Version
       run: ./gradlew :publishSuperCORE
 
-    - uses: actions/checkout@v2
-      with:
-        ref: 'releases'
-        clean: 'false'
 
     - uses: stefanzweifel/git-auto-commit-action@v4
       with:

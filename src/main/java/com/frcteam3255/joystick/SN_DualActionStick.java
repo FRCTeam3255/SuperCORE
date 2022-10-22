@@ -9,6 +9,7 @@ package com.frcteam3255.joystick;
 
 import com.frcteam3255.preferences.SN_IntPreference;
 
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.button.*;
 
@@ -67,6 +68,19 @@ public class SN_DualActionStick extends Joystick {
 	private static final int AXIS_RIGHT_STICK_X = 2;
 	private static final int AXIS_RIGHT_STICK_Y = 3;
 
+	// Slew Rate Limiters
+	private static final SlewRateLimiter axis0SlewRateLimiter = new SlewRateLimiter(0);
+	private static final SlewRateLimiter axis1SlewRateLimiter = new SlewRateLimiter(0);
+	private static final SlewRateLimiter axis2SlewRateLimiter = new SlewRateLimiter(0);
+	private static final SlewRateLimiter axis3SlewRateLimiter = new SlewRateLimiter(0);
+
+	private static final SlewRateLimiter[] slewRateLimters = {
+		axis0SlewRateLimiter, 
+		axis1SlewRateLimiter, 
+		axis2SlewRateLimiter, 
+		axis3SlewRateLimiter
+	};
+
 	/**
 	 * Logitech F310 Gamepad with 12 Buttons and custom Axes
 	 *
@@ -86,10 +100,28 @@ public class SN_DualActionStick extends Joystick {
 	}
 
 	/**
+  *	Sets the arcade move slew rate limit value
+	*
+  * @param rateLimit The rate-of-change limit, in units per second
+  */
+	public void setArcadeMoveSlewRateLimit(double rateLimit) {
+		slewRateLimters[AXIS_ARCADE_MOVE] = new SlewRateLimiter(rateLimit);
+	}
+
+	/**
 	 * @return position value of RawAxis({@value #AXIS_ARCADE_ROTATE})
 	 */
 	public double getArcadeRotate() {
 		return getRawAxis(AXIS_ARCADE_ROTATE);
+	}
+
+	/**
+	 * Sets the arcade rotate slew rate limit value
+	 * 
+	 * @param rateLimit The rate-of-change limit, in units per second
+	 */
+	public void setArcadeRotateSlewRateLimit(double rateLimit) {
+		slewRateLimters[AXIS_ARCADE_ROTATE] = new SlewRateLimiter(rateLimit);
 	}
 
 	/**

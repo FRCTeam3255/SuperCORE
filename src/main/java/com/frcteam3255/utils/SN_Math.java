@@ -169,4 +169,37 @@ public class SN_Math {
     }
 
 	// end 364's code
+
+		/**
+		 * Converts Falcon integrated encoder counts to meters
+		 * 
+		 * @param position Falcon integrated encoder counts
+		 * @param circumference Circumference of Wheel in Meters
+		 * @param gearRatio Gear Ratio between Falcon and Mechanism
+		 * @return Meters Traveled
+		 */
+		public static double falconToMeters(double position, double circumference, double gearRatio) {
+			double motorRotations = position / TALONFX_ENCODER_PULSES_PER_COUNT;
+			double wheelRotations = motorRotations / gearRatio;
+			double meters = wheelRotations * circumference;
+
+			return meters;
+		}
+
+		/**
+		 * Converts meters to Falcon integrated encoder counts
+		 * 
+		 * @param meters Meters Traveled
+		 * @param circumference Circumference of Wheel in Meters
+		 * @param gearRatio Gear Ratio between Falcon and Mechanism
+		 * @return Falcon integrated encoder counts
+		 */
+		public static double metersToFalcon(double meters, double circumference, double gearRatio) {
+
+			double wheelRotations = meters / circumference;
+			double motorRotations = wheelRotations * gearRatio;
+			double encoderCounts = motorRotations * TALONFX_ENCODER_PULSES_PER_COUNT;
+
+			return encoderCounts;
+		}
 }

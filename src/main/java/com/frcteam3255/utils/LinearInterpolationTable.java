@@ -1,17 +1,19 @@
 package com.frcteam3255.utils;
 
-import java.awt.geom.Point2D;
-
 /**
  * Linear Interpolation Table for finding the best value based on limited data points. "Borrowed" from 1706's 2022 code.
  */
 public class LinearInterpolationTable {
     private double m_maxInput = Double.NEGATIVE_INFINITY;
     private double m_minInput = Double.POSITIVE_INFINITY;
-    private final Point2D[] m_points;
+    private final SN_Point2D[] m_points;
     public final int size;
 
-    public LinearInterpolationTable(Point2D... points) {
+    /**
+     * Create new SN_Lerp 
+     * @param points
+     */
+    public LinearInterpolationTable(SN_Point2D... points) {
         m_points = points;
         size = m_points.length;
         for (int i = 0; i < size; i++) {
@@ -41,7 +43,7 @@ public class LinearInterpolationTable {
         return interpolate(input, m_points[index], m_points[index + 1]);
     }
 
-    public static double interpolate(double input, Point2D point1, Point2D point2) {
+    public static double interpolate(double input, SN_Point2D point1, SN_Point2D point2) {
         final double slope = (point2.getY() - point1.getY()) / (point2.getX() - point1.getX());
         final double delta_x = input - point1.getX();
         final double delta_y = delta_x * slope;
@@ -64,7 +66,7 @@ public class LinearInterpolationTable {
         return yVals;
     }
 
-    public Point2D[] getTable() {
+    public SN_Point2D[] getTable() {
         return m_points;
     }
 }

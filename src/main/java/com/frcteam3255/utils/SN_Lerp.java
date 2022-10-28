@@ -3,7 +3,7 @@ package com.frcteam3255.utils;
 /**
  * Linear Interpolation Table for finding the best value based on limited data points. "Borrowed" from 1706's 2022 code.
  */
-public class LinearInterpolationTable {
+public class SN_Lerp {
     private double m_maxInput = Double.NEGATIVE_INFINITY;
     private double m_minInput = Double.POSITIVE_INFINITY;
     private final SN_Point2D[] m_points;
@@ -13,7 +13,7 @@ public class LinearInterpolationTable {
      * Create new SN_Lerp 
      * @param points
      */
-    public LinearInterpolationTable(SN_Point2D... points) {
+    public SN_Lerp(SN_Point2D... points) {
         m_points = points;
         size = m_points.length;
         for (int i = 0; i < size; i++) {

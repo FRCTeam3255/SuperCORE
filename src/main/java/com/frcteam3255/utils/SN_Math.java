@@ -180,7 +180,7 @@ public class SN_Math {
 		
 			double result = Math.pow(base, exponent);
 			
-			return (base >= 0) == (result >= 0) ? result : -result;
+			return (base > 0) ? result : -result;
 
 		} 
 }

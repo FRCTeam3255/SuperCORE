@@ -3,15 +3,18 @@ package com.frcteam3255.components;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 
+/**
+ * Wrapper for the Limelight
+ * <p>
+ * Adds custom return methods like {@link #hasTarget()} and
+ * {@link #getOffsetX()}
+ */
 public class SN_Limelight {
 
 	NetworkTable table;
 
 	/**
-	 * Wrapper for the Limelight
-	 * <p>
-	 * Adds custom return methods like {@link #hasTarget()} and
-	 * {@link #getOffsetX()}
+	 * Creates new SN_Limelight Instance
 	 */
 	public SN_Limelight() {
 		table = NetworkTableInstance.getDefault().getTable("limelight");

@@ -6,15 +6,18 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.BaseTalonConfiguration;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
 
 public class SN_NEO extends CANSparkMax implements SN_MotorInterface{
 
     private SparkMaxPIDController pidController;
+    public RelativeEncoder encoder;
 
     public SN_NEO(int deviceId) {
         super(deviceId, MotorType.kBrushless);
         pidController = super.getPIDController();
+        encoder = super.getEncoder();
         super.restoreFactoryDefaults();
     }
 
@@ -109,7 +112,7 @@ public class SN_NEO extends CANSparkMax implements SN_MotorInterface{
      */
     @Override
     public void setSensorPhase(boolean PhaseSensor) {
-        super.getEncoder().setInverted(PhaseSensor);
+        encoder.setInverted(PhaseSensor);
     }
 
     /**
@@ -120,7 +123,7 @@ public class SN_NEO extends CANSparkMax implements SN_MotorInterface{
      */
 	@Override
 	public double getSelectedSensorPosition() {
-		return super.getEncoder().getPosition();
+		return encoder.getPosition();
 	}
     
     /**
@@ -131,7 +134,7 @@ public class SN_NEO extends CANSparkMax implements SN_MotorInterface{
      */
 	@Override
 	public double getSelectedSensorVelocity() {
-        return super.getEncoder().getVelocity();
+        return encoder.getVelocity();
 	}
 
     /**
@@ -152,7 +155,7 @@ public class SN_NEO extends CANSparkMax implements SN_MotorInterface{
 
     @Override
     public ErrorCode setSelectedSensorPosition(double sensorPos) {
-        super.getEncoder().setPosition(sensorPos);
+        encoder.setPosition(sensorPos);
         return null;
     }
 

@@ -20,6 +20,8 @@ public interface SN_MotorInterface {
     public double getSelectedSensorPosition();
     public double getSelectedSensorVelocity();
     public double getMotorOutputPercent();
+    public ErrorCode configFactoryDefault();
+    public ErrorCode setSelectedSensorPosition(double sensorPos);
 
     
 

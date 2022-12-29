@@ -144,5 +144,17 @@ public class SN_NEO extends CANSparkMax implements SN_MotorInterface{
 		return super.get();
 	}
 
+    @Override
+    public ErrorCode configFactoryDefault() {
+        super.restoreFactoryDefaults();
+        return null;
+    }
+
+    @Override
+    public ErrorCode setSelectedSensorPosition(double sensorPos) {
+        super.getEncoder().setPosition(sensorPos);
+        return null;
+    }
+
     
 }

@@ -13,6 +13,8 @@ public class SN_NEO extends CANSparkMax implements SN_MotorInterface{
 
     private SparkMaxPIDController pidController;
     public RelativeEncoder encoder;
+    private ControlMode pidType = ControlMode.Disabled;
+    private double pidSetpoint;
 
     public SN_NEO(int deviceId) {
         super(deviceId, MotorType.kBrushless);
@@ -23,20 +25,23 @@ public class SN_NEO extends CANSparkMax implements SN_MotorInterface{
 
     @Override
     public void set(ControlMode mode, double value) {
-       switch (mode) {
-        case PercentOutput:
-            super.set(value);
-            break;
-        case Velocity:
-            pidController.setReference(value, CANSparkMax.ControlType.kVelocity);
-            break;
-            
-        case Position:
-            pidController.setReference(value, CANSparkMax.ControlType.kPosition);
-            break;
+        pidSetpoint = value;
+        pidType = mode;
+        switch (mode) {
+            case PercentOutput:
+                super.set(value);
+                break;
 
-        default:
-            break;
+            case Velocity:
+                pidController.setReference(value, CANSparkMax.ControlType.kVelocity);
+                break;
+                
+            case Position:
+                pidController.setReference(value, CANSparkMax.ControlType.kPosition);
+                break;
+
+            default:
+                break;
        }
         
     }
@@ -99,6 +104,8 @@ public class SN_NEO extends CANSparkMax implements SN_MotorInterface{
         super.enableSoftLimit(SoftLimitDirection.kReverse, allConfigs.reverseSoftLimitEnable);
         super.setSoftLimit(SoftLimitDirection.kForward, (float)allConfigs.forwardSoftLimitThreshold);
         super.setSoftLimit(SoftLimitDirection.kReverse, (float)allConfigs.reverseSoftLimitThreshold);
+
+        super.burnFlash();
         return null;
     }
     
@@ -132,7 +139,7 @@ public class SN_NEO extends CANSparkMax implements SN_MotorInterface{
      */
 	@Override
 	public double getMotorOutputPercent() {
-		return super.get();
+		return super.getAppliedOutput();
 	}
 
     @Override
@@ -145,6 +152,24 @@ public class SN_NEO extends CANSparkMax implements SN_MotorInterface{
     public ErrorCode setSelectedSensorPosition(double sensorPos) {
         encoder.setPosition(sensorPos);
         return null;
+    }
+
+    @Override
+    public void neutralOutput() {
+        super.stopMotor();
+    }
+
+    @Override
+    public double getClosedLoopError() {
+        switch (pidType) {
+            case Velocity:
+                return pidSetpoint - getSelectedSensorVelocity();
+                
+            case Position:
+                return pidSetpoint - getSelectedSensorPosition();
+            default:
+                return 0;
+        }
     }
 
     

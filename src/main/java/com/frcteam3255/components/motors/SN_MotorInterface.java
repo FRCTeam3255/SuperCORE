@@ -21,6 +21,8 @@ public interface SN_MotorInterface {
     public double getMotorOutputPercent();
     public ErrorCode configFactoryDefault();
     public ErrorCode setSelectedSensorPosition(double sensorPos);
+    public void neutralOutput();
+    public double getClosedLoopError();
 
     
 

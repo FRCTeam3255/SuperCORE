@@ -21,6 +21,7 @@ public class SN_NEO extends CANSparkMax implements SN_MotorInterface{
         pidController = super.getPIDController();
         encoder = super.getEncoder();
         super.restoreFactoryDefaults();
+        super.burnFlash();
     }
 
     @Override

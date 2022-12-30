@@ -14,7 +14,6 @@ public interface SN_MotorInterface {
     public void set(ControlMode mode, double value);
     public void set(ControlMode mode, double demand0, DemandType demand1Type, double demand1);
     public void setInverted(boolean invert);
-    public void setSensorPhase(boolean PhaseSensor);
     public void setNeutralMode(NeutralMode neutralMode);
     public ErrorCode configAllSettings(BaseTalonConfiguration allConfigs);
     public double getSelectedSensorPosition();

@@ -101,19 +101,7 @@ public class SN_NEO extends CANSparkMax implements SN_MotorInterface{
         super.setSoftLimit(SoftLimitDirection.kReverse, (float)allConfigs.reverseSoftLimitThreshold);
         return null;
     }
-
-    /**
-     * Set the phase of the MotorFeedbackSensor so that it is set to be in phase with the motor
-     * itself. This only works for quadrature encoders and analog sensors. This will throw an error if
-     * the user tries to set the inversion of the hall sensor.
-     *
-     * @param PhaseSensor The phase of the sensor
-     * @return {@link REVLibError#kOk} if successful
-     */
-    @Override
-    public void setSensorPhase(boolean PhaseSensor) {
-        encoder.setInverted(PhaseSensor);
-    }
+    
 
     /**
      * Get the position of the motor. This returns the native units of 'rotations' by default, and can

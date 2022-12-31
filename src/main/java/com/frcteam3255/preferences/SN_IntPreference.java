@@ -36,6 +36,6 @@ public class SN_IntPreference extends SN_Preferences {
 		if (isUsingDefaults()) {
 			return m_defaultValue;
 		}
-		return Preferences.getInstance().getInt(m_name, m_defaultValue);
+		return Preferences.getInt(m_name, m_defaultValue);
 	}
 }

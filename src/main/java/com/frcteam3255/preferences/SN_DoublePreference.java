@@ -36,6 +36,6 @@ public class SN_DoublePreference extends SN_Preferences {
 		if (isUsingDefaults()) {
 			return m_defaultValue;
 		}
-		return Preferences.getInstance().getDouble(m_name, m_defaultValue);
+		return Preferences.getDouble(m_name, m_defaultValue);
 	}
 }

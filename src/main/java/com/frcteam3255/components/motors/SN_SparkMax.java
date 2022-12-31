@@ -9,15 +9,27 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
 
-public class SN_NEO extends CANSparkMax implements SN_MotorInterface{
+public class SN_SparkMax extends CANSparkMax implements SN_MotorInterface{
 
     private SparkMaxPIDController pidController;
     public RelativeEncoder encoder;
     private ControlMode pidType = ControlMode.Disabled;
     private double pidSetpoint;
 
-    public SN_NEO(int deviceId) {
-        super(deviceId, MotorType.kBrushless);
+    /**
+     * Creates a SparkMax object for use with a brushless motor.
+     */
+    public SN_SparkMax(int deviceId) {
+        this(deviceId, MotorType.kBrushless);
+    }
+
+    /**
+     * Creates a SparkMax object with the defined motorType
+     * @param motorType
+	 *            Motor type to use. (Brushed or Brushless)
+     */
+    public SN_SparkMax(int deviceId, MotorType motorType) {
+        super(deviceId, motorType);
         pidController = super.getPIDController();
         encoder = super.getEncoder();
         super.restoreFactoryDefaults();

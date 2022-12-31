@@ -202,4 +202,17 @@ public class SN_Math {
 
 			return encoderCounts;
 		}
+	/**
+	 * Returns signed power
+	 * @param base base number
+	 * @param exponent exponent number
+	 * @return base to the power of the exponent with the original sign of the base.
+	 */
+		public static double signedPow(double base, double exponent) {
+		
+			double result = Math.pow(base, exponent);
+			
+			return (base > 0) ? result : -result;
+
+		} 
 }

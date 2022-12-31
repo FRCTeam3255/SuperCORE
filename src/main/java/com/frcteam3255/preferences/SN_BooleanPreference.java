@@ -36,6 +36,6 @@ public class SN_BooleanPreference extends SN_Preferences {
 		if (isUsingDefaults()) {
 			return m_defaultValue;
 		}
-		return Preferences.getInstance().getBoolean(m_name, m_defaultValue);
+		return Preferences.getBoolean(m_name, m_defaultValue);
 	}
 }

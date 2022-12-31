@@ -61,7 +61,12 @@ public class SN_SparkMax extends CANSparkMax implements SN_MotorInterface{
 
     @Override
     public void set(ControlMode mode, double demand0, DemandType demand1Type, double demand1) {
-        // TODO: Complete
+        if (demand1Type == DemandType.ArbitraryFeedForward){
+            this.set(mode, demand0 + demand1);
+        }
+        else {
+            throw new java.lang.UnsupportedOperationException("Only DemandType.ArbitraryFeedForward is supported.");
+        } 
     }
 
     @Override

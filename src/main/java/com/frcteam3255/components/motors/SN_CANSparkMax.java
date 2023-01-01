@@ -9,7 +9,7 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
 
-public class SN_SparkMax extends CANSparkMax implements SN_MotorInterface{
+public class SN_CANSparkMax extends CANSparkMax implements SN_MotorInterface{
 
     private SparkMaxPIDController pidController;
     public RelativeEncoder encoder;
@@ -19,7 +19,7 @@ public class SN_SparkMax extends CANSparkMax implements SN_MotorInterface{
     /**
      * Creates a SparkMax object for use with a brushless motor.
      */
-    public SN_SparkMax(int deviceId) {
+    public SN_CANSparkMax(int deviceId) {
         this(deviceId, MotorType.kBrushless);
     }
 
@@ -28,12 +28,11 @@ public class SN_SparkMax extends CANSparkMax implements SN_MotorInterface{
      * @param motorType
 	 *            Motor type to use. (Brushed or Brushless)
      */
-    public SN_SparkMax(int deviceId, MotorType motorType) {
+    public SN_CANSparkMax(int deviceId, MotorType motorType) {
         super(deviceId, motorType);
         pidController = super.getPIDController();
         encoder = super.getEncoder();
         super.restoreFactoryDefaults();
-        super.burnFlash();
     }
 
     @Override
@@ -123,7 +122,6 @@ public class SN_SparkMax extends CANSparkMax implements SN_MotorInterface{
         super.setSoftLimit(SoftLimitDirection.kForward, (float)allConfigs.forwardSoftLimitThreshold);
         super.setSoftLimit(SoftLimitDirection.kReverse, (float)allConfigs.reverseSoftLimitThreshold);
 
-        super.burnFlash();
         return null;
     }
     

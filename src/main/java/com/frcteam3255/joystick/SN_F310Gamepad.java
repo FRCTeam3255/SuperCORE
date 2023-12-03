@@ -59,6 +59,11 @@ public class SN_F310Gamepad extends Joystick {
 	private static final int AXIS_RS_X = 4;
 	private static final int AXIS_RS_Y = 5;
 
+	private static final double TRIGGER_PRESS_THRESHOLD = 0.5;
+
+	public Trigger trig_LT = new Trigger(() -> getAxisLT() > TRIGGER_PRESS_THRESHOLD);
+	public Trigger trig_RT = new Trigger(() -> getAxisRT() > TRIGGER_PRESS_THRESHOLD);
+
 	/**
 	 * Logitech F310 Gamepad
 	 *

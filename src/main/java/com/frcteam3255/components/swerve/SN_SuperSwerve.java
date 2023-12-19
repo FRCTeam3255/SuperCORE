@@ -31,15 +31,15 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 /* TODO: MAKE JAVADOC */
-public class SuperSwerve extends SubsystemBase {
-	private SwerveModule[] modules;
+public class SN_SuperSwerve extends SubsystemBase {
+	private SN_SwerveModule[] modules;
 	private SwerveDrivePoseEstimator swervePoseEstimator;
 	private SwerveDriveKinematics swerveKinematics;
 	public SwerveAutoBuilder swerveAutoBuilder;
 	private Pigeon2 pigeon;
 	private boolean isFieldRelative;
 
-	private SwerveConstants swerveConstants;
+	private SN_SwerveConstants swerveConstants;
 	private PIDConstants autoDrivePID;
 	private PIDConstants autoSteerPID;
 	private Matrix<N3, N1> stateStdDevs;
@@ -103,9 +103,9 @@ public class SuperSwerve extends SubsystemBase {
 	 *                                  of 2023, you can supply this with
 	 *                                  Robot.isSimulation();
 	 */
-	public SuperSwerve(
-			SwerveConstants swerveConstants,
-			SwerveModule[] modules,
+	public SN_SuperSwerve(
+			SN_SwerveConstants swerveConstants,
+			SN_SwerveModule[] modules,
 			double wheelbase,
 			double trackWidth,
 			String CANBusName, int pigeonCANId,
@@ -138,20 +138,20 @@ public class SuperSwerve extends SubsystemBase {
 		this.autoSteerPID = autoSteerPID;
 		this.isSimulation = isSimulation;
 
-		SwerveModule.isSimulation = isSimulation;
-		SwerveModule.wheelCircumference = swerveConstants.wheelCircumference;
-		SwerveModule.maxModuleSpeedMeters = swerveConstants.maxSpeedMeters;
-		SwerveModule.driveGearRatio = swerveConstants.driveGearRatio;
-		SwerveModule.steerGearRatio = swerveConstants.steerGearRatio;
+		SN_SwerveModule.isSimulation = isSimulation;
+		SN_SwerveModule.wheelCircumference = swerveConstants.wheelCircumference;
+		SN_SwerveModule.maxModuleSpeedMeters = swerveConstants.maxSpeedMeters;
+		SN_SwerveModule.driveGearRatio = swerveConstants.driveGearRatio;
+		SN_SwerveModule.steerGearRatio = swerveConstants.steerGearRatio;
 
-		SwerveModule.CANBusName = CANBusName;
-		SwerveModule.minimumSteerSpeedPercent = minimumSteerPercent;
+		SN_SwerveModule.CANBusName = CANBusName;
+		SN_SwerveModule.minimumSteerSpeedPercent = minimumSteerPercent;
 
-		SwerveModule.isDriveInverted = isDriveInverted;
-		SwerveModule.driveNeutralMode = driveNeutralMode;
+		SN_SwerveModule.isDriveInverted = isDriveInverted;
+		SN_SwerveModule.driveNeutralMode = driveNeutralMode;
 
-		SwerveModule.isSteerInverted = isSteerInverted;
-		SwerveModule.steerNeutralMode = steerNeutralMode;
+		SN_SwerveModule.isSteerInverted = isSteerInverted;
+		SN_SwerveModule.steerNeutralMode = steerNeutralMode;
 
 		pigeon = new Pigeon2(pigeonCANId, CANBusName);
 
@@ -162,7 +162,7 @@ public class SuperSwerve extends SubsystemBase {
 	}
 
 	public void configure() {
-		for (SwerveModule mod : modules) {
+		for (SN_SwerveModule mod : modules) {
 			mod.configure();
 		}
 
@@ -191,7 +191,7 @@ public class SuperSwerve extends SubsystemBase {
 	 * Reset all of the steer motors to the absolute encoder values.
 	 */
 	public void resetModulesToAbsolute() {
-		for (SwerveModule mod : modules) {
+		for (SN_SwerveModule mod : modules) {
 			mod.resetSteerMotorToAbsolute();
 		}
 	}
@@ -204,7 +204,7 @@ public class SuperSwerve extends SubsystemBase {
 	public SwerveModulePosition[] getModulePositions() {
 		SwerveModulePosition[] positions = new SwerveModulePosition[4];
 
-		for (SwerveModule mod : modules) {
+		for (SN_SwerveModule mod : modules) {
 			positions[mod.moduleNumber] = mod.getModulePosition();
 		}
 
@@ -225,7 +225,7 @@ public class SuperSwerve extends SubsystemBase {
 		// Lowers the speeds so that they are actually achievable
 		SwerveDriveKinematics.desaturateWheelSpeeds(desiredModuleStates, swerveConstants.maxSpeedMeters);
 
-		for (SwerveModule mod : modules) {
+		for (SN_SwerveModule mod : modules) {
 			mod.setModuleState(desiredModuleStates[mod.moduleNumber], isOpenLoop);
 		}
 	}
@@ -306,7 +306,7 @@ public class SuperSwerve extends SubsystemBase {
 	 * Sets all modules to neutral output
 	 */
 	public void neutralDriveOutputs() {
-		for (SwerveModule mod : modules) {
+		for (SN_SwerveModule mod : modules) {
 			mod.neutralDriveOutput();
 		}
 	}
@@ -392,7 +392,7 @@ public class SuperSwerve extends SubsystemBase {
 		updatePoseEstimator();
 		SmartDashboard.putNumber("Drivetrain/Yaw Degrees", getRotation().getDegrees());
 		SmartDashboard.putBoolean("Drivetrain/Is Field Relative", isFieldRelative);
-		for (SwerveModule mod : modules) {
+		for (SN_SwerveModule mod : modules) {
 			SmartDashboard.putNumber("Drivetrain/Module " + mod.moduleNumber + "/Speed",
 					Units.metersToFeet(mod.getModuleState().speedMetersPerSecond));
 			SmartDashboard.putNumber("Drivetrain/Module " + mod.moduleNumber + "/Distance",

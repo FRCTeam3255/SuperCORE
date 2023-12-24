@@ -63,7 +63,7 @@ public class SN_SwerveModule extends SubsystemBase {
      * @param driveMotorID          The CAN id of the drive motor
      * @param steerMotorID          The CAN id of the steer motor
      * @param absoluteEncoderID     The CAN id of the CANcoder
-     * @param absoluteEncoderOffset The offset of the CANcoder. This is
+     * @param absoluteEncoderOffset The offset of the CANcoder in degrees. This is
      *                              typically obtained by aligning all of the wheels
      *                              in the appropriate direction and then copying
      *                              the Raw Absolute encoder value.

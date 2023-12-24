@@ -7,11 +7,13 @@ package com.frcteam3255.components.swerve;
 import edu.wpi.first.math.util.Units;
 
 /**
+ * <p> 
  * A wrapper for a swerve module's physical constants. Contains preset constants
- * as well as a constructor for custom constants. <br>
+ * as well as a constructor for custom constants. </p>
+ * <p>
  * Currently, there are presets for all MK4I Falcon 500 modules, with and
  * without FOC. Values are taken directly from their website.
- * (https://www.swervedrivespecialties.com/products/mk4i-swerve-module)
+ * (https://www.swervedrivespecialties.com/products/mk4i-swerve-module) </p>
  */
 public class SN_SwerveConstants {
     private static final double WHEEL_CIRCUMFERENCE = Units.inchesToMeters(3.8) * Math.PI;

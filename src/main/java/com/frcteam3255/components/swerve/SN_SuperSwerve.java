@@ -30,7 +30,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-/* TODO: MAKE JAVADOC */
 public class SN_SuperSwerve extends SubsystemBase {
     private SN_SwerveModule[] modules;
     private SwerveDrivePoseEstimator swervePoseEstimator;
@@ -57,65 +56,54 @@ public class SN_SuperSwerve extends SubsystemBase {
     private double lastSimTime = simTimer.get();
     private Field2d field;
 
+    // TODO: Create Example Implementation
     /**
+     * <p>
      * A superclass for a Swerve Drive. Your Drivetrain subsystem should extend from
-     * this class. Derived from https://github.com/ACat701/SuperSwerve23
+     * this class. View an example implementation here: REALLY COOL LINK HERE 😎
+     * </p>
+     * Derived from https://github.com/ACat701/SuperSwerve23
      *
-     * @param swerveConstants
-     *                                  The constants for all of your modules, such
+     * @param swerveConstants           The constants for all of your modules, such
      *                                  as gear ratio and max
      *                                  speed. You can create your own
      *                                  SN_SwerveConstants object or use a
      *                                  preset.
-     * @param driveConfig
-     *                                  - The configuration for every drive motor.
-     *                                  <b>IMPORTANT: Configure PID and
+     * @param driveConfig               The configuration for every drive motor.
+     *                                  <b>Configure PID and
      *                                  FeedForward!</b>
-     * @param steerConfig
-     *                                  - The configuration for every steer motor.
-     *                                  <b>IMPORTANT: Configure PID!</b>
-     * @param modules
-     *                                  An array of your SN_SwerveModules.
-     * @param wheelbase
-     *                                  Physically measured distance (center to
+     * @param steerConfig               The configuration for every steer motor.
+     *                                  <b>Configure PID!</b>
+     * @param modules                   An array of SN_SwerveModules.
+     * @param wheelbase                 Physically measured distance (center to
      *                                  center) between the Left &
-     *                                  Right wheels.
-     * @param trackWidth
-     *                                  Physically measured distance (center to
+     *                                  Right wheels in meters
+     * @param trackWidth                Physically measured distance (center to
      *                                  center) between the Front &
-     *                                  Back wheels
-     * @param CANBusName
-     *                                  The name of the CANBus that all of the
-     *                                  swerve components are on.
-     * @param pigeonCANId
-     *                                  The CAN id of the Pigeon. The Pigeon MUST be
+     *                                  Back wheels in meters
+     * @param CANBusName                The name of the CANBus that all of the
+     *                                  swerve components are on
+     * @param pigeonCANId               The CAN id of the Pigeon. The Pigeon MUST be
      *                                  on the same CANBus as the
      *                                  modules
-     * @param minimumSteerPercent
-     *                                  The minimum PercentOutput required to make
+     * @param minimumSteerPercent       The minimum PercentOutput required to make
      *                                  the steer motor move
-     * @param isDriveInverted
-     *                                  If the drive motors on every module should
-     *                                  be inverted.
-     * @param isSteerInverted
-     *                                  If the steer motors on every module should
-     *                                  be inverted.
-     * @param driveNeutralMode
-     *                                  The behavior of every drive motor when set
+     * @param isDriveInverted           If the drive motors on every module should
+     *                                  be inverted
+     * @param isSteerInverted           If the steer motors on every module should
+     *                                  be inverted
+     * @param driveNeutralMode          The behavior of every drive motor when set
      *                                  to
      *                                  neutral-output
-     * @param steerNeutralMode
-     *                                  The behavior of every steer motor when set
+     * @param steerNeutralMode          The behavior of every steer motor when set
      *                                  to
      *                                  neutral-output
-     * @param stateStdDevs
-     *                                  Standard deviations of the pose estimate (x
+     * @param stateStdDevs              Standard deviations of the pose estimate (x
      *                                  position in meters, y
      *                                  position in meters, and heading in radians).
      *                                  Increase these
      *                                  numbers to trust your state estimate less.
-     * @param visionStdDevs
-     *                                  Standard deviations of vision pose
+     * @param visionStdDevs             Standard deviations of vision pose
      *                                  measurements (x position in
      *                                  meters, y position in meters, and heading in
      *                                  radians). Increase
@@ -126,15 +114,12 @@ public class SN_SuperSwerve extends SubsystemBase {
      *                                  Drivetrain during autonomous in order to
      *                                  reach the correct pose
      * @param autoSteerPID              The rotational PID constants applied to the
-     *                                  entire
-     *                                  Drivetrain during autonomous in order to
-     *                                  reach the correct pose
-     * @param autoFlipWithAllianceColor
-     *                                  Whether the PathPlanner auto builder flips
+     *                                  entire Drivetrain during autonomous in order
+     *                                  to reach the correct pose
+     * @param autoFlipWithAllianceColor Whether the PathPlanner auto builder flips
      *                                  paths based on alliance
      *                                  color.
-     * @param isSimulation
-     *                                  If your robot is running in Simulation. As
+     * @param isSimulation              If your robot is running in Simulation. As
      *                                  of 2023, you can supply
      *                                  this with Robot.isSimulation();
      */
@@ -287,16 +272,20 @@ public class SN_SuperSwerve extends SubsystemBase {
         setModuleStates(desiredModuleStates, isOpenLoop);
     }
 
+    // TODO: Replace with WPILib ChassisSpeeds.discretize when 2024 releases
+    // https://github.wpilib.org/allwpilib/docs/development/java/edu/wpi/first/math/kinematics/ChassisSpeeds.html#discretize(double,double,double,double)
     /**
      * Credit: WPILib 2024 and 4738. <br>
-     * <br>
-     * Discretizes a continuous-time chassis speed. It takes our current position
-     * and then adds an offset to it, knowing that the robot's esimated position is
-     * not following the exact position of the robot.
+     * <p>
+     * When we are commanding motors in our code, we typically do not account for
+     * the delay in the motors receiving inputs.
+     * However, for Swerve, we want to account for this delay, especially when we
+     * are turning. "Discretizing" a ChassisSpeed means that take what we would have
+     * inputted and account for the time period being discrete (not continuous).
+     * </p>
      *
      * @param speeds The speeds about to be inputted into the robot.
-     * @return The same thing as we input. Think of this method as an interceptor,
-     *         not changing the parameter but using it for calculations.
+     * @return The same desired speeds, but adjusted to our current location.
      */
     public ChassisSpeeds discretize(ChassisSpeeds speeds) {
         double dt = 0.02;

@@ -68,19 +68,14 @@ public class SN_SuperSwerve extends SubsystemBase {
 	 *            The constants for all of your modules, such as gear ratio and max
 	 *            speed. You can create your own SN_SwerveConstants object or use a
 	 *            preset.
-	 * @param driveConfig
-	 *            The configuration for every drive motor. <b>Configure PID and
-	 *            FeedForward!</b>
-	 * @param steerConfig
-	 *            The configuration for every steer motor. <b>Configure PID!</b>
 	 * @param modules
 	 *            An array of SN_SwerveModules.
 	 * @param wheelbase
-	 *            Physically measured distance (center to center) between the Left &
+	 *            Physically measured distance (center to center) between the Left and
 	 *            Right wheels in meters
 	 * @param trackWidth
 	 *            Physically measured distance (center to center) between the Front
-	 *            & Back wheels in meters
+	 *            and Back wheels in meters
 	 * @param CANBusName
 	 *            The name of the CANBus that all of the swerve components are on
 	 * @param pigeonCANId
@@ -204,7 +199,7 @@ public class SN_SuperSwerve extends SubsystemBase {
 	}
 
 	/**
-	 * Set the states (velocity & position) of the modules.
+	 * Set the states (velocity and position) of the modules.
 	 *
 	 * @param desiredModuleStates
 	 *            Desired states to set the modules to
@@ -227,7 +222,7 @@ public class SN_SuperSwerve extends SubsystemBase {
 	}
 
 	/**
-	 * Set the states (velocity & position) of the modules in autonomous. These are
+	 * Set the states (velocity and position) of the modules in autonomous. These are
 	 * always set with closed-loop control.
 	 *
 	 * @param desiredModuleStates

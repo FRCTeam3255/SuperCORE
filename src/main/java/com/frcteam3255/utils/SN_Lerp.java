@@ -10,8 +10,8 @@ package com.frcteam3255.utils;
  * <p>
  * 2. Create new SN_Lerp with this list of points
  * <p>
- * 3. On the created SN_Lerp, call getOutput() with the desired x value
- * and it will return a linearly interpolated y value between the two closest
+ * 3. On the created SN_Lerp, call getOutput() with the desired x value and it
+ * will return a linearly interpolated y value between the two closest
  * datapoints
  */
 public class SN_Lerp {

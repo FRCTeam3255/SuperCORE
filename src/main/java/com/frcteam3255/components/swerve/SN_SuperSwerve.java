@@ -71,8 +71,8 @@ public class SN_SuperSwerve extends SubsystemBase {
 	 * @param modules
 	 *            An array of SN_SwerveModules.
 	 * @param wheelbase
-	 *            Physically measured distance (center to center) between the Left and
-	 *            Right wheels in meters
+	 *            Physically measured distance (center to center) between the Left
+	 *            and Right wheels in meters
 	 * @param trackWidth
 	 *            Physically measured distance (center to center) between the Front
 	 *            and Back wheels in meters
@@ -222,8 +222,8 @@ public class SN_SuperSwerve extends SubsystemBase {
 	}
 
 	/**
-	 * Set the states (velocity and position) of the modules in autonomous. These are
-	 * always set with closed-loop control.
+	 * Set the states (velocity and position) of the modules in autonomous. These
+	 * are always set with closed-loop control.
 	 *
 	 * @param desiredModuleStates
 	 *            Desired states to set the modules to

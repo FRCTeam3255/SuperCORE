@@ -19,7 +19,7 @@ These are tasks that need to be done every year, so instead of just rewriting al
 
 ## Features:
 
-### Supported Controlers:
+### Supported Controllers:
 
 * Logitech F310 Gamepad
     * SN_DualActionStick
@@ -40,9 +40,9 @@ These are tasks that need to be done every year, so instead of just rewriting al
     * SN_MotionProfile
 
 ### Robot Preferences
- Using the SuperCORE preferences gives the ability to swtich between using the hardcoded values and the Network Tables values.
+ Using the SuperCORE preferences gives the ability to switch between using the hardcoded values and the Network Tables values.
 
-## Competetion
+## Competition
  It is recommended during a competition that:
 * all SN_Debug messages be disabled, making other important error messages more visible.
 * hardcoded Robot Preferences are used.

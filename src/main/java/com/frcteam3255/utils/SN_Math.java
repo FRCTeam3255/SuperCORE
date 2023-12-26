@@ -86,133 +86,156 @@ public class SN_Math {
 	// begin 364's code
 
 	/**
-     * Converts Falcon integrated encoder counts (falcon) to degrees
-	 * From 364's BaseFalconSwerve
-     * 
-     * @param counts Falcon Integrated Encoder Counts
-     * @param gearRatio Gear Ratio between Falcon and Mechanism
-     * @return Degrees of Rotation of Mechanism
-     */
-    public static double falconToDegrees(double counts, double gearRatio) {
-        return counts * (360.0 / (gearRatio * 2048.0));
-    }
+	 * Converts Falcon integrated encoder counts (falcon) to degrees From 364's
+	 * BaseFalconSwerve
+	 *
+	 * @param counts
+	 *            Falcon Integrated Encoder Counts
+	 * @param gearRatio
+	 *            Gear Ratio between Falcon and Mechanism
+	 * @return Degrees of Rotation of Mechanism
+	 */
+	public static double falconToDegrees(double counts, double gearRatio) {
+		return counts * (360.0 / (gearRatio * 2048.0));
+	}
 
-    /**
-     * Converts degrees to Falcon integrated encoder counts (falcon)
-	 * From 364's BaseFalconSwerve
-     * 
-     * @param degrees Degrees of rotation of Mechanism
-     * @param gearRatio Gear Ratio between Falcon and Mechanism
-     * @return Falcon Integrated Encoder Counts
-     */
-    public static double degreesToFalcon(double degrees, double gearRatio) {
-        double ticks =  degrees / (360.0 / (gearRatio * 2048.0));
-        return ticks;
-    }
+	/**
+	 * Converts degrees to Falcon integrated encoder counts (falcon) From 364's
+	 * BaseFalconSwerve
+	 *
+	 * @param degrees
+	 *            Degrees of rotation of Mechanism
+	 * @param gearRatio
+	 *            Gear Ratio between Falcon and Mechanism
+	 * @return Falcon Integrated Encoder Counts
+	 */
+	public static double degreesToFalcon(double degrees, double gearRatio) {
+		double ticks = degrees / (360.0 / (gearRatio * 2048.0));
+		return ticks;
+	}
 
-    /**
-     * Converts Falcon integrated encoder counts per 100 milliseconds (falcon) to RPM
-	 * From 364's BaseFalconSwerve
-     * 
-     * @param velocityCounts Falcon Integrated Encoder Counts per 100 milliseconds
-     * @param gearRatio Gear Ratio between Falcon and Mechanism (set to 1 for Falcon RPM)
-     * @return RPM of Mechanism
-     */
-    public static double falconToRPM(double velocityCounts, double gearRatio) {
-        double motorRPM = velocityCounts * (600.0 / 2048.0);        
-        double mechRPM = motorRPM / gearRatio;
-        return mechRPM;
-    }
+	/**
+	 * Converts Falcon integrated encoder counts per 100 milliseconds (falcon) to
+	 * RPM From 364's BaseFalconSwerve
+	 *
+	 * @param velocityCounts
+	 *            Falcon Integrated Encoder Counts per 100 milliseconds
+	 * @param gearRatio
+	 *            Gear Ratio between Falcon and Mechanism (set to 1 for Falcon RPM)
+	 * @return RPM of Mechanism
+	 */
+	public static double falconToRPM(double velocityCounts, double gearRatio) {
+		double motorRPM = velocityCounts * (600.0 / 2048.0);
+		double mechRPM = motorRPM / gearRatio;
+		return mechRPM;
+	}
 
-    /**
-     * Converts RPM to Falcon integrated encoder counts per 100 milliseconds (falcon) 
-	 * From 364's BaseFalconSwerve
-     * 
-     * @param RPM RPM of mechanism
-     * @param gearRatio Gear Ratio between Falcon and Mechanism (set to 1 for Falcon RPM)
-     * @return Falcon Integrated Encoder Counts per 100 milliseconds
-     */
-    public static double RPMToFalcon(double RPM, double gearRatio) {
-        double motorRPM = RPM * gearRatio;
-        double sensorCounts = motorRPM * (2048.0 / 600.0);
-        return sensorCounts;
-    }
+	/**
+	 * Converts RPM to Falcon integrated encoder counts per 100 milliseconds
+	 * (falcon) From 364's BaseFalconSwerve
+	 *
+	 * @param RPM
+	 *            RPM of mechanism
+	 * @param gearRatio
+	 *            Gear Ratio between Falcon and Mechanism (set to 1 for Falcon RPM)
+	 * @return Falcon Integrated Encoder Counts per 100 milliseconds
+	 */
+	public static double RPMToFalcon(double RPM, double gearRatio) {
+		double motorRPM = RPM * gearRatio;
+		double sensorCounts = motorRPM * (2048.0 / 600.0);
+		return sensorCounts;
+	}
 
-    /**
-     * Converts Falcon integrated encoder counts per 100 milliseconds (falcon) to Meters per Second (MPS)
-	 * From 364's BaseFalconSwerve
-     * 
-     * @param velocitycounts Falcon Integrated Encoder Counts per 100 milliseconds
-     * @param circumference Circumference of Wheel in Meters
-     * @param gearRatio Gear Ratio between Falcon and Mechanism (set to 1 for Falcon RPM)
-     * @return Mechanism Meters per Second
-     */
-    public static double falconToMPS(double velocitycounts, double circumference, double gearRatio){
-        double wheelRPM = falconToRPM(velocitycounts, gearRatio);
-        double wheelMPS = (wheelRPM * circumference) / 60;
-        return wheelMPS;
-    }
+	/**
+	 * Converts Falcon integrated encoder counts per 100 milliseconds (falcon) to
+	 * Meters per Second (MPS) From 364's BaseFalconSwerve
+	 *
+	 * @param velocitycounts
+	 *            Falcon Integrated Encoder Counts per 100 milliseconds
+	 * @param circumference
+	 *            Circumference of Wheel in Meters
+	 * @param gearRatio
+	 *            Gear Ratio between Falcon and Mechanism (set to 1 for Falcon RPM)
+	 * @return Mechanism Meters per Second
+	 */
+	public static double falconToMPS(double velocitycounts, double circumference, double gearRatio) {
+		double wheelRPM = falconToRPM(velocitycounts, gearRatio);
+		double wheelMPS = (wheelRPM * circumference) / 60;
+		return wheelMPS;
+	}
 
-    /**
-     * Converts Meters per Second (MPS) to Falcon integrated encoder counts per 100 milliseconds (falcon) 
-	 * From 364's BaseFalconSwerve
-     * 
-     * @param velocity Velocity in Meters per Second
-     * @param circumference Circumference of Wheel in Meters
-     * @param gearRatio Gear Ratio between Falcon and Mechanism (set to 1 for Falcon RPM)
-     * @return Falcon Integrated Encoder Counts per 100 milliseconds
-     */
-    public static double MPSToFalcon(double velocity, double circumference, double gearRatio){
-        double wheelRPM = ((velocity * 60) / circumference);
-        double wheelVelocity = RPMToFalcon(wheelRPM, gearRatio);
-        return wheelVelocity;
-    }
+	/**
+	 * Converts Meters per Second (MPS) to Falcon integrated encoder counts per 100
+	 * milliseconds (falcon) From 364's BaseFalconSwerve
+	 *
+	 * @param velocity
+	 *            Velocity in Meters per Second
+	 * @param circumference
+	 *            Circumference of Wheel in Meters
+	 * @param gearRatio
+	 *            Gear Ratio between Falcon and Mechanism (set to 1 for Falcon RPM)
+	 * @return Falcon Integrated Encoder Counts per 100 milliseconds
+	 */
+	public static double MPSToFalcon(double velocity, double circumference, double gearRatio) {
+		double wheelRPM = ((velocity * 60) / circumference);
+		double wheelVelocity = RPMToFalcon(wheelRPM, gearRatio);
+		return wheelVelocity;
+	}
 
 	// end 364's code
 
-		/**
-		 * Converts Falcon integrated encoder counts to meters
-		 * 
-		 * @param position Falcon integrated encoder counts
-		 * @param circumference Circumference of Wheel in Meters
-		 * @param gearRatio Gear Ratio between Falcon and Mechanism
-		 * @return Meters Traveled
-		 */
-		public static double falconToMeters(double position, double circumference, double gearRatio) {
-			double motorRotations = position / TALONFX_ENCODER_PULSES_PER_COUNT;
-			double wheelRotations = motorRotations / gearRatio;
-			double meters = wheelRotations * circumference;
+	/**
+	 * Converts Falcon integrated encoder counts to meters
+	 *
+	 * @param position
+	 *            Falcon integrated encoder counts
+	 * @param circumference
+	 *            Circumference of Wheel in Meters
+	 * @param gearRatio
+	 *            Gear Ratio between Falcon and Mechanism
+	 * @return Meters Traveled
+	 */
+	public static double falconToMeters(double position, double circumference, double gearRatio) {
+		double motorRotations = position / TALONFX_ENCODER_PULSES_PER_COUNT;
+		double wheelRotations = motorRotations / gearRatio;
+		double meters = wheelRotations * circumference;
 
-			return meters;
-		}
+		return meters;
+	}
 
-		/**
-		 * Converts meters to Falcon integrated encoder counts
-		 * 
-		 * @param meters Meters Traveled
-		 * @param circumference Circumference of Wheel in Meters
-		 * @param gearRatio Gear Ratio between Falcon and Mechanism
-		 * @return Falcon integrated encoder counts
-		 */
-		public static double metersToFalcon(double meters, double circumference, double gearRatio) {
+	/**
+	 * Converts meters to Falcon integrated encoder counts
+	 *
+	 * @param meters
+	 *            Meters Traveled
+	 * @param circumference
+	 *            Circumference of Wheel in Meters
+	 * @param gearRatio
+	 *            Gear Ratio between Falcon and Mechanism
+	 * @return Falcon integrated encoder counts
+	 */
+	public static double metersToFalcon(double meters, double circumference, double gearRatio) {
 
-			double wheelRotations = meters / circumference;
-			double motorRotations = wheelRotations * gearRatio;
-			double encoderCounts = motorRotations * TALONFX_ENCODER_PULSES_PER_COUNT;
+		double wheelRotations = meters / circumference;
+		double motorRotations = wheelRotations * gearRatio;
+		double encoderCounts = motorRotations * TALONFX_ENCODER_PULSES_PER_COUNT;
 
-			return encoderCounts;
-		}
+		return encoderCounts;
+	}
 	/**
 	 * Returns signed power
-	 * @param base base number
-	 * @param exponent exponent number
+	 *
+	 * @param base
+	 *            base number
+	 * @param exponent
+	 *            exponent number
 	 * @return base to the power of the exponent with the original sign of the base.
 	 */
-		public static double signedPow(double base, double exponent) {
-		
-			double result = Math.pow(base, exponent);
-			
-			return (base > 0) ? result : -result;
+	public static double signedPow(double base, double exponent) {
 
-		} 
+		double result = Math.pow(base, exponent);
+
+		return (base > 0) ? result : -result;
+
+	}
 }

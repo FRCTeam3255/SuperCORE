@@ -6,15 +6,14 @@ import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
 public class SN_TalonSRX extends TalonSRX implements SN_MotorInterface {
 
-    public SN_TalonSRX(int deviceNumber) {
-        super(deviceNumber);
-        super.configFactoryDefault();
-    }
+	public SN_TalonSRX(int deviceNumber) {
+		super(deviceNumber);
+		super.configFactoryDefault();
+	}
 
-    @Override
-    public ErrorCode configAllSettings(BaseTalonConfiguration allConfigs) {
-        return super.configAllSettings(allConfigs);
-    }
+	@Override
+	public ErrorCode configAllSettings(BaseTalonConfiguration allConfigs) {
+		return super.configAllSettings(allConfigs);
+	}
 
-    
 }

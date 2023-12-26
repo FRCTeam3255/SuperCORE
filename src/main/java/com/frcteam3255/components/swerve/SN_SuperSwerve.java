@@ -60,7 +60,7 @@ public class SN_SuperSwerve extends SubsystemBase {
 	/**
 	 * <p>
 	 * A superclass for a Swerve Drive. Your Drivetrain subsystem should extend from
-	 * this class. View an example implementation here: REALLY COOL LINK HERE 😎
+	 * this class. View an example implementation here: REALLY COOL LINK HERE
 	 * </p>
 	 * Derived from https://github.com/ACat701/SuperSwerve23
 	 *

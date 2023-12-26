@@ -19,7 +19,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class SN_SwerveModule extends SubsystemBase {
 
-	// -✨- Module-Specific -✨-
+	// -*- Module-Specific -*-
 	private TalonFX driveMotor;
 	private TalonFX steerMotor;
 
@@ -28,7 +28,7 @@ public class SN_SwerveModule extends SubsystemBase {
 
 	public int moduleNumber;
 
-	// -✨- Static Motor Config -✨-
+	// -*- Static Motor Config -*-
 	public static TalonFXConfiguration driveConfiguration;
 	public static TalonFXConfiguration steerConfiguration;
 	public static boolean isDriveInverted = false;
@@ -38,14 +38,14 @@ public class SN_SwerveModule extends SubsystemBase {
 	public static String CANBusName = "Swerve";
 	public static double minimumSteerSpeedPercent = 0.01;
 
-	// -✨- Static Physical Constants -✨-
+	// -*- Static Physical Constants -*-
 	// These default to L2s, but should be overridden
 	public static double driveGearRatio = SN_SwerveConstants.MK4I_L2.driveGearRatio;
 	public static double steerGearRatio = SN_SwerveConstants.MK4I_L2.steerGearRatio;
 	public static double wheelCircumference = SN_SwerveConstants.MK4I_L2.wheelCircumference;
 	public static double maxModuleSpeedMeters = SN_SwerveConstants.MK4I_L2.maxSpeedMeters;
 
-	// -✨- Sim -✨-
+	// -*- Sim -*-
 	public static boolean isSimulation = false;
 	private SwerveModuleState lastDesiredSwerveModuleState = new SwerveModuleState(0, new Rotation2d(0));
 	private double desiredDrivePosition;
@@ -89,7 +89,7 @@ public class SN_SwerveModule extends SubsystemBase {
 	}
 
 	public void configure() {
-		// -✨- Drive Motor Config -✨-
+		// -*- Drive Motor Config -*-
 		driveMotor.configFactoryDefault();
 
 		driveMotor.setNeutralMode(driveNeutralMode);
@@ -97,7 +97,7 @@ public class SN_SwerveModule extends SubsystemBase {
 
 		driveMotor.configAllSettings(driveConfiguration);
 
-		// -✨- Steer Motor Config -✨-
+		// -*- Steer Motor Config -*-
 		steerMotor.configFactoryDefault();
 
 		steerMotor.setNeutralMode(steerNeutralMode);
@@ -105,7 +105,7 @@ public class SN_SwerveModule extends SubsystemBase {
 
 		steerMotor.configAllSettings(steerConfiguration);
 
-		// -✨- Absolute Encoder Config -✨-
+		// -*- Absolute Encoder Config -*-
 		absoluteEncoder.configFactoryDefault();
 	}
 
@@ -216,7 +216,7 @@ public class SN_SwerveModule extends SubsystemBase {
 
 		// Optimize explanation: https://youtu.be/0Xi9yb1IMyA?t=226
 		SwerveModuleState state = CTREModuleState.optimize(desiredState, getModuleState().angle);
-		// -✨- Setting the Drive Motor -✨-
+		// -*- Setting the Drive Motor -*-
 
 		if (isOpenLoop) {
 			// Setting the motor to PercentOutput uses a percent of the motors max output.
@@ -230,7 +230,7 @@ public class SN_SwerveModule extends SubsystemBase {
 			driveMotor.set(ControlMode.Velocity, velocity);
 		}
 
-		// -✨- Setting the Steer Motor -✨-
+		// -*- Setting the Steer Motor -*-
 
 		double angle = SN_Math.degreesToFalcon(state.angle.getDegrees(), steerGearRatio);
 

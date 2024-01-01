@@ -40,13 +40,14 @@ public class SN_SuperSwerve extends SubsystemBase {
 	private boolean isFieldRelative;
 
 	private SN_SwerveConstants swerveConstants;
-	private double wheelbase;
-	private double trackWidth;
+	/**
+	 * Drive base radius in meters. Distance from robot center to furthest module.
+	 */
+	private double driveBaseRadius;
 	private PIDConstants autoDrivePID;
 	private PIDConstants autoSteerPID;
 	private Matrix<N3, N1> stateStdDevs;
 	private Matrix<N3, N1> visionStdDevs;
-	private boolean autoFlipWithAllianceColor;
 	public HashMap<String, Command> autoEventMap = new HashMap<>();
 	private ReplanningConfig autoReplanningConfig;
 
@@ -109,24 +110,20 @@ public class SN_SuperSwerve extends SubsystemBase {
 	 * @param autoSteerPID
 	 *            The rotational PID constants applied to the entire Drivetrain
 	 *            during autonomous in order to reach the correct pose
-	 * @param autoFlipWithAllianceColor
-	 *            Whether the PathPlanner auto builder flips paths based on alliance
-	 *            color.
 	 * @param isSimulation
 	 *            If your robot is running in Simulation. As of 2023, you can supply
 	 *            this with Robot.isSimulation();
 	 * @param autoReplanningConfig
 	 *            The configuration for replanning paths in autonomous. See the
-	 *            (Pathplanner
-	 *            API)[https://mjansen4857.com/pathplanner/docs/java/com/pathplanner/lib/util/ReplanningConfig.html]
-	 *            for more information
+	 *            <a href=
+	 *            "https://mjansen4857.com/pathplanner/docs/java/com/pathplanner/lib/util/ReplanningConfig.html">PathPlanner
+	 *            API</a> for more information
 	 */
 	public SN_SuperSwerve(SN_SwerveConstants swerveConstants, SN_SwerveModule[] modules, double wheelbase,
 			double trackWidth, String CANBusName, int pigeonCANId, double minimumSteerPercent, boolean isDriveInverted,
 			boolean isSteerInverted, NeutralMode driveNeutralMode, NeutralMode steerNeutralMode,
 			Matrix<N3, N1> stateStdDevs, Matrix<N3, N1> visionStdDevs, PIDConstants autoDrivePID,
-			PIDConstants autoSteerPID, boolean autoFlipWithAllianceColor, boolean isSimulation,
-			ReplanningConfig autoReplanningConfig) {
+			PIDConstants autoSteerPID, boolean isSimulation, ReplanningConfig autoReplanningConfig) {
 
 		simTimer.start();
 
@@ -140,11 +137,8 @@ public class SN_SuperSwerve extends SubsystemBase {
 				new Translation2d(-wheelbase / 2.0, -trackWidth / 2.0));
 
 		this.modules = modules;
-		this.wheelbase = wheelbase;
-		this.trackWidth = trackWidth;
 		this.stateStdDevs = stateStdDevs;
 		this.visionStdDevs = visionStdDevs;
-		this.autoFlipWithAllianceColor = autoFlipWithAllianceColor;
 		this.swerveConstants = swerveConstants;
 		this.autoDrivePID = autoDrivePID;
 		this.autoSteerPID = autoSteerPID;
@@ -166,6 +160,7 @@ public class SN_SuperSwerve extends SubsystemBase {
 		SN_SwerveModule.isSteerInverted = isSteerInverted;
 		SN_SwerveModule.steerNeutralMode = steerNeutralMode;
 
+		driveBaseRadius = Math.sqrt(Math.pow((wheelbase / 2), 2) + Math.pow((trackWidth / 2), 2));
 		pigeon = new Pigeon2(pigeonCANId, CANBusName);
 
 		// The absolute encoders need time to initialize
@@ -181,10 +176,6 @@ public class SN_SuperSwerve extends SubsystemBase {
 
 		swervePoseEstimator = new SwerveDrivePoseEstimator(swerveKinematics, getRotation(), getModulePositions(),
 				new Pose2d(), stateStdDevs, visionStdDevs);
-
-		// TODO: MOVE SOMEWHERE ELSE BEFORE PRing
-		double driveBaseRadius = 0; // Drive base radius in meters. Distance from robot center to furthest module.
-		driveBaseRadius = Math.sqrt(Math.pow((wheelbase / 2), 2) + Math.pow((trackWidth / 2), 2));
 
 		AutoBuilder.configureHolonomic(this::getPose, this::resetPoseToPose, this::getChassisSpeeds,
 				this::driveAutonomous, new HolonomicPathFollowerConfig(autoDrivePID, autoSteerPID,

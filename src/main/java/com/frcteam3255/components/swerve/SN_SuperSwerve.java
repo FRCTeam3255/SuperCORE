@@ -110,20 +110,20 @@ public class SN_SuperSwerve extends SubsystemBase {
 	 * @param autoSteerPID
 	 *            The rotational PID constants applied to the entire Drivetrain
 	 *            during autonomous in order to reach the correct pose
-	 * @param isSimulation
-	 *            If your robot is running in Simulation. As of 2023, you can supply
-	 *            this with Robot.isSimulation();
 	 * @param autoReplanningConfig
 	 *            The configuration for replanning paths in autonomous. See the
 	 *            <a href=
 	 *            "https://mjansen4857.com/pathplanner/docs/java/com/pathplanner/lib/util/ReplanningConfig.html">PathPlanner
 	 *            API</a> for more information
+	 * @param isSimulation
+	 *            If your robot is running in Simulation. As of 2023, you can supply
+	 *            this with Robot.isSimulation();
 	 */
 	public SN_SuperSwerve(SN_SwerveConstants swerveConstants, SN_SwerveModule[] modules, double wheelbase,
 			double trackWidth, String CANBusName, int pigeonCANId, double minimumSteerPercent, boolean isDriveInverted,
 			boolean isSteerInverted, NeutralMode driveNeutralMode, NeutralMode steerNeutralMode,
 			Matrix<N3, N1> stateStdDevs, Matrix<N3, N1> visionStdDevs, PIDConstants autoDrivePID,
-			PIDConstants autoSteerPID, boolean isSimulation, ReplanningConfig autoReplanningConfig) {
+			PIDConstants autoSteerPID, ReplanningConfig autoReplanningConfig, boolean isSimulation) {
 
 		simTimer.start();
 

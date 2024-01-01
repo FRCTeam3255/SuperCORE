@@ -110,6 +110,14 @@ tasks.register('cleanPublishSuperCORE') {
     dependsOn tasks.publishSuperCORE
 }
 
+tasks.register('cleanPublishSuperCORELocalDev') {
+    group = 'supercore'
+    description = 'Creates a local export of SuperCORE. Installable as vendor dep using http://127.0.0.1:5500/releases/com/frcteam3255/supercore/SuperCORE-latest.json'
+    vendorFileInput = file("src/generate/LocalSuperCORE.json")
+    dependsOn tasks.cleanReleaseRepo
+    dependsOn tasks.publishSuperCORE
+}
+
 task publishJavaDoc(){
     group = 'supercore'
     description ='Adds Java Docs to release.'

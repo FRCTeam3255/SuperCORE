@@ -8,9 +8,11 @@ import java.util.HashMap;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.sensors.Pigeon2;
-import com.pathplanner.lib.PathPlannerTrajectory;
-import com.pathplanner.lib.auto.PIDConstants;
-import com.pathplanner.lib.auto.SwerveAutoBuilder;
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.path.PathPlannerTrajectory;
+import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
+import com.pathplanner.lib.util.PIDConstants;
+import com.pathplanner.lib.util.ReplanningConfig;
 
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
@@ -34,17 +36,19 @@ public class SN_SuperSwerve extends SubsystemBase {
 	private SN_SwerveModule[] modules;
 	private SwerveDrivePoseEstimator swervePoseEstimator;
 	private SwerveDriveKinematics swerveKinematics;
-	public SwerveAutoBuilder swerveAutoBuilder;
 	private Pigeon2 pigeon;
 	private boolean isFieldRelative;
 
 	private SN_SwerveConstants swerveConstants;
+	private double wheelbase;
+	private double trackWidth;
 	private PIDConstants autoDrivePID;
 	private PIDConstants autoSteerPID;
 	private Matrix<N3, N1> stateStdDevs;
 	private Matrix<N3, N1> visionStdDevs;
 	private boolean autoFlipWithAllianceColor;
 	public HashMap<String, Command> autoEventMap = new HashMap<>();
+	private ReplanningConfig autoReplanningConfig;
 
 	public PathPlannerTrajectory exampleAuto;
 
@@ -111,12 +115,18 @@ public class SN_SuperSwerve extends SubsystemBase {
 	 * @param isSimulation
 	 *            If your robot is running in Simulation. As of 2023, you can supply
 	 *            this with Robot.isSimulation();
+	 * @param autoReplanningConfig
+	 *            The configuration for replanning paths in autonomous. See the
+	 *            (Pathplanner
+	 *            API)[https://mjansen4857.com/pathplanner/docs/java/com/pathplanner/lib/util/ReplanningConfig.html]
+	 *            for more information
 	 */
 	public SN_SuperSwerve(SN_SwerveConstants swerveConstants, SN_SwerveModule[] modules, double wheelbase,
 			double trackWidth, String CANBusName, int pigeonCANId, double minimumSteerPercent, boolean isDriveInverted,
 			boolean isSteerInverted, NeutralMode driveNeutralMode, NeutralMode steerNeutralMode,
 			Matrix<N3, N1> stateStdDevs, Matrix<N3, N1> visionStdDevs, PIDConstants autoDrivePID,
-			PIDConstants autoSteerPID, boolean autoFlipWithAllianceColor, boolean isSimulation) {
+			PIDConstants autoSteerPID, boolean autoFlipWithAllianceColor, boolean isSimulation,
+			ReplanningConfig autoReplanningConfig) {
 
 		simTimer.start();
 
@@ -130,6 +140,8 @@ public class SN_SuperSwerve extends SubsystemBase {
 				new Translation2d(-wheelbase / 2.0, -trackWidth / 2.0));
 
 		this.modules = modules;
+		this.wheelbase = wheelbase;
+		this.trackWidth = trackWidth;
 		this.stateStdDevs = stateStdDevs;
 		this.visionStdDevs = visionStdDevs;
 		this.autoFlipWithAllianceColor = autoFlipWithAllianceColor;
@@ -137,6 +149,7 @@ public class SN_SuperSwerve extends SubsystemBase {
 		this.autoDrivePID = autoDrivePID;
 		this.autoSteerPID = autoSteerPID;
 		this.isSimulation = isSimulation;
+		this.autoReplanningConfig = autoReplanningConfig;
 
 		SN_SwerveModule.isSimulation = isSimulation;
 		SN_SwerveModule.wheelCircumference = swerveConstants.wheelCircumference;
@@ -169,8 +182,14 @@ public class SN_SuperSwerve extends SubsystemBase {
 		swervePoseEstimator = new SwerveDrivePoseEstimator(swerveKinematics, getRotation(), getModulePositions(),
 				new Pose2d(), stateStdDevs, visionStdDevs);
 
-		swerveAutoBuilder = new SwerveAutoBuilder(this::getPose, this::resetPoseToPose, swerveKinematics, autoDrivePID,
-				autoSteerPID, this::setModuleStatesAuto, autoEventMap, autoFlipWithAllianceColor, this);
+		// TODO: MOVE SOMEWHERE ELSE BEFORE PRing
+		double driveBaseRadius = 0; // Drive base radius in meters. Distance from robot center to furthest module.
+		driveBaseRadius = Math.sqrt(Math.pow((wheelbase / 2), 2) + Math.pow((trackWidth / 2), 2));
+
+		AutoBuilder.configureHolonomic(this::getPose, this::resetPoseToPose, this::getChassisSpeeds,
+				this::driveAutonomous, new HolonomicPathFollowerConfig(autoDrivePID, autoSteerPID,
+						swerveConstants.maxSpeedMeters, driveBaseRadius, autoReplanningConfig),
+				this);
 
 	}
 
@@ -199,6 +218,30 @@ public class SN_SuperSwerve extends SubsystemBase {
 	}
 
 	/**
+	 * Get the state (velocity, angle) of each module.
+	 *
+	 * @return An Array of Swerve module states (velocity, angle)
+	 */
+	public SwerveModuleState[] getModuleStates() {
+		SwerveModuleState[] states = new SwerveModuleState[4];
+
+		for (SN_SwerveModule mod : modules) {
+			states[mod.moduleNumber] = mod.getModuleState();
+		}
+
+		return states;
+	}
+
+	/**
+	 * Returns the robot-relative chassis speeds.
+	 *
+	 * @return The robot-relative chassis speeds
+	 */
+	public ChassisSpeeds getChassisSpeeds() {
+		return swerveKinematics.toChassisSpeeds(getModuleStates());
+	}
+
+	/**
 	 * Set the states (velocity and position) of the modules.
 	 *
 	 * @param desiredModuleStates
@@ -219,18 +262,6 @@ public class SN_SuperSwerve extends SubsystemBase {
 		for (SN_SwerveModule mod : modules) {
 			mod.setModuleState(desiredModuleStates[mod.moduleNumber], isOpenLoop);
 		}
-	}
-
-	/**
-	 * Set the states (velocity and position) of the modules in autonomous. These
-	 * are always set with closed-loop control.
-	 *
-	 * @param desiredModuleStates
-	 *            Desired states to set the modules to
-	 *
-	 */
-	private void setModuleStatesAuto(SwerveModuleState[] desiredModuleStates) {
-		setModuleStates(desiredModuleStates, false);
 	}
 
 	/**
@@ -257,6 +288,18 @@ public class SN_SuperSwerve extends SubsystemBase {
 
 		SwerveModuleState[] desiredModuleStates = swerveKinematics.toSwerveModuleStates(discretize(chassisSpeeds));
 		setModuleStates(desiredModuleStates, isOpenLoop);
+	}
+
+	/**
+	 * Drive the drivetrain in autonomous. Autonomous driving is always closed loop.
+	 *
+	 * @param chassisSpeeds
+	 *            Desired robot-relative chassis speeds
+	 *
+	 */
+	public void driveAutonomous(ChassisSpeeds chassisSpeeds) {
+		SwerveModuleState[] desiredModuleStates = swerveKinematics.toSwerveModuleStates(discretize(chassisSpeeds));
+		setModuleStates(desiredModuleStates, false);
 	}
 
 	// TODO: Replace with WPILib ChassisSpeeds.discretize when 2024 releases

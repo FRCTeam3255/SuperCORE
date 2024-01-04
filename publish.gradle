@@ -115,7 +115,13 @@ tasks.register('cleanPublishSuperCORELocalDev') {
     description = 'Creates a local export of SuperCORE. Installable as vendor dep using http://127.0.0.1:5500/releases/com/frcteam3255/supercore/SuperCORE-latest.json'
     vendorFileInput = file("src/generate/LocalSuperCORE.json")
     dependsOn tasks.cleanReleaseRepo
-    dependsOn tasks.publishSuperCORE
+    group = 'supercore'
+    dependsOn clean
+    dependsOn tasks.withType(PublishToMavenRepository).matching {
+        it.repository == publishing.repositories.Local
+    }
+    dependsOn tasks.generateVendorJson
+    finalizedBy tasks.publishJavaDoc
 }
 
 task publishJavaDoc(){

@@ -6,8 +6,8 @@ package com.frcteam3255.components.swerve;
 
 import java.util.HashMap;
 
-import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.sensors.Pigeon2;
+import com.ctre.phoenix6.hardware.Pigeon2;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.PathPlannerTrajectory;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
@@ -121,7 +121,7 @@ public class SN_SuperSwerve extends SubsystemBase {
 	 */
 	public SN_SuperSwerve(SN_SwerveConstants swerveConstants, SN_SwerveModule[] modules, double wheelbase,
 			double trackWidth, String CANBusName, int pigeonCANId, double minimumSteerPercent, boolean isDriveInverted,
-			boolean isSteerInverted, NeutralMode driveNeutralMode, NeutralMode steerNeutralMode,
+			boolean isSteerInverted, NeutralModeValue driveNeutralMode, NeutralModeValue steerNeutralMode,
 			Matrix<N3, N1> stateStdDevs, Matrix<N3, N1> visionStdDevs, PIDConstants autoDrivePID,
 			PIDConstants autoSteerPID, ReplanningConfig autoReplanningConfig, boolean isSimulation) {
 
@@ -387,7 +387,7 @@ public class SN_SuperSwerve extends SubsystemBase {
 			simAngle += swerveKinematics.toChassisSpeeds(lastDesiredStates).omegaRadiansPerSecond * timeFromLastUpdate;
 			return new Rotation2d(simAngle);
 		}
-		return Rotation2d.fromDegrees(pigeon.getYaw());
+		return Rotation2d.fromDegrees(pigeon.getAngle());
 	}
 
 	/**

@@ -4,11 +4,15 @@
 
 package com.frcteam3255.components.swerve;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.can.TalonFX;
-import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
-import com.ctre.phoenix.sensors.CANCoder;
+import com.ctre.phoenix6.configs.CANcoderConfiguration;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.NeutralOut;
+import com.ctre.phoenix6.controls.PositionDutyCycle;
+import com.ctre.phoenix6.controls.VelocityDutyCycle;
+import com.ctre.phoenix6.controls.VoltageOut;
+import com.ctre.phoenix6.hardware.CANcoder;
+import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.frcteam3255.utils.CTREModuleState;
 import com.frcteam3255.utils.SN_Math;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -23,7 +27,7 @@ public class SN_SwerveModule extends SubsystemBase {
 	private TalonFX driveMotor;
 	private TalonFX steerMotor;
 
-	private CANCoder absoluteEncoder;
+	private CANcoder absoluteEncoder;
 	private double absoluteEncoderOffset;
 
 	public int moduleNumber;
@@ -32,9 +36,9 @@ public class SN_SwerveModule extends SubsystemBase {
 	public static TalonFXConfiguration driveConfiguration;
 	public static TalonFXConfiguration steerConfiguration;
 	public static boolean isDriveInverted = false;
-	public static NeutralMode driveNeutralMode = NeutralMode.Brake;
+	public static NeutralModeValue driveNeutralMode = NeutralModeValue.Brake;
 	public static boolean isSteerInverted = true;
-	public static NeutralMode steerNeutralMode = NeutralMode.Coast;
+	public static NeutralModeValue steerNeutralMode = NeutralModeValue.Coast;
 	public static String CANBusName = "Swerve";
 	public static double minimumSteerSpeedPercent = 0.01;
 
@@ -81,7 +85,7 @@ public class SN_SwerveModule extends SubsystemBase {
 		driveMotor = new TalonFX(driveMotorID, CANBusName);
 		steerMotor = new TalonFX(steerMotorID, CANBusName);
 
-		absoluteEncoder = new CANCoder(absoluteEncoderID, CANBusName);
+		absoluteEncoder = new CANcoder(absoluteEncoderID, CANBusName);
 		this.absoluteEncoderOffset = absoluteEncoderOffset;
 
 		driveConfiguration = new TalonFXConfiguration();
@@ -89,24 +93,20 @@ public class SN_SwerveModule extends SubsystemBase {
 	}
 
 	public void configure() {
-		// -*- Drive Motor Config -*-
-		driveMotor.configFactoryDefault();
-
-		driveMotor.setNeutralMode(driveNeutralMode);
+		// -*- Drive Motor Config -*
 		driveMotor.setInverted(isDriveInverted);
+		driveConfiguration.MotorOutput.NeutralMode = driveNeutralMode;
 
-		driveMotor.configAllSettings(driveConfiguration);
+		driveMotor.getConfigurator().apply(driveConfiguration);
 
 		// -*- Steer Motor Config -*-
-		steerMotor.configFactoryDefault();
-
-		steerMotor.setNeutralMode(steerNeutralMode);
 		steerMotor.setInverted(isSteerInverted);
+		steerConfiguration.MotorOutput.NeutralMode = steerNeutralMode;
 
-		steerMotor.configAllSettings(steerConfiguration);
+		steerMotor.getConfigurator().apply(steerConfiguration);
 
 		// -*- Absolute Encoder Config -*-
-		absoluteEncoder.configFactoryDefault();
+		absoluteEncoder.getConfigurator().apply(new CANcoderConfiguration());
 	}
 
 	/**
@@ -116,7 +116,7 @@ public class SN_SwerveModule extends SubsystemBase {
 	 * @return Position in degrees
 	 */
 	public double getRawAbsoluteEncoder() {
-		return absoluteEncoder.getAbsolutePosition();
+		return absoluteEncoder.getAbsolutePosition().getValue();
 	}
 
 	/**
@@ -143,14 +143,14 @@ public class SN_SwerveModule extends SubsystemBase {
 	public void resetSteerMotorToAbsolute() {
 		double absoluteEncoderCount = SN_Math.degreesToFalcon(getAbsoluteEncoder(), steerGearRatio);
 
-		steerMotor.setSelectedSensorPosition(absoluteEncoderCount);
+		steerMotor.setRotorPosition(absoluteEncoderCount);
 	}
 
 	/**
 	 * Reset the drive motor's encoder to 0.
 	 */
 	public void resetDriveMotorEncoder() {
-		driveMotor.setSelectedSensorPosition(0);
+		driveMotor.setRotorPosition(0);
 	}
 
 	/**
@@ -160,11 +160,11 @@ public class SN_SwerveModule extends SubsystemBase {
 	 */
 	public SwerveModuleState getModuleState() {
 
-		double velocity = SN_Math.falconToMPS(driveMotor.getSelectedSensorVelocity(), wheelCircumference,
+		double velocity = SN_Math.falconToMPS(driveMotor.getVelocity().getValue(), wheelCircumference,
 				driveGearRatio);
 
 		Rotation2d angle = Rotation2d
-				.fromDegrees(SN_Math.falconToDegrees(steerMotor.getSelectedSensorPosition(), steerGearRatio));
+				.fromDegrees(SN_Math.falconToDegrees(steerMotor.getVelocity().getValue(), steerGearRatio));
 
 		return new SwerveModuleState(velocity, angle);
 	}
@@ -184,11 +184,11 @@ public class SN_SwerveModule extends SubsystemBase {
 			return new SwerveModulePosition(desiredDrivePosition, lastDesiredSwerveModuleState.angle);
 		}
 
-		double distance = SN_Math.falconToMeters(driveMotor.getSelectedSensorPosition(), wheelCircumference,
+		double distance = SN_Math.falconToMeters(driveMotor.getPosition().getValue(), wheelCircumference,
 				driveGearRatio);
 
 		Rotation2d angle = Rotation2d
-				.fromDegrees(SN_Math.falconToDegrees(steerMotor.getSelectedSensorPosition(), steerGearRatio));
+				.fromDegrees(SN_Math.falconToDegrees(steerMotor.getPosition().getValue(), steerGearRatio));
 
 		return new SwerveModulePosition(distance, angle);
 	}
@@ -197,7 +197,7 @@ public class SN_SwerveModule extends SubsystemBase {
 	 * Neutral the drive motor output.
 	 */
 	public void neutralDriveOutput() {
-		driveMotor.neutralOutput();
+		driveMotor.setControl(new NeutralOut());
 	}
 
 	/**
@@ -221,13 +221,10 @@ public class SN_SwerveModule extends SubsystemBase {
 		if (isOpenLoop) {
 			// Setting the motor to PercentOutput uses a percent of the motors max output.
 			// So, the requested speed divided by it's max speed.
-			double percentOutput = state.speedMetersPerSecond / maxModuleSpeedMeters;
-			driveMotor.set(ControlMode.PercentOutput, percentOutput);
-
+			driveMotor.setControl(new VoltageOut(0).withOutput(state.speedMetersPerSecond / maxModuleSpeedMeters));
 		} else {
 			double velocity = SN_Math.MPSToFalcon(state.speedMetersPerSecond, wheelCircumference, driveGearRatio);
-
-			driveMotor.set(ControlMode.Velocity, velocity);
+			driveMotor.setControl(new VelocityDutyCycle(velocity));
 		}
 
 		// -*- Setting the Steer Motor -*-
@@ -239,6 +236,6 @@ public class SN_SwerveModule extends SubsystemBase {
 		if (Math.abs(state.speedMetersPerSecond) < (minimumSteerSpeedPercent * maxModuleSpeedMeters)) {
 			return;
 		}
-		steerMotor.set(ControlMode.Position, angle);
+		steerMotor.setControl(new PositionDutyCycle(angle));
 	}
 }

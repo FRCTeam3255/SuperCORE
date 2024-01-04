@@ -160,8 +160,7 @@ public class SN_SwerveModule extends SubsystemBase {
 	 */
 	public SwerveModuleState getModuleState() {
 
-		double velocity = SN_Math.falconToMPS(driveMotor.getVelocity().getValue(), wheelCircumference,
-				driveGearRatio);
+		double velocity = SN_Math.falconToMPS(driveMotor.getVelocity().getValue(), wheelCircumference, driveGearRatio);
 
 		Rotation2d angle = Rotation2d
 				.fromDegrees(SN_Math.falconToDegrees(steerMotor.getVelocity().getValue(), steerGearRatio));

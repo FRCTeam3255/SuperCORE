@@ -143,14 +143,14 @@ public class SN_SwerveModule extends SubsystemBase {
 	public void resetSteerMotorToAbsolute() {
 		double absoluteEncoderCount = SN_Math.degreesToFalcon(getAbsoluteEncoder(), steerGearRatio);
 
-		steerMotor.setRotorPosition(absoluteEncoderCount);
+		steerMotor.setPosition(absoluteEncoderCount);
 	}
 
 	/**
 	 * Reset the drive motor's encoder to 0.
 	 */
 	public void resetDriveMotorEncoder() {
-		driveMotor.setRotorPosition(0);
+		driveMotor.setPosition(0);
 	}
 
 	/**

@@ -387,7 +387,7 @@ public class SN_SuperSwerve extends SubsystemBase {
 			simAngle += swerveKinematics.toChassisSpeeds(lastDesiredStates).omegaRadiansPerSecond * timeFromLastUpdate;
 			return new Rotation2d(simAngle);
 		}
-		return Rotation2d.fromDegrees(pigeon.getAngle());
+		return Rotation2d.fromDegrees(pigeon.getYaw().getValue());
 	}
 
 	/**

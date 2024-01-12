@@ -49,7 +49,7 @@ public class SN_SuperSwerve extends SubsystemBase {
 	private Matrix<N3, N1> stateStdDevs;
 	private Matrix<N3, N1> visionStdDevs;
 	public HashMap<String, Command> autoEventMap = new HashMap<>();
-	private boolean flipAutoPaths;
+	private boolean autoFlipPaths;
 	private ReplanningConfig autoReplanningConfig;
 
 	public PathPlannerTrajectory exampleAuto;
@@ -116,7 +116,7 @@ public class SN_SuperSwerve extends SubsystemBase {
 	 *            <a href=
 	 *            "https://mjansen4857.com/pathplanner/docs/java/com/pathplanner/lib/util/ReplanningConfig.html">PathPlanner
 	 *            API</a> for more information
-	 * @param autoFlipField
+	 * @param autoFlipPaths
 	 *            Determines if paths should be flipped to the other side of the
 	 *            field. This will maintain a global blue alliance origin. Used for
 	 *            PathPlanner
@@ -128,7 +128,7 @@ public class SN_SuperSwerve extends SubsystemBase {
 			double trackWidth, String CANBusName, int pigeonCANId, double minimumSteerPercent, boolean isDriveInverted,
 			boolean isSteerInverted, NeutralModeValue driveNeutralMode, NeutralModeValue steerNeutralMode,
 			Matrix<N3, N1> stateStdDevs, Matrix<N3, N1> visionStdDevs, PIDConstants autoDrivePID,
-			PIDConstants autoSteerPID, ReplanningConfig autoReplanningConfig, boolean flipAutoPaths,
+			PIDConstants autoSteerPID, ReplanningConfig autoReplanningConfig, boolean autoFlipPaths,
 			boolean isSimulation) {
 
 		simTimer.start();
@@ -150,7 +150,7 @@ public class SN_SuperSwerve extends SubsystemBase {
 		this.autoSteerPID = autoSteerPID;
 		this.isSimulation = isSimulation;
 		this.autoReplanningConfig = autoReplanningConfig;
-		this.flipAutoPaths = flipAutoPaths;
+		this.autoFlipPaths = autoFlipPaths;
 
 		SN_SwerveModule.isSimulation = isSimulation;
 		SN_SwerveModule.wheelCircumference = swerveConstants.wheelCircumference;
@@ -187,7 +187,7 @@ public class SN_SuperSwerve extends SubsystemBase {
 		AutoBuilder.configureHolonomic(this::getPose, this::resetPoseToPose, this::getChassisSpeeds,
 				this::driveAutonomous, new HolonomicPathFollowerConfig(autoDrivePID, autoSteerPID,
 						swerveConstants.maxSpeedMeters, driveBaseRadius, autoReplanningConfig),
-				() -> flipAutoPaths, this);
+				() -> autoFlipPaths, this);
 	}
 
 	/**

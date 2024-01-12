@@ -49,6 +49,7 @@ public class SN_SuperSwerve extends SubsystemBase {
 	private Matrix<N3, N1> stateStdDevs;
 	private Matrix<N3, N1> visionStdDevs;
 	public HashMap<String, Command> autoEventMap = new HashMap<>();
+	private boolean flipAutoPaths;
 	private ReplanningConfig autoReplanningConfig;
 
 	public PathPlannerTrajectory exampleAuto;
@@ -115,6 +116,10 @@ public class SN_SuperSwerve extends SubsystemBase {
 	 *            <a href=
 	 *            "https://mjansen4857.com/pathplanner/docs/java/com/pathplanner/lib/util/ReplanningConfig.html">PathPlanner
 	 *            API</a> for more information
+	 * @param autoFlipField
+	 *            Determines if paths should be flipped to the other side of the
+	 *            field. This will maintain a global blue alliance origin. Used for
+	 *            PathPlanner
 	 * @param isSimulation
 	 *            If your robot is running in Simulation. As of 2023, you can supply
 	 *            this with Robot.isSimulation();
@@ -123,7 +128,8 @@ public class SN_SuperSwerve extends SubsystemBase {
 			double trackWidth, String CANBusName, int pigeonCANId, double minimumSteerPercent, boolean isDriveInverted,
 			boolean isSteerInverted, NeutralModeValue driveNeutralMode, NeutralModeValue steerNeutralMode,
 			Matrix<N3, N1> stateStdDevs, Matrix<N3, N1> visionStdDevs, PIDConstants autoDrivePID,
-			PIDConstants autoSteerPID, ReplanningConfig autoReplanningConfig, boolean isSimulation) {
+			PIDConstants autoSteerPID, ReplanningConfig autoReplanningConfig, boolean flipAutoPaths,
+			boolean isSimulation) {
 
 		simTimer.start();
 
@@ -144,6 +150,7 @@ public class SN_SuperSwerve extends SubsystemBase {
 		this.autoSteerPID = autoSteerPID;
 		this.isSimulation = isSimulation;
 		this.autoReplanningConfig = autoReplanningConfig;
+		this.flipAutoPaths = flipAutoPaths;
 
 		SN_SwerveModule.isSimulation = isSimulation;
 		SN_SwerveModule.wheelCircumference = swerveConstants.wheelCircumference;
@@ -180,8 +187,7 @@ public class SN_SuperSwerve extends SubsystemBase {
 		AutoBuilder.configureHolonomic(this::getPose, this::resetPoseToPose, this::getChassisSpeeds,
 				this::driveAutonomous, new HolonomicPathFollowerConfig(autoDrivePID, autoSteerPID,
 						swerveConstants.maxSpeedMeters, driveBaseRadius, autoReplanningConfig),
-				this);
-
+				() -> flipAutoPaths, this);
 	}
 
 	/**

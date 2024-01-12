@@ -62,13 +62,12 @@ public class SN_SuperSwerve extends SubsystemBase {
 	private double lastSimTime = simTimer.get();
 	private Field2d field;
 
-	// TODO: Create Example Implementation
 	/**
 	 * <p>
 	 * A superclass for a Swerve Drive. Your Drivetrain subsystem should extend from
-	 * this class. View an example implementation here: REALLY COOL LINK HERE
+	 * this class. View an example implementation here:
+	 * https://github.com/FRCTeam3255/Standard_Swerve_Code
 	 * </p>
-	 * Derived from https://github.com/ACat701/SuperSwerve23
 	 *
 	 * @param swerveConstants
 	 *            The constants for all of your modules, such as gear ratio and max

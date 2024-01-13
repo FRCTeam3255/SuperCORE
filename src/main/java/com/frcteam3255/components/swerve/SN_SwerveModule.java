@@ -26,6 +26,10 @@ public class SN_SwerveModule extends SubsystemBase {
 	// -*- Module-Specific -*-
 	private TalonFX driveMotor;
 	private TalonFX steerMotor;
+	private VoltageOut driveMotorControllerOpen;
+	private VelocityDutyCycle driveMotorControllerClosed;
+
+	private PositionDutyCycle steerMotorController;
 
 	private CANcoder absoluteEncoder;
 	private double absoluteEncoderOffset;
@@ -84,6 +88,9 @@ public class SN_SwerveModule extends SubsystemBase {
 
 		driveMotor = new TalonFX(driveMotorID, CANBusName);
 		steerMotor = new TalonFX(steerMotorID, CANBusName);
+		driveMotorControllerOpen = new VoltageOut(0);
+		driveMotorControllerClosed = new VelocityDutyCycle(0);
+		steerMotorController = new PositionDutyCycle(0);
 
 		absoluteEncoder = new CANcoder(absoluteEncoderID, CANBusName);
 		this.absoluteEncoderOffset = absoluteEncoderOffset;
@@ -141,7 +148,7 @@ public class SN_SwerveModule extends SubsystemBase {
 	 * it's rotation.
 	 */
 	public void resetSteerMotorToAbsolute() {
-		double absoluteEncoderCount = SN_Math.degreesToFalcon(getAbsoluteEncoder(), steerGearRatio);
+		double absoluteEncoderCount = SN_Math.degreesToRotations(getAbsoluteEncoder(), steerGearRatio);
 
 		steerMotor.setPosition(absoluteEncoderCount);
 	}
@@ -160,10 +167,11 @@ public class SN_SwerveModule extends SubsystemBase {
 	 */
 	public SwerveModuleState getModuleState() {
 
-		double velocity = SN_Math.falconToMPS(driveMotor.getVelocity().getValue(), wheelCircumference, driveGearRatio);
+		double velocity = SN_Math.rotationsToMPS(driveMotor.getVelocity().getValue(), wheelCircumference,
+				driveGearRatio);
 
 		Rotation2d angle = Rotation2d
-				.fromDegrees(SN_Math.falconToDegrees(steerMotor.getPosition().getValue(), steerGearRatio));
+				.fromDegrees(SN_Math.rotationsToDegrees(steerMotor.getPosition().getValue(), steerGearRatio));
 
 		return new SwerveModuleState(velocity, angle);
 	}
@@ -183,11 +191,11 @@ public class SN_SwerveModule extends SubsystemBase {
 			return new SwerveModulePosition(desiredDrivePosition, lastDesiredSwerveModuleState.angle);
 		}
 
-		double distance = SN_Math.falconToMeters(driveMotor.getPosition().getValue(), wheelCircumference,
+		double distance = SN_Math.rotationsToMeters(driveMotor.getPosition().getValue(), wheelCircumference,
 				driveGearRatio);
 
 		Rotation2d angle = Rotation2d
-				.fromDegrees(SN_Math.falconToDegrees(steerMotor.getPosition().getValue(), steerGearRatio));
+				.fromDegrees(SN_Math.rotationsToDegrees(steerMotor.getPosition().getValue(), steerGearRatio));
 
 		return new SwerveModulePosition(distance, angle);
 	}
@@ -220,22 +228,23 @@ public class SN_SwerveModule extends SubsystemBase {
 		if (isOpenLoop) {
 			// Setting the motor to PercentOutput uses a percent of the motors max output.
 			// So, the requested speed divided by it's max speed.
-			driveMotor
-					.setControl(new VoltageOut(0).withOutput((state.speedMetersPerSecond / maxModuleSpeedMeters) * 12));
+			driveMotor.setControl(
+					driveMotorControllerOpen.withOutput((state.speedMetersPerSecond / maxModuleSpeedMeters) * 12));
 		} else {
-			double velocity = SN_Math.MPSToFalcon(state.speedMetersPerSecond, wheelCircumference, driveGearRatio);
-			driveMotor.setControl(new VelocityDutyCycle(0).withVelocity(velocity));
+			double velocity = SN_Math.MPSToFalconRotations(state.speedMetersPerSecond, wheelCircumference,
+					driveGearRatio);
+			driveMotor.setControl(driveMotorControllerClosed.withVelocity(velocity));
 		}
 
 		// -*- Setting the Steer Motor -*-
 
-		double angle = SN_Math.degreesToFalcon(state.angle.getDegrees(), steerGearRatio);
+		double rotation = SN_Math.degreesToRotations(state.angle.getDegrees(), steerGearRatio);
 
 		// If the requested speed is lower than a relevant steering speed,
 		// don't turn the motor. Set it to whatever it's previous angle was.
 		if (Math.abs(state.speedMetersPerSecond) < (minimumSteerSpeedPercent * maxModuleSpeedMeters)) {
 			return;
 		}
-		steerMotor.setControl(new PositionDutyCycle(0).withPosition(angle));
+		steerMotor.setControl(steerMotorController.withPosition(rotation));
 	}
 }

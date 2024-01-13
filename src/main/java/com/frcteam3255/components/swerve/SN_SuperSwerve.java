@@ -57,6 +57,7 @@ public class SN_SuperSwerve extends SubsystemBase {
 	private boolean isSimulation;
 	private double simAngle = 0;
 	private SwerveModuleState[] lastDesiredStates;
+	public double[] swerveDesiredStates = new double[8];
 	private double timeFromLastUpdate = 0;
 	private Timer simTimer = new Timer();
 	private double lastSimTime = simTimer.get();
@@ -255,6 +256,11 @@ public class SN_SuperSwerve extends SubsystemBase {
 		// well
 		SwerveDriveKinematics.desaturateWheelSpeeds(desiredModuleStates, swerveConstants.maxSpeedMeters);
 
+		for (int i = 0; i < 8; i += 2) {
+			swerveDesiredStates[i] = desiredModuleStates[i / 2].angle.getRadians();
+			swerveDesiredStates[i + 1] = desiredModuleStates[i / 2].speedMetersPerSecond;
+		}
+
 		for (SN_SwerveModule mod : modules) {
 			mod.setModuleState(desiredModuleStates[mod.moduleNumber], isOpenLoop);
 		}
@@ -432,5 +438,7 @@ public class SN_SuperSwerve extends SubsystemBase {
 
 		field.setRobotPose(getPose());
 		SmartDashboard.putData(field);
+
+		SmartDashboard.putNumberArray("Drivetrain/DesiredStates", swerveDesiredStates);
 	}
 }

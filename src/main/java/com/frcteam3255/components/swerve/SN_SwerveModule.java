@@ -163,7 +163,7 @@ public class SN_SwerveModule extends SubsystemBase {
 		double velocity = SN_Math.falconToMPS(driveMotor.getVelocity().getValue(), wheelCircumference, driveGearRatio);
 
 		Rotation2d angle = Rotation2d
-				.fromDegrees(SN_Math.falconToDegrees(steerMotor.getVelocity().getValue(), steerGearRatio));
+				.fromDegrees(SN_Math.falconToDegrees(steerMotor.getPosition().getValue(), steerGearRatio));
 
 		return new SwerveModuleState(velocity, angle);
 	}
@@ -220,10 +220,11 @@ public class SN_SwerveModule extends SubsystemBase {
 		if (isOpenLoop) {
 			// Setting the motor to PercentOutput uses a percent of the motors max output.
 			// So, the requested speed divided by it's max speed.
-			driveMotor.setControl(new VoltageOut(0).withOutput(state.speedMetersPerSecond / maxModuleSpeedMeters));
+			driveMotor
+					.setControl(new VoltageOut(0).withOutput((state.speedMetersPerSecond / maxModuleSpeedMeters) * 12));
 		} else {
 			double velocity = SN_Math.MPSToFalcon(state.speedMetersPerSecond, wheelCircumference, driveGearRatio);
-			driveMotor.setControl(new VelocityDutyCycle(velocity));
+			driveMotor.setControl(new VelocityDutyCycle(0).withVelocity(velocity));
 		}
 
 		// -*- Setting the Steer Motor -*-
@@ -235,6 +236,6 @@ public class SN_SwerveModule extends SubsystemBase {
 		if (Math.abs(state.speedMetersPerSecond) < (minimumSteerSpeedPercent * maxModuleSpeedMeters)) {
 			return;
 		}
-		steerMotor.setControl(new PositionDutyCycle(angle));
+		steerMotor.setControl(new PositionDutyCycle(0).withPosition(angle));
 	}
 }

@@ -434,6 +434,8 @@ public class SN_SuperSwerve extends SubsystemBase {
 					mod.getAbsoluteEncoder());
 			SmartDashboard.putNumber("Drivetrain/Module " + mod.moduleNumber + "/Absolute Encoder Raw Value",
 					mod.getRawAbsoluteEncoder());
+			SmartDashboard.putNumber("Drivetrain/Module " + mod.moduleNumber + "/Desired Angle",
+					swerveDesiredStates[mod.moduleNumber * 2]);
 		}
 
 		field.setRobotPose(getPose());

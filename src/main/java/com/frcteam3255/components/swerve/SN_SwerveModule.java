@@ -75,9 +75,9 @@ public class SN_SwerveModule extends SubsystemBase {
 	 * @param absoluteEncoderID
 	 *            The CAN id of the CANcoder
 	 * @param absoluteEncoderOffset
-	 *            The offset of the CANcoder in degrees. This is typically obtained
-	 *            by aligning all of the wheels in the appropriate direction and
-	 *            then copying the Raw Absolute encoder value.
+	 *            The offset of the CANcoder in rotations. This is typically
+	 *            obtained by aligning all of the wheels in the appropriate
+	 *            direction and then copying the Raw Absolute encoder value.
 	 */
 	public SN_SwerveModule(int moduleNumber, int driveMotorID, int steerMotorID, int absoluteEncoderID,
 			double absoluteEncoderOffset) {
@@ -120,7 +120,7 @@ public class SN_SwerveModule extends SubsystemBase {
 	 * Get the current raw position (no offset applied) of the module's absolute
 	 * encoder. This value will NOT match the physical angle of the wheel.
 	 *
-	 * @return Position in degrees
+	 * @return Position in rotations
 	 */
 	public double getRawAbsoluteEncoder() {
 		return absoluteEncoder.getAbsolutePosition().getValue();
@@ -130,16 +130,16 @@ public class SN_SwerveModule extends SubsystemBase {
 	 * Get the current position, with the offset applied, of the module's absolute
 	 * encoder. This value should match the physical angle of the module's wheel.
 	 *
-	 * @return Position in degrees, with the module's offset
+	 * @return Position in rotations, with the module's offset
 	 */
 	public double getAbsoluteEncoder() {
-		double degrees = getRawAbsoluteEncoder();
+		double rotations = getRawAbsoluteEncoder();
 
 		// "This could make the value negative but it doesn't matter." - Ian 2023
 		// 99% confident that it's because it's a continuous circle
-		degrees -= absoluteEncoderOffset;
+		rotations -= absoluteEncoderOffset;
 
-		return degrees;
+		return rotations;
 	}
 
 	/**
@@ -148,7 +148,7 @@ public class SN_SwerveModule extends SubsystemBase {
 	 * it's rotation.
 	 */
 	public void resetSteerMotorToAbsolute() {
-		double absoluteEncoderCount = SN_Math.degreesToRotations(getAbsoluteEncoder(), steerGearRatio);
+		double absoluteEncoderCount = (getAbsoluteEncoder() * steerGearRatio);
 
 		steerMotor.setPosition(absoluteEncoderCount);
 	}

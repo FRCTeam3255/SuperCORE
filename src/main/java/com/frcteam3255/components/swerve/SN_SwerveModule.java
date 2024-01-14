@@ -103,12 +103,15 @@ public class SN_SwerveModule extends SubsystemBase {
 		// -*- Drive Motor Config -*
 		driveMotor.setInverted(isDriveInverted);
 		driveConfiguration.MotorOutput.NeutralMode = driveNeutralMode;
+		driveConfiguration.Feedback.SensorToMechanismRatio = driveGearRatio;
 
 		driveMotor.getConfigurator().apply(driveConfiguration);
 
 		// -*- Steer Motor Config -*-
 		steerMotor.setInverted(isSteerInverted);
 		steerConfiguration.MotorOutput.NeutralMode = steerNeutralMode;
+		steerConfiguration.Feedback.SensorToMechanismRatio = steerGearRatio;
+		steerConfiguration.ClosedLoopGeneral.ContinuousWrap = true;
 
 		steerMotor.getConfigurator().apply(steerConfiguration);
 
@@ -148,9 +151,7 @@ public class SN_SwerveModule extends SubsystemBase {
 	 * it's rotation.
 	 */
 	public void resetSteerMotorToAbsolute() {
-		double absoluteEncoderCount = (getAbsoluteEncoder() * steerGearRatio);
-
-		steerMotor.setPosition(absoluteEncoderCount);
+		steerMotor.setPosition(getAbsoluteEncoder());
 	}
 
 	/**
@@ -167,11 +168,9 @@ public class SN_SwerveModule extends SubsystemBase {
 	 */
 	public SwerveModuleState getModuleState() {
 
-		double velocity = SN_Math.rotationsToMPS(driveMotor.getVelocity().getValue(), wheelCircumference,
-				driveGearRatio);
+		double velocity = SN_Math.rotationsToMPS(driveMotor.getVelocity().getValue(), wheelCircumference, 1);
 
-		Rotation2d angle = Rotation2d
-				.fromDegrees(SN_Math.rotationsToDegrees(steerMotor.getPosition().getValue(), steerGearRatio));
+		Rotation2d angle = Rotation2d.fromDegrees(SN_Math.rotationsToDegrees(steerMotor.getPosition().getValue(), 1));
 
 		return new SwerveModuleState(velocity, angle);
 	}
@@ -191,11 +190,9 @@ public class SN_SwerveModule extends SubsystemBase {
 			return new SwerveModulePosition(desiredDrivePosition, lastDesiredSwerveModuleState.angle);
 		}
 
-		double distance = SN_Math.rotationsToMeters(driveMotor.getPosition().getValue(), wheelCircumference,
-				driveGearRatio);
+		double distance = SN_Math.rotationsToMeters(driveMotor.getPosition().getValue(), wheelCircumference, 1);
 
-		Rotation2d angle = Rotation2d
-				.fromDegrees(SN_Math.rotationsToDegrees(steerMotor.getPosition().getValue(), steerGearRatio));
+		Rotation2d angle = Rotation2d.fromDegrees(SN_Math.rotationsToDegrees(steerMotor.getPosition().getValue(), 1));
 
 		return new SwerveModulePosition(distance, angle);
 	}
@@ -231,14 +228,13 @@ public class SN_SwerveModule extends SubsystemBase {
 			driveMotor.setControl(
 					driveMotorControllerOpen.withOutput((state.speedMetersPerSecond / maxModuleSpeedMeters) * 12));
 		} else {
-			double velocity = SN_Math.MPSToFalconRotations(state.speedMetersPerSecond, wheelCircumference,
-					driveGearRatio);
+			double velocity = SN_Math.MPSToFalconRotations(state.speedMetersPerSecond, wheelCircumference, 1);
 			driveMotor.setControl(driveMotorControllerClosed.withVelocity(velocity));
 		}
 
 		// -*- Setting the Steer Motor -*-
 
-		double rotation = SN_Math.degreesToRotations(state.angle.getDegrees(), steerGearRatio);
+		double rotation = SN_Math.degreesToRotations(state.angle.getDegrees(), 1);
 
 		// If the requested speed is lower than a relevant steering speed,
 		// don't turn the motor. Set it to whatever it's previous angle was.

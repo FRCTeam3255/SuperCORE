@@ -1,4 +1,10 @@
-ext.pubVersion = '0.0.0'
+def getDate() {
+    def date = new Date()
+    def formattedDate = date.format('y.MM.dd.HH.mmss')
+    return formattedDate
+}
+
+ext.pubVersion = getDate()
 ext.releasesRepoUrl = "releases"
 ext.vendorFileInput = file("src/generate/SuperCORE.json")
 ext.groupName = 'frcteam3255'

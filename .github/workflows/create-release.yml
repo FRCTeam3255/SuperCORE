@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
 
     # This grabs the WPILib docker container
-    container: wpilib/roborio-cross-ubuntu:2022-20.04
+    container: wpilib/roborio-cross-ubuntu:2024-22.04
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -52,7 +52,7 @@ jobs:
         version=${{github.ref_name}}
         version=${version#v}
         echo Version Number: $version
-        sed -i.bak -r "s/[0-9]+.[0-9].[0-9]/$version/" config.gradle
+        sed -i.bak -r "s/[0-9]+.[0-9].[0-9]/$version/" config.gradle   
 
     - name: Publish New Version
       run: ./gradlew :publishSuperCORE

@@ -7,6 +7,7 @@ package com.frcteam3255.components.swerve;
 import java.util.HashMap;
 
 import com.ctre.phoenix6.hardware.Pigeon2;
+import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.PathPlannerTrajectory;
@@ -34,10 +35,10 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class SN_SuperSwerve extends SubsystemBase {
 	private SN_SwerveModule[] modules;
-	private SwerveDrivePoseEstimator swervePoseEstimator;
-	private SwerveDriveKinematics swerveKinematics;
+	public SwerveDrivePoseEstimator swervePoseEstimator;
+	public SwerveDriveKinematics swerveKinematics;
 	private Pigeon2 pigeon;
-	private boolean isFieldRelative;
+	public boolean isFieldRelative;
 
 	private SN_SwerveConstants swerveConstants;
 	/**
@@ -55,18 +56,23 @@ public class SN_SuperSwerve extends SubsystemBase {
 	public PathPlannerTrajectory exampleAuto;
 
 	private boolean isSimulation;
-	private double simAngle = 0;
-	private SwerveModuleState[] lastDesiredStates;
-	public double[] swerveDesiredStates = new double[8];
-	private double timeFromLastUpdate = 0;
-	private Timer simTimer = new Timer();
-	private double lastSimTime = simTimer.get();
-	private Field2d field;
+	public double simAngle = 0;
+	public SwerveModuleState[] lastDesiredStates = new SwerveModuleState[]{new SwerveModuleState(),
+			new SwerveModuleState(), new SwerveModuleState(), new SwerveModuleState()};
+	public double timeFromLastUpdate = 0;
+	public Timer simTimer = new Timer();
+	public double lastSimTime = simTimer.get();
+	public Field2d field;
 
 	/**
 	 * <p>
 	 * A superclass for a Swerve Drive. Your Drivetrain subsystem should extend from
-	 * this class. View an example implementation here:
+	 * this class. In addition to the parameters required, it is highly recommended
+	 * that you override SN_SwerveModule's driveConfiguration, steerConfiguration,
+	 * and driveFeedForward in your configure method.
+	 * </p>
+	 * <p>
+	 * View an example implementation here:
 	 * https://github.com/FRCTeam3255/Standard_Swerve_Code
 	 * </p>
 	 *
@@ -89,10 +95,10 @@ public class SN_SuperSwerve extends SubsystemBase {
 	 *            the modules
 	 * @param minimumSteerPercent
 	 *            The minimum PercentOutput required to make the steer motor move
-	 * @param isDriveInverted
-	 *            If the drive motors on every module should be inverted
-	 * @param isSteerInverted
-	 *            If the steer motors on every module should be inverted
+	 * @param driveInversion
+	 *            The direction that is positive for drive motors
+	 * @param steerInversion
+	 *            The direction that is positive for steer motors
 	 * @param driveNeutralMode
 	 *            The behavior of every drive motor when set to neutral-output
 	 * @param steerNeutralMode
@@ -125,11 +131,11 @@ public class SN_SuperSwerve extends SubsystemBase {
 	 *            this with Robot.isSimulation();
 	 */
 	public SN_SuperSwerve(SN_SwerveConstants swerveConstants, SN_SwerveModule[] modules, double wheelbase,
-			double trackWidth, String CANBusName, int pigeonCANId, double minimumSteerPercent, boolean isDriveInverted,
-			boolean isSteerInverted, NeutralModeValue driveNeutralMode, NeutralModeValue steerNeutralMode,
-			Matrix<N3, N1> stateStdDevs, Matrix<N3, N1> visionStdDevs, PIDConstants autoDrivePID,
-			PIDConstants autoSteerPID, ReplanningConfig autoReplanningConfig, boolean autoFlipPaths,
-			boolean isSimulation) {
+			double trackWidth, String CANBusName, int pigeonCANId, double minimumSteerPercent,
+			InvertedValue driveInversion, InvertedValue steerInversion, NeutralModeValue driveNeutralMode,
+			NeutralModeValue steerNeutralMode, Matrix<N3, N1> stateStdDevs, Matrix<N3, N1> visionStdDevs,
+			PIDConstants autoDrivePID, PIDConstants autoSteerPID, ReplanningConfig autoReplanningConfig,
+			boolean autoFlipPaths, boolean isSimulation) {
 
 		simTimer.start();
 
@@ -161,10 +167,10 @@ public class SN_SuperSwerve extends SubsystemBase {
 		SN_SwerveModule.CANBusName = CANBusName;
 		SN_SwerveModule.minimumSteerSpeedPercent = minimumSteerPercent;
 
-		SN_SwerveModule.isDriveInverted = isDriveInverted;
+		SN_SwerveModule.driveInversion = driveInversion;
 		SN_SwerveModule.driveNeutralMode = driveNeutralMode;
 
-		SN_SwerveModule.isSteerInverted = isSteerInverted;
+		SN_SwerveModule.steerInversion = steerInversion;
 		SN_SwerveModule.steerNeutralMode = steerNeutralMode;
 
 		driveBaseRadius = Math.sqrt(Math.pow((wheelbase / 2), 2) + Math.pow((trackWidth / 2), 2));
@@ -255,11 +261,6 @@ public class SN_SuperSwerve extends SubsystemBase {
 		// be done here because speeds must be lowered relative to the other speeds as
 		// well
 		SwerveDriveKinematics.desaturateWheelSpeeds(desiredModuleStates, swerveConstants.maxSpeedMeters);
-
-		for (int i = 0; i < 8; i += 2) {
-			swerveDesiredStates[i] = desiredModuleStates[i / 2].angle.getRadians();
-			swerveDesiredStates[i + 1] = desiredModuleStates[i / 2].speedMetersPerSecond;
-		}
 
 		for (SN_SwerveModule mod : modules) {
 			mod.setModuleState(desiredModuleStates[mod.moduleNumber], isOpenLoop);
@@ -430,17 +431,17 @@ public class SN_SuperSwerve extends SubsystemBase {
 					Units.metersToFeet(mod.getModulePosition().distanceMeters));
 			SmartDashboard.putNumber("Drivetrain/Module " + mod.moduleNumber + "/Angle",
 					mod.getModuleState().angle.getDegrees());
+			SmartDashboard.putNumber("Drivetrain/Module " + mod.moduleNumber + "/Desired Angle Degrees",
+					lastDesiredStates[mod.moduleNumber].angle.getDegrees());
 			SmartDashboard.putNumber("Drivetrain/Module " + mod.moduleNumber + "/Absolute Encoder Angle (WITH OFFSET)",
 					mod.getAbsoluteEncoder());
 			SmartDashboard.putNumber("Drivetrain/Module " + mod.moduleNumber + "/Absolute Encoder Raw Value",
 					mod.getRawAbsoluteEncoder());
-			SmartDashboard.putNumber("Drivetrain/Module " + mod.moduleNumber + "/Desired Angle",
-					swerveDesiredStates[mod.moduleNumber * 2]);
+
 		}
 
 		field.setRobotPose(getPose());
 		SmartDashboard.putData(field);
 
-		SmartDashboard.putNumberArray("Drivetrain/DesiredStates", swerveDesiredStates);
 	}
 }

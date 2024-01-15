@@ -6,18 +6,22 @@ package com.frcteam3255.components.swerve;
 
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.NeutralOut;
 import com.ctre.phoenix6.controls.PositionDutyCycle;
-import com.ctre.phoenix6.controls.VelocityDutyCycle;
-import com.ctre.phoenix6.controls.VoltageOut;
+import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.frcteam3255.utils.CTREModuleState;
 import com.frcteam3255.utils.SN_Math;
+
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -26,10 +30,6 @@ public class SN_SwerveModule extends SubsystemBase {
 	// -*- Module-Specific -*-
 	private TalonFX driveMotor;
 	private TalonFX steerMotor;
-	private VoltageOut driveMotorControllerOpen;
-	private VelocityDutyCycle driveMotorControllerClosed;
-
-	private PositionDutyCycle steerMotorController;
 
 	private CANcoder absoluteEncoder;
 	private double absoluteEncoderOffset;
@@ -39,10 +39,16 @@ public class SN_SwerveModule extends SubsystemBase {
 	// -*- Static Motor Config -*-
 	public static TalonFXConfiguration driveConfiguration;
 	public static TalonFXConfiguration steerConfiguration;
-	public static boolean isDriveInverted = false;
+	public static SimpleMotorFeedforward driveFeedForward;
+
+	private DutyCycleOut driveMotorControllerOpen;
+	private VelocityVoltage driveMotorControllerClosed;
+	private PositionDutyCycle steerMotorController;
+
 	public static NeutralModeValue driveNeutralMode = NeutralModeValue.Brake;
-	public static boolean isSteerInverted = true;
 	public static NeutralModeValue steerNeutralMode = NeutralModeValue.Coast;
+	public static InvertedValue driveInversion = InvertedValue.CounterClockwise_Positive;
+	public static InvertedValue steerInversion = InvertedValue.Clockwise_Positive;
 	public static String CANBusName = "Swerve";
 	public static double minimumSteerSpeedPercent = 0.01;
 
@@ -88,8 +94,8 @@ public class SN_SwerveModule extends SubsystemBase {
 
 		driveMotor = new TalonFX(driveMotorID, CANBusName);
 		steerMotor = new TalonFX(steerMotorID, CANBusName);
-		driveMotorControllerOpen = new VoltageOut(0);
-		driveMotorControllerClosed = new VelocityDutyCycle(0);
+		driveMotorControllerClosed = new VelocityVoltage(0);
+		driveMotorControllerOpen = new DutyCycleOut(0);
 		steerMotorController = new PositionDutyCycle(0);
 
 		absoluteEncoder = new CANcoder(absoluteEncoderID, CANBusName);
@@ -97,18 +103,19 @@ public class SN_SwerveModule extends SubsystemBase {
 
 		driveConfiguration = new TalonFXConfiguration();
 		steerConfiguration = new TalonFXConfiguration();
+		driveFeedForward = new SimpleMotorFeedforward(0, 0, 0);
 	}
 
 	public void configure() {
 		// -*- Drive Motor Config -*
-		driveMotor.setInverted(isDriveInverted);
+		driveConfiguration.MotorOutput.Inverted = driveInversion;
 		driveConfiguration.MotorOutput.NeutralMode = driveNeutralMode;
 		driveConfiguration.Feedback.SensorToMechanismRatio = driveGearRatio;
 
 		driveMotor.getConfigurator().apply(driveConfiguration);
 
 		// -*- Steer Motor Config -*-
-		steerMotor.setInverted(isSteerInverted);
+		steerConfiguration.MotorOutput.Inverted = steerInversion;
 		steerConfiguration.MotorOutput.NeutralMode = steerNeutralMode;
 		steerConfiguration.Feedback.SensorToMechanismRatio = steerGearRatio;
 		steerConfiguration.ClosedLoopGeneral.ContinuousWrap = true;
@@ -223,24 +230,30 @@ public class SN_SwerveModule extends SubsystemBase {
 		// -*- Setting the Drive Motor -*-
 
 		if (isOpenLoop) {
-			// Setting the motor to PercentOutput uses a percent of the motors max output.
+			// The output is from -1 to 1. Essentially a precentage
 			// So, the requested speed divided by it's max speed.
-			driveMotor.setControl(
-					driveMotorControllerOpen.withOutput((state.speedMetersPerSecond / maxModuleSpeedMeters) * 12));
+			driveMotorControllerOpen.Output = (state.speedMetersPerSecond / maxModuleSpeedMeters);
+			driveMotor.setControl(driveMotorControllerOpen);
+
 		} else {
-			double velocity = SN_Math.MPSToFalconRotations(state.speedMetersPerSecond, wheelCircumference, 1);
-			driveMotor.setControl(driveMotorControllerClosed.withVelocity(velocity));
+			driveMotorControllerClosed.Velocity = SN_Math.MPSToFalconRotations(state.speedMetersPerSecond,
+					wheelCircumference, 1);
+			driveMotorControllerClosed.FeedForward = driveFeedForward.calculate(desiredState.speedMetersPerSecond);
+
+			driveMotor.setControl(driveMotorControllerClosed);
 		}
 
 		// -*- Setting the Steer Motor -*-
 
-		double rotation = SN_Math.degreesToRotations(state.angle.getDegrees(), 1);
+		double rotation = Units.degreesToRotations(state.angle.getDegrees());
 
 		// If the requested speed is lower than a relevant steering speed,
 		// don't turn the motor. Set it to whatever it's previous angle was.
 		if (Math.abs(state.speedMetersPerSecond) < (minimumSteerSpeedPercent * maxModuleSpeedMeters)) {
 			return;
 		}
-		steerMotor.setControl(steerMotorController.withPosition(rotation));
+
+		steerMotorController.Position = rotation;
+		steerMotor.setControl(steerMotorController);
 	}
 }

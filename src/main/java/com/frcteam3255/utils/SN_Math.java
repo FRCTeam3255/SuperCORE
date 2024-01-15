@@ -247,6 +247,8 @@ public class SN_Math {
 	}
 
 	// -*- Falcon v6 Methods -*-
+	// TODO: Decide which of these are actually necessary to keep since the Gear
+	// Ratio is just passed into the Falcon now
 
 	/**
 	 * Converts rotations to degrees. Based off of 364's BaseFalconSwerve

@@ -16,18 +16,18 @@ import edu.wpi.first.wpilibj2.command.button.*;
  * Custom 12 Button Joystick set up for Logitech Extreme 3D Joystick
  */
 public class SN_Extreme3DStick extends Joystick {
-	public Button btn_1 = new JoystickButton(this, 1);
-	public Button btn_2 = new JoystickButton(this, 2);
-	public Button btn_3 = new JoystickButton(this, 3);
-	public Button btn_4 = new JoystickButton(this, 4);
-	public Button btn_5 = new JoystickButton(this, 5);
-	public Button btn_6 = new JoystickButton(this, 6);
-	public Button btn_7 = new JoystickButton(this, 7);
-	public Button btn_8 = new JoystickButton(this, 8);
-	public Button btn_9 = new JoystickButton(this, 9);
-	public Button btn_10 = new JoystickButton(this, 10);
-	public Button btn_11 = new JoystickButton(this, 11);
-	public Button btn_12 = new JoystickButton(this, 12);
+	public JoystickButton btn_1 = new JoystickButton(this, 1);
+	public JoystickButton btn_2 = new JoystickButton(this, 2);
+	public JoystickButton btn_3 = new JoystickButton(this, 3);
+	public JoystickButton btn_4 = new JoystickButton(this, 4);
+	public JoystickButton btn_5 = new JoystickButton(this, 5);
+	public JoystickButton btn_6 = new JoystickButton(this, 6);
+	public JoystickButton btn_7 = new JoystickButton(this, 7);
+	public JoystickButton btn_8 = new JoystickButton(this, 8);
+	public JoystickButton btn_9 = new JoystickButton(this, 9);
+	public JoystickButton btn_10 = new JoystickButton(this, 10);
+	public JoystickButton btn_11 = new JoystickButton(this, 11);
+	public JoystickButton btn_12 = new JoystickButton(this, 12);
 
 	// POV Buttons
 	public POVButton POV_North = new POVButton(this, 0);

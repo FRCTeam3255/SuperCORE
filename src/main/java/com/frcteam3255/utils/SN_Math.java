@@ -305,7 +305,7 @@ public class SN_Math {
 	 */
 	public static double mechanismRPMToRotations(double RPM, double gearRatio) {
 		double motorRPM = RPM * gearRatio;
-		double sensorCounts = motorRPM * (600.0);
+		double sensorCounts = motorRPM;
 		return sensorCounts;
 	}
 
@@ -340,7 +340,7 @@ public class SN_Math {
 	 * @return Falcon Rotations per second (RPM)
 	 */
 	public static double MPSToFalconRotations(double velocity, double circumference, double gearRatio) {
-		double wheelRPM = ((velocity * 60) / circumference);
+		double wheelRPM = ((velocity) / circumference);
 		double wheelVelocity = mechanismRPMToRotations(wheelRPM, gearRatio);
 		return wheelVelocity;
 	}

@@ -28,8 +28,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class SN_SwerveModule extends SubsystemBase {
 
 	// -*- Module-Specific -*-
-	private TalonFX driveMotor;
-	private TalonFX steerMotor;
+	public TalonFX driveMotor;
+	public TalonFX steerMotor;
 
 	private CANcoder absoluteEncoder;
 	private double absoluteEncoderOffset;

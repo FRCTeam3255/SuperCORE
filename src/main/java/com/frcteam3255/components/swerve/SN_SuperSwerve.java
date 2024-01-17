@@ -397,6 +397,13 @@ public class SN_SuperSwerve extends SubsystemBase {
 		pigeon.setYaw(yaw);
 	}
 
+	/**
+	 * <p>
+	 * <b>Must be run periodically in order to function properly!</b>
+	 * </p>
+	 * Updates the values based on the current timestamp of the robot. Mainly
+	 * required for simulation & discretize
+	 */
 	public void updateTimer() {
 		timeFromLastUpdate = Timer.getFPGATimestamp() - lastSimTime;
 		lastSimTime = Timer.getFPGATimestamp();

@@ -58,8 +58,7 @@ public class SN_SuperSwerve extends SubsystemBase {
 	private SwerveModuleState[] lastDesiredStates = new SwerveModuleState[]{new SwerveModuleState(),
 			new SwerveModuleState(), new SwerveModuleState(), new SwerveModuleState()};
 	public double timeFromLastUpdate = 0;
-	public Timer simTimer = new Timer();
-	public double lastSimTime = simTimer.get();
+	public double lastSimTime = Timer.getFPGATimestamp();
 	public Field2d field;
 
 	/**
@@ -134,8 +133,6 @@ public class SN_SuperSwerve extends SubsystemBase {
 			NeutralModeValue steerNeutralMode, Matrix<N3, N1> stateStdDevs, Matrix<N3, N1> visionStdDevs,
 			PIDConstants autoDrivePID, PIDConstants autoSteerPID, ReplanningConfig autoReplanningConfig,
 			boolean autoFlipPaths, boolean isSimulation) {
-
-		simTimer.start();
 
 		isFieldRelative = true;
 		field = new Field2d();
@@ -297,7 +294,8 @@ public class SN_SuperSwerve extends SubsystemBase {
 			chassisSpeeds = new ChassisSpeeds(translation.getX(), translation.getY(), rotation);
 		}
 
-		SwerveModuleState[] desiredModuleStates = swerveKinematics.toSwerveModuleStates(discretize(chassisSpeeds));
+		SwerveModuleState[] desiredModuleStates = swerveKinematics
+				.toSwerveModuleStates(ChassisSpeeds.discretize(chassisSpeeds, timeFromLastUpdate));
 		setModuleStates(desiredModuleStates, isOpenLoop);
 	}
 
@@ -309,35 +307,9 @@ public class SN_SuperSwerve extends SubsystemBase {
 	 *
 	 */
 	public void driveAutonomous(ChassisSpeeds chassisSpeeds) {
-		SwerveModuleState[] desiredModuleStates = swerveKinematics.toSwerveModuleStates(discretize(chassisSpeeds));
+		SwerveModuleState[] desiredModuleStates = swerveKinematics
+				.toSwerveModuleStates(ChassisSpeeds.discretize(chassisSpeeds, timeFromLastUpdate));
 		setModuleStates(desiredModuleStates, false);
-	}
-
-	// TODO: Replace with WPILib ChassisSpeeds.discretize when 2024 releases
-	// https://github.wpilib.org/allwpilib/docs/development/java/edu/wpi/first/math/kinematics/ChassisSpeeds.html#discretize(double,double,double,double)
-	/**
-	 * Credit: WPILib 2024 and 4738. <br>
-	 * <p>
-	 * When we are commanding motors in our code, we typically do not account for
-	 * the delay in the motors receiving inputs. However, for Swerve, we want to
-	 * account for this delay, especially when we are turning. "Discretizing" a
-	 * ChassisSpeed means that take what we would have inputted and account for the
-	 * time period being discrete (not continuous).
-	 * </p>
-	 *
-	 * @param speeds
-	 *            The speeds about to be inputted into the robot.
-	 * @return The same desired speeds, but adjusted to our current location.
-	 */
-	public ChassisSpeeds discretize(ChassisSpeeds speeds) {
-		double dt = 0.02;
-
-		var desiredDeltaPose = new Pose2d(speeds.vxMetersPerSecond * dt, speeds.vyMetersPerSecond * dt,
-				new Rotation2d(speeds.omegaRadiansPerSecond * dt * 4));
-
-		var twist = new Pose2d().log(desiredDeltaPose);
-
-		return new ChassisSpeeds((twist.dx / dt), (twist.dy / dt), (speeds.omegaRadiansPerSecond));
 	}
 
 	/**
@@ -402,8 +374,6 @@ public class SN_SuperSwerve extends SubsystemBase {
 	 */
 	public Rotation2d getRotation() {
 		if (isSimulation && lastDesiredStates != null) {
-			timeFromLastUpdate = simTimer.get() - lastSimTime;
-			lastSimTime = simTimer.get();
 			simAngle += swerveKinematics.toChassisSpeeds(lastDesiredStates).omegaRadiansPerSecond * timeFromLastUpdate;
 			return new Rotation2d(simAngle);
 		}
@@ -427,8 +397,14 @@ public class SN_SuperSwerve extends SubsystemBase {
 		pigeon.setYaw(yaw);
 	}
 
+	public void updateTimer() {
+		timeFromLastUpdate = Timer.getFPGATimestamp() - lastSimTime;
+		lastSimTime = Timer.getFPGATimestamp();
+	}
+
 	@Override
 	public void periodic() {
+		updateTimer();
 		updatePoseEstimator();
 	}
 }

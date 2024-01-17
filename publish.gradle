@@ -13,11 +13,13 @@ task libraryBuild() {}
 
 task sourcesJar(type: Jar, dependsOn: classes) {
     group='building'
+    archiveClassifier = 'sources'
     from sourceSets.main.allSource
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
     group='building'
+    archiveClassifier = 'javadoc'
     from javadoc.destinationDir
 }
 

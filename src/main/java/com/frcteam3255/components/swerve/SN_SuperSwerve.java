@@ -55,7 +55,7 @@ public class SN_SuperSwerve extends SubsystemBase {
 
 	private boolean isSimulation;
 	public double simAngle = 0;
-	public SwerveModuleState[] lastDesiredStates = new SwerveModuleState[]{new SwerveModuleState(),
+	private SwerveModuleState[] lastDesiredStates = new SwerveModuleState[]{new SwerveModuleState(),
 			new SwerveModuleState(), new SwerveModuleState(), new SwerveModuleState()};
 	public double timeFromLastUpdate = 0;
 	public Timer simTimer = new Timer();
@@ -220,11 +220,11 @@ public class SN_SuperSwerve extends SubsystemBase {
 	}
 
 	/**
-	 * Get the state (velocity, angle) of each module.
+	 * Get the actual state (velocity, angle) of each module.
 	 *
 	 * @return An Array of Swerve module states (velocity, angle)
 	 */
-	public SwerveModuleState[] getModuleStates() {
+	public SwerveModuleState[] getActualModuleStates() {
 		SwerveModuleState[] states = new SwerveModuleState[4];
 
 		for (SN_SwerveModule mod : modules) {
@@ -235,12 +235,21 @@ public class SN_SuperSwerve extends SubsystemBase {
 	}
 
 	/**
+	 * Get the last desired states (velocity, angle) of each module.
+	 *
+	 * @return An Array of Swerve module states (velocity, angle)
+	 */
+	public SwerveModuleState[] getDesiredModuleStates() {
+		return lastDesiredStates;
+	}
+
+	/**
 	 * Returns the robot-relative chassis speeds.
 	 *
 	 * @return The robot-relative chassis speeds
 	 */
 	public ChassisSpeeds getChassisSpeeds() {
-		return swerveKinematics.toChassisSpeeds(getModuleStates());
+		return swerveKinematics.toChassisSpeeds(getActualModuleStates());
 	}
 
 	/**

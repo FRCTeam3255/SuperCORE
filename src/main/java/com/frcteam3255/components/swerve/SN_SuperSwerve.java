@@ -402,7 +402,7 @@ public class SN_SuperSwerve extends SubsystemBase {
 	 * <b>Must be run periodically in order to function properly!</b>
 	 * </p>
 	 * Updates the values based on the current timestamp of the robot. Mainly
-	 * required for simulation & discretize
+	 * required for simulation and discretize
 	 */
 	public void updateTimer() {
 		timeFromLastUpdate = Timer.getFPGATimestamp() - lastSimTime;

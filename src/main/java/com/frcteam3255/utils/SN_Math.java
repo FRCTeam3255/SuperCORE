@@ -255,8 +255,8 @@ public class SN_Math {
 	 *            Circumference of Wheel in Meters
 	 * @param gearRatio
 	 *            Gear Ratio between the motor and Mechanism. If you can, the best
-	 *            approach is to configure the gear ratio to the motor itself & set
-	 *            this parameter to 1.
+	 *            approach is to configure the gear ratio to the motor itself and
+	 *            set this parameter to 1.
 	 * @return Mechanism Meters per Second
 	 */
 	public static double rotationsToMeters(double rotations, double circumference, double gearRatio) {
@@ -274,8 +274,8 @@ public class SN_Math {
 	 *            Circumference of Wheel in Meters
 	 * @param gearRatio
 	 *            Gear Ratio between the motor and Mechanism. If you can, the best
-	 *            approach is to configure the gear ratio to the motor itself & set
-	 *            this parameter to 1.S
+	 *            approach is to configure the gear ratio to the motor itself and
+	 *            set this parameter to 1.S
 	 * @return Motor rotations
 	 */
 	public static double metersToRotations(double meters, double circumference, double gearRatio) {

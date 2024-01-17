@@ -26,32 +26,30 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class SN_SuperSwerve extends SubsystemBase {
-	private SN_SwerveModule[] modules;
+	public SN_SwerveModule[] modules;
 	public SwerveDrivePoseEstimator swervePoseEstimator;
 	public SwerveDriveKinematics swerveKinematics;
-	private Pigeon2 pigeon;
+	public Pigeon2 pigeon;
 	public boolean isFieldRelative;
 
-	private SN_SwerveConstants swerveConstants;
+	public SN_SwerveConstants swerveConstants;
 	/**
 	 * Drive base radius in meters. Distance from robot center to furthest module.
 	 */
 	private double driveBaseRadius;
-	private PIDConstants autoDrivePID;
-	private PIDConstants autoSteerPID;
+	public PIDConstants autoDrivePID;
+	public PIDConstants autoSteerPID;
 	private Matrix<N3, N1> stateStdDevs;
 	private Matrix<N3, N1> visionStdDevs;
 	public HashMap<String, Command> autoEventMap = new HashMap<>();
-	private boolean autoFlipPaths;
-	private ReplanningConfig autoReplanningConfig;
+	public ReplanningConfig autoReplanningConfig;
+	public boolean autoFlipPaths;
 
 	public PathPlannerTrajectory exampleAuto;
 
@@ -180,6 +178,11 @@ public class SN_SuperSwerve extends SubsystemBase {
 		Timer.delay(2.5);
 		resetModulesToAbsolute();
 		configure();
+
+		AutoBuilder.configureHolonomic(this::getPose, this::resetPoseToPose, this::getChassisSpeeds,
+				this::driveAutonomous, new HolonomicPathFollowerConfig(autoDrivePID, autoSteerPID,
+						swerveConstants.maxSpeedMeters, driveBaseRadius, autoReplanningConfig),
+				() -> autoFlipPaths, this);
 	}
 
 	public void configure() {
@@ -190,10 +193,6 @@ public class SN_SuperSwerve extends SubsystemBase {
 		swervePoseEstimator = new SwerveDrivePoseEstimator(swerveKinematics, getRotation(), getModulePositions(),
 				new Pose2d(), stateStdDevs, visionStdDevs);
 
-		AutoBuilder.configureHolonomic(this::getPose, this::resetPoseToPose, this::getChassisSpeeds,
-				this::driveAutonomous, new HolonomicPathFollowerConfig(autoDrivePID, autoSteerPID,
-						swerveConstants.maxSpeedMeters, driveBaseRadius, autoReplanningConfig),
-				() -> autoFlipPaths, this);
 	}
 
 	/**
@@ -422,26 +421,5 @@ public class SN_SuperSwerve extends SubsystemBase {
 	@Override
 	public void periodic() {
 		updatePoseEstimator();
-		SmartDashboard.putNumber("Drivetrain/Yaw Degrees", getRotation().getDegrees());
-		SmartDashboard.putBoolean("Drivetrain/Is Field Relative", isFieldRelative);
-		for (SN_SwerveModule mod : modules) {
-			SmartDashboard.putNumber("Drivetrain/Module " + mod.moduleNumber + "/Speed",
-					Units.metersToFeet(mod.getModuleState().speedMetersPerSecond));
-			SmartDashboard.putNumber("Drivetrain/Module " + mod.moduleNumber + "/Distance",
-					Units.metersToFeet(mod.getModulePosition().distanceMeters));
-			SmartDashboard.putNumber("Drivetrain/Module " + mod.moduleNumber + "/Angle",
-					mod.getModuleState().angle.getDegrees());
-			SmartDashboard.putNumber("Drivetrain/Module " + mod.moduleNumber + "/Desired Angle Degrees",
-					lastDesiredStates[mod.moduleNumber].angle.getDegrees());
-			SmartDashboard.putNumber("Drivetrain/Module " + mod.moduleNumber + "/Absolute Encoder Angle (WITH OFFSET)",
-					mod.getAbsoluteEncoder());
-			SmartDashboard.putNumber("Drivetrain/Module " + mod.moduleNumber + "/Absolute Encoder Raw Value",
-					mod.getRawAbsoluteEncoder());
-
-		}
-
-		field.setRobotPose(getPose());
-		SmartDashboard.putData(field);
-
 	}
 }

@@ -175,9 +175,9 @@ public class SN_SwerveModule extends SubsystemBase {
 	 */
 	public SwerveModuleState getModuleState() {
 
-		double velocity = SN_Math.rotationsToMPS(driveMotor.getVelocity().getValue(), wheelCircumference, 1);
+		double velocity = SN_Math.rotationsToMeters(driveMotor.getVelocity().getValue(), wheelCircumference, 1);
 
-		Rotation2d angle = Rotation2d.fromDegrees(SN_Math.rotationsToDegrees(steerMotor.getPosition().getValue(), 1));
+		Rotation2d angle = Rotation2d.fromDegrees(Units.rotationsToDegrees(steerMotor.getPosition().getValue()));
 
 		return new SwerveModuleState(velocity, angle);
 	}
@@ -199,7 +199,7 @@ public class SN_SwerveModule extends SubsystemBase {
 
 		double distance = SN_Math.rotationsToMeters(driveMotor.getPosition().getValue(), wheelCircumference, 1);
 
-		Rotation2d angle = Rotation2d.fromDegrees(SN_Math.rotationsToDegrees(steerMotor.getPosition().getValue(), 1));
+		Rotation2d angle = Rotation2d.fromDegrees(Units.rotationsToDegrees(steerMotor.getPosition().getValue()));
 
 		return new SwerveModulePosition(distance, angle);
 	}
@@ -230,13 +230,13 @@ public class SN_SwerveModule extends SubsystemBase {
 		// -*- Setting the Drive Motor -*-
 
 		if (isOpenLoop) {
-			// The output is from -1 to 1. Essentially a precentage
+			// The output is from -1 to 1. Essentially a percentage
 			// So, the requested speed divided by it's max speed.
 			driveMotorControllerOpen.Output = (state.speedMetersPerSecond / maxModuleSpeedMeters);
 			driveMotor.setControl(driveMotorControllerOpen);
 
 		} else {
-			driveMotorControllerClosed.Velocity = SN_Math.MPSToFalconRotations(state.speedMetersPerSecond,
+			driveMotorControllerClosed.Velocity = SN_Math.metersToRotations(state.speedMetersPerSecond,
 					wheelCircumference, 1);
 			driveMotorControllerClosed.FeedForward = driveFeedForward.calculate(desiredState.speedMetersPerSecond);
 

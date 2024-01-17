@@ -20,29 +20,29 @@ import edu.wpi.first.wpilibj2.command.button.*;
  */
 public class SN_DualActionStick extends Joystick {
 	/** Joystick Button 1 */
-	public Button btn_X = new JoystickButton(this, 1);
+	public JoystickButton btn_X = new JoystickButton(this, 1);
 	/** Joystick Button 2 */
-	public Button btn_A = new JoystickButton(this, 2);
+	public JoystickButton btn_A = new JoystickButton(this, 2);
 	/** Joystick Button 3 */
-	public Button btn_B = new JoystickButton(this, 3);
+	public JoystickButton btn_B = new JoystickButton(this, 3);
 	/** Joystick Button 4 */
-	public Button btn_Y = new JoystickButton(this, 4);
+	public JoystickButton btn_Y = new JoystickButton(this, 4);
 	/** Joystick Button 5 */
-	public Button btn_LBump = new JoystickButton(this, 5);
+	public JoystickButton btn_LBump = new JoystickButton(this, 5);
 	/** Joystick Button 6 */
-	public Button btn_RBump = new JoystickButton(this, 6);
+	public JoystickButton btn_RBump = new JoystickButton(this, 6);
 	/** Joystick Button 7 */
-	public Button btn_LTrig = new JoystickButton(this, 7);
+	public JoystickButton btn_LTrig = new JoystickButton(this, 7);
 	/** Joystick Button 8 */
-	public Button btn_RTrig = new JoystickButton(this, 8);
+	public JoystickButton btn_RTrig = new JoystickButton(this, 8);
 	/** Joystick Button 9 */
-	public Button btn_Back = new JoystickButton(this, 9);
+	public JoystickButton btn_Back = new JoystickButton(this, 9);
 	/** Joystick Button 10 */
-	public Button btn_Start = new JoystickButton(this, 10);
+	public JoystickButton btn_Start = new JoystickButton(this, 10);
 	/** Joystick Button 11 */
-	public Button btn_LStick = new JoystickButton(this, 11);
+	public JoystickButton btn_LStick = new JoystickButton(this, 11);
 	/** Joystick Button 12 */
-	public Button btn_RStick = new JoystickButton(this, 12);
+	public JoystickButton btn_RStick = new JoystickButton(this, 12);
 
 	// POV Buttons
 	public POVButton POV_North = new POVButton(this, 0);

@@ -8,12 +8,13 @@ import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.NeutralOut;
-import com.ctre.phoenix6.controls.PositionDutyCycle;
+import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.ctre.phoenix6.signals.SensorDirectionValue;
 import com.frcteam3255.utils.CTREModuleState;
 import com.frcteam3255.utils.SN_Math;
 
@@ -39,16 +40,18 @@ public class SN_SwerveModule extends SubsystemBase {
 	// -*- Static Motor Config -*-
 	public static TalonFXConfiguration driveConfiguration;
 	public static TalonFXConfiguration steerConfiguration;
+	public static CANcoderConfiguration cancoderConfiguration;
 	public static SimpleMotorFeedforward driveFeedForward;
 
 	private DutyCycleOut driveMotorControllerOpen;
 	private VelocityVoltage driveMotorControllerClosed;
-	private PositionDutyCycle steerMotorController;
+	private PositionVoltage steerMotorController;
 
 	public static NeutralModeValue driveNeutralMode = NeutralModeValue.Brake;
 	public static NeutralModeValue steerNeutralMode = NeutralModeValue.Coast;
 	public static InvertedValue driveInversion = InvertedValue.CounterClockwise_Positive;
 	public static InvertedValue steerInversion = InvertedValue.Clockwise_Positive;
+	public static SensorDirectionValue cancoderInversion = SensorDirectionValue.CounterClockwise_Positive;
 	public static String CANBusName = "Swerve";
 	public static double minimumSteerSpeedPercent = 0.01;
 
@@ -96,7 +99,7 @@ public class SN_SwerveModule extends SubsystemBase {
 		steerMotor = new TalonFX(steerMotorID, CANBusName);
 		driveMotorControllerClosed = new VelocityVoltage(0);
 		driveMotorControllerOpen = new DutyCycleOut(0);
-		steerMotorController = new PositionDutyCycle(0);
+		steerMotorController = new PositionVoltage(0);
 
 		absoluteEncoder = new CANcoder(absoluteEncoderID, CANBusName);
 		this.absoluteEncoderOffset = absoluteEncoderOffset;
@@ -123,7 +126,8 @@ public class SN_SwerveModule extends SubsystemBase {
 		steerMotor.getConfigurator().apply(steerConfiguration);
 
 		// -*- Absolute Encoder Config -*-
-		absoluteEncoder.getConfigurator().apply(new CANcoderConfiguration());
+		cancoderConfiguration.MagnetSensor.SensorDirection = cancoderInversion;
+		absoluteEncoder.getConfigurator().apply(cancoderConfiguration);
 	}
 
 	/**
@@ -245,7 +249,7 @@ public class SN_SwerveModule extends SubsystemBase {
 
 		// -*- Setting the Steer Motor -*-
 
-		double rotation = Units.degreesToRotations(state.angle.getDegrees());
+		double rotation = state.angle.getRotations();
 
 		// If the requested speed is lower than a relevant steering speed,
 		// don't turn the motor. Set it to whatever it's previous angle was.

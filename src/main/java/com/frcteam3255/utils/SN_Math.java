@@ -275,7 +275,7 @@ public class SN_Math {
 	 * @param gearRatio
 	 *            Gear Ratio between the motor and Mechanism. If you can, the best
 	 *            approach is to configure the gear ratio to the motor itself and
-	 *            set this parameter to 1.S
+	 *            set this parameter to 1.
 	 * @return Motor rotations
 	 */
 	public static double metersToRotations(double meters, double circumference, double gearRatio) {

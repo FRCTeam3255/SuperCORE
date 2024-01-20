@@ -9,6 +9,7 @@ import java.util.HashMap;
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.ctre.phoenix6.signals.SensorDirectionValue;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.PathPlannerTrajectory;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
@@ -96,6 +97,8 @@ public class SN_SuperSwerve extends SubsystemBase {
 	 *            The direction that is positive for drive motors
 	 * @param steerInversion
 	 *            The direction that is positive for steer motors
+	 * @param cancoderInversion
+	 *            The direction that is positive for Cancoders
 	 * @param driveNeutralMode
 	 *            The behavior of every drive motor when set to neutral-output
 	 * @param steerNeutralMode
@@ -129,10 +132,10 @@ public class SN_SuperSwerve extends SubsystemBase {
 	 */
 	public SN_SuperSwerve(SN_SwerveConstants swerveConstants, SN_SwerveModule[] modules, double wheelbase,
 			double trackWidth, String CANBusName, int pigeonCANId, double minimumSteerPercent,
-			InvertedValue driveInversion, InvertedValue steerInversion, NeutralModeValue driveNeutralMode,
-			NeutralModeValue steerNeutralMode, Matrix<N3, N1> stateStdDevs, Matrix<N3, N1> visionStdDevs,
-			PIDConstants autoDrivePID, PIDConstants autoSteerPID, ReplanningConfig autoReplanningConfig,
-			boolean autoFlipPaths, boolean isSimulation) {
+			InvertedValue driveInversion, InvertedValue steerInversion, SensorDirectionValue cancoderInversion,
+			NeutralModeValue driveNeutralMode, NeutralModeValue steerNeutralMode, Matrix<N3, N1> stateStdDevs,
+			Matrix<N3, N1> visionStdDevs, PIDConstants autoDrivePID, PIDConstants autoSteerPID,
+			ReplanningConfig autoReplanningConfig, boolean autoFlipPaths, boolean isSimulation) {
 
 		isFieldRelative = true;
 		field = new Field2d();
@@ -260,12 +263,11 @@ public class SN_SuperSwerve extends SubsystemBase {
 	 *
 	 */
 	public void setModuleStates(SwerveModuleState[] desiredModuleStates, boolean isOpenLoop) {
-		lastDesiredStates = desiredModuleStates;
-
 		// Lowers the speeds if needed so that they are actually achievable. This has to
 		// be done here because speeds must be lowered relative to the other speeds as
 		// well
 		SwerveDriveKinematics.desaturateWheelSpeeds(desiredModuleStates, swerveConstants.maxSpeedMeters);
+		lastDesiredStates = desiredModuleStates;
 
 		for (SN_SwerveModule mod : modules) {
 			mod.setModuleState(desiredModuleStates[mod.moduleNumber], isOpenLoop);
@@ -375,7 +377,7 @@ public class SN_SuperSwerve extends SubsystemBase {
 	public Rotation2d getRotation() {
 		if (isSimulation && lastDesiredStates != null) {
 			simAngle += swerveKinematics.toChassisSpeeds(lastDesiredStates).omegaRadiansPerSecond * timeFromLastUpdate;
-			return new Rotation2d(simAngle);
+			return Rotation2d.fromRadians(simAngle);
 		}
 		return Rotation2d.fromDegrees(pigeon.getYaw().getValue());
 	}

@@ -246,135 +246,39 @@ public class SN_Math {
 		return encoderCounts;
 	}
 
-	// -*- Falcon v6 Methods -*-
-	// TODO: Decide which of these are actually necessary to keep since the Gear
-	// Ratio is just passed into the Falcon now
-
 	/**
-	 * Converts rotations to degrees. Based off of 364's BaseFalconSwerve
+	 * Converts motor rotations to meters. Based off of 364's BaseFalconSwerve
 	 *
 	 * @param rotations
-	 *            Rotations
-	 * @param gearRatio
-	 *            Gear Ratio between Falcon and Mechanism
-	 * @return Degrees of Rotation of Mechanism
-	 */
-	public static double rotationsToDegrees(double rotations, double gearRatio) {
-		return rotations * (360.0 / (gearRatio));
-	}
-
-	/**
-	 * Converts degrees to rotations. Based off of 364's BaseFalconSwerve
-	 *
-	 * @param degrees
-	 *            Degrees of rotation of Mechanism
-	 * @param gearRatio
-	 *            Gear Ratio between Falcon and Mechanism
-	 * @return Rotations
-	 */
-	public static double degreesToRotations(double degrees, double gearRatio) {
-		double rotations = degrees / (360.0 / (gearRatio));
-		return rotations;
-	}
-
-	/**
-	 * Converts Falcon rotations per second (RPM) to the mechanism's RPM. Based off
-	 * of 364's BaseFalconSwerve
-	 *
-	 * @param velocityCounts
-	 *            Falcon Rotations per second (RPM)
-	 * @param gearRatio
-	 *            Gear Ratio between Falcon and Mechanism
-	 * @return RPM of Mechanism
-	 */
-	public static double rotationsToMechanismRPM(double velocityCounts, double gearRatio) {
-		double motorRPM = velocityCounts * (600.0);
-		double mechRPM = motorRPM / gearRatio;
-		return mechRPM;
-	}
-
-	/**
-	 * Converts the mechanism's RPM to Falcon rotations per second (RPM). Based off
-	 * of 364's BaseFalconSwerve
-	 *
-	 * @param RPM
-	 *            RPM of mechanism
-	 * @param gearRatio
-	 *            Gear Ratio between Falcon and Mechanism
-	 * @return Falcon Rotations per second (RPM)
-	 */
-	public static double mechanismRPMToRotations(double RPM, double gearRatio) {
-		double motorRPM = RPM * gearRatio;
-		double sensorCounts = motorRPM * (600.0);
-		return sensorCounts;
-	}
-
-	/**
-	 * Converts Falcon rotations per second (RPM) to Meters per Second (MPS). Based
-	 * off of 364's BaseFalconSwerve
-	 *
-	 * @param velocitycounts
-	 *            Falcon Rotations per Second (RPM)
+	 *            Motor Rotations
 	 * @param circumference
 	 *            Circumference of Wheel in Meters
 	 * @param gearRatio
-	 *            Gear Ratio between Falcon and Mechanism
+	 *            Gear Ratio between the motor and Mechanism. If you can, the best
+	 *            approach is to configure the gear ratio to the motor itself and
+	 *            set this parameter to 1.
 	 * @return Mechanism Meters per Second
 	 */
-	public static double rotationsToMPS(double velocitycounts, double circumference, double gearRatio) {
-		double wheelRPM = rotationsToMechanismRPM(velocitycounts, gearRatio);
-		double wheelMPS = (wheelRPM * circumference) / 60;
+	public static double rotationsToMeters(double rotations, double circumference, double gearRatio) {
+		double wheelRPS = rotations / gearRatio;
+		double wheelMPS = (wheelRPS * circumference);
 		return wheelMPS;
 	}
 
 	/**
-	 * Converts Meters per Second (MPS) to Falcon rotations per second (RPM). Based
-	 * off of 364's BaseFalconSwerve
-	 *
-	 * @param velocity
-	 *            Velocity in Meters per Second
-	 * @param circumference
-	 *            Circumference of Wheel in Meters
-	 * @param gearRatio
-	 *            Gear Ratio between Falcon and Mechanism
-	 * @return Falcon Rotations per second (RPM)
-	 */
-	public static double MPSToFalconRotations(double velocity, double circumference, double gearRatio) {
-		double wheelRPM = ((velocity * 60) / circumference);
-		double wheelVelocity = mechanismRPMToRotations(wheelRPM, gearRatio);
-		return wheelVelocity;
-	}
-
-	/**
-	 * Converts Falcon rotations to meters
-	 *
-	 * @param position
-	 *            Falcon rotations
-	 * @param circumference
-	 *            Circumference of Wheel in Meters
-	 * @param gearRatio
-	 *            Gear Ratio between Falcon and Mechanism
-	 * @return Meters Traveled
-	 */
-	public static double rotationsToMeters(double position, double circumference, double gearRatio) {
-		double wheelRotations = position / gearRatio;
-		double meters = wheelRotations * circumference;
-		return meters;
-	}
-
-	/**
-	 * Converts meters to Falcon rotations
+	 * Converts meters to motor rotations
 	 *
 	 * @param meters
 	 *            Meters Traveled
 	 * @param circumference
 	 *            Circumference of Wheel in Meters
 	 * @param gearRatio
-	 *            Gear Ratio between Falcon and Mechanism
-	 * @return Falcon rotations
+	 *            Gear Ratio between the motor and Mechanism. If you can, the best
+	 *            approach is to configure the gear ratio to the motor itself and
+	 *            set this parameter to 1.
+	 * @return Motor rotations
 	 */
-	public static double metersToFalconRotations(double meters, double circumference, double gearRatio) {
-
+	public static double metersToRotations(double meters, double circumference, double gearRatio) {
 		double wheelRotations = meters / circumference;
 		double motorRotations = wheelRotations * gearRatio;
 

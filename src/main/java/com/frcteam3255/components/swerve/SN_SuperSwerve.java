@@ -9,6 +9,7 @@ import java.util.HashMap;
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.ctre.phoenix6.signals.SensorDirectionValue;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.PathPlannerTrajectory;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
@@ -26,42 +27,39 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class SN_SuperSwerve extends SubsystemBase {
-	private SN_SwerveModule[] modules;
+	public SN_SwerveModule[] modules;
 	public SwerveDrivePoseEstimator swervePoseEstimator;
 	public SwerveDriveKinematics swerveKinematics;
-	private Pigeon2 pigeon;
+	public Pigeon2 pigeon;
 	public boolean isFieldRelative;
 
-	private SN_SwerveConstants swerveConstants;
+	public SN_SwerveConstants swerveConstants;
 	/**
 	 * Drive base radius in meters. Distance from robot center to furthest module.
 	 */
 	private double driveBaseRadius;
-	private PIDConstants autoDrivePID;
-	private PIDConstants autoSteerPID;
+	public PIDConstants autoDrivePID;
+	public PIDConstants autoSteerPID;
 	private Matrix<N3, N1> stateStdDevs;
 	private Matrix<N3, N1> visionStdDevs;
 	public HashMap<String, Command> autoEventMap = new HashMap<>();
-	private boolean autoFlipPaths;
-	private ReplanningConfig autoReplanningConfig;
+	public ReplanningConfig autoReplanningConfig;
+	public boolean autoFlipPaths;
 
 	public PathPlannerTrajectory exampleAuto;
 
 	private boolean isSimulation;
 	public double simAngle = 0;
-	public SwerveModuleState[] lastDesiredStates = new SwerveModuleState[]{new SwerveModuleState(),
+	private SwerveModuleState[] lastDesiredStates = new SwerveModuleState[]{new SwerveModuleState(),
 			new SwerveModuleState(), new SwerveModuleState(), new SwerveModuleState()};
 	public double timeFromLastUpdate = 0;
-	public Timer simTimer = new Timer();
-	public double lastSimTime = simTimer.get();
+	public double lastSimTime = Timer.getFPGATimestamp();
 	public Field2d field;
 
 	/**
@@ -99,6 +97,8 @@ public class SN_SuperSwerve extends SubsystemBase {
 	 *            The direction that is positive for drive motors
 	 * @param steerInversion
 	 *            The direction that is positive for steer motors
+	 * @param cancoderInversion
+	 *            The direction that is positive for Cancoders
 	 * @param driveNeutralMode
 	 *            The behavior of every drive motor when set to neutral-output
 	 * @param steerNeutralMode
@@ -132,12 +132,10 @@ public class SN_SuperSwerve extends SubsystemBase {
 	 */
 	public SN_SuperSwerve(SN_SwerveConstants swerveConstants, SN_SwerveModule[] modules, double wheelbase,
 			double trackWidth, String CANBusName, int pigeonCANId, double minimumSteerPercent,
-			InvertedValue driveInversion, InvertedValue steerInversion, NeutralModeValue driveNeutralMode,
-			NeutralModeValue steerNeutralMode, Matrix<N3, N1> stateStdDevs, Matrix<N3, N1> visionStdDevs,
-			PIDConstants autoDrivePID, PIDConstants autoSteerPID, ReplanningConfig autoReplanningConfig,
-			boolean autoFlipPaths, boolean isSimulation) {
-
-		simTimer.start();
+			InvertedValue driveInversion, InvertedValue steerInversion, SensorDirectionValue cancoderInversion,
+			NeutralModeValue driveNeutralMode, NeutralModeValue steerNeutralMode, Matrix<N3, N1> stateStdDevs,
+			Matrix<N3, N1> visionStdDevs, PIDConstants autoDrivePID, PIDConstants autoSteerPID,
+			ReplanningConfig autoReplanningConfig, boolean autoFlipPaths, boolean isSimulation) {
 
 		isFieldRelative = true;
 		field = new Field2d();
@@ -172,6 +170,7 @@ public class SN_SuperSwerve extends SubsystemBase {
 
 		SN_SwerveModule.steerInversion = steerInversion;
 		SN_SwerveModule.steerNeutralMode = steerNeutralMode;
+		SN_SwerveModule.cancoderInversion = cancoderInversion;
 
 		driveBaseRadius = Math.sqrt(Math.pow((wheelbase / 2), 2) + Math.pow((trackWidth / 2), 2));
 		pigeon = new Pigeon2(pigeonCANId, CANBusName);
@@ -180,6 +179,11 @@ public class SN_SuperSwerve extends SubsystemBase {
 		Timer.delay(2.5);
 		resetModulesToAbsolute();
 		configure();
+
+		AutoBuilder.configureHolonomic(this::getPose, this::resetPoseToPose, this::getChassisSpeeds,
+				this::driveAutonomous, new HolonomicPathFollowerConfig(autoDrivePID, autoSteerPID,
+						swerveConstants.maxSpeedMeters, driveBaseRadius, autoReplanningConfig),
+				() -> autoFlipPaths, this);
 	}
 
 	public void configure() {
@@ -190,10 +194,6 @@ public class SN_SuperSwerve extends SubsystemBase {
 		swervePoseEstimator = new SwerveDrivePoseEstimator(swerveKinematics, getRotation(), getModulePositions(),
 				new Pose2d(), stateStdDevs, visionStdDevs);
 
-		AutoBuilder.configureHolonomic(this::getPose, this::resetPoseToPose, this::getChassisSpeeds,
-				this::driveAutonomous, new HolonomicPathFollowerConfig(autoDrivePID, autoSteerPID,
-						swerveConstants.maxSpeedMeters, driveBaseRadius, autoReplanningConfig),
-				() -> autoFlipPaths, this);
 	}
 
 	/**
@@ -221,11 +221,11 @@ public class SN_SuperSwerve extends SubsystemBase {
 	}
 
 	/**
-	 * Get the state (velocity, angle) of each module.
+	 * Get the actual state (velocity, angle) of each module.
 	 *
 	 * @return An Array of Swerve module states (velocity, angle)
 	 */
-	public SwerveModuleState[] getModuleStates() {
+	public SwerveModuleState[] getActualModuleStates() {
 		SwerveModuleState[] states = new SwerveModuleState[4];
 
 		for (SN_SwerveModule mod : modules) {
@@ -236,12 +236,21 @@ public class SN_SuperSwerve extends SubsystemBase {
 	}
 
 	/**
+	 * Get the last desired states (velocity, angle) of each module.
+	 *
+	 * @return An Array of Swerve module states (velocity, angle)
+	 */
+	public SwerveModuleState[] getDesiredModuleStates() {
+		return lastDesiredStates;
+	}
+
+	/**
 	 * Returns the robot-relative chassis speeds.
 	 *
 	 * @return The robot-relative chassis speeds
 	 */
 	public ChassisSpeeds getChassisSpeeds() {
-		return swerveKinematics.toChassisSpeeds(getModuleStates());
+		return swerveKinematics.toChassisSpeeds(getActualModuleStates());
 	}
 
 	/**
@@ -255,12 +264,11 @@ public class SN_SuperSwerve extends SubsystemBase {
 	 *
 	 */
 	public void setModuleStates(SwerveModuleState[] desiredModuleStates, boolean isOpenLoop) {
-		lastDesiredStates = desiredModuleStates;
-
 		// Lowers the speeds if needed so that they are actually achievable. This has to
 		// be done here because speeds must be lowered relative to the other speeds as
 		// well
 		SwerveDriveKinematics.desaturateWheelSpeeds(desiredModuleStates, swerveConstants.maxSpeedMeters);
+		lastDesiredStates = desiredModuleStates;
 
 		for (SN_SwerveModule mod : modules) {
 			mod.setModuleState(desiredModuleStates[mod.moduleNumber], isOpenLoop);
@@ -289,7 +297,8 @@ public class SN_SuperSwerve extends SubsystemBase {
 			chassisSpeeds = new ChassisSpeeds(translation.getX(), translation.getY(), rotation);
 		}
 
-		SwerveModuleState[] desiredModuleStates = swerveKinematics.toSwerveModuleStates(discretize(chassisSpeeds));
+		SwerveModuleState[] desiredModuleStates = swerveKinematics
+				.toSwerveModuleStates(ChassisSpeeds.discretize(chassisSpeeds, timeFromLastUpdate));
 		setModuleStates(desiredModuleStates, isOpenLoop);
 	}
 
@@ -301,35 +310,9 @@ public class SN_SuperSwerve extends SubsystemBase {
 	 *
 	 */
 	public void driveAutonomous(ChassisSpeeds chassisSpeeds) {
-		SwerveModuleState[] desiredModuleStates = swerveKinematics.toSwerveModuleStates(discretize(chassisSpeeds));
-		setModuleStates(desiredModuleStates, false);
-	}
-
-	// TODO: Replace with WPILib ChassisSpeeds.discretize when 2024 releases
-	// https://github.wpilib.org/allwpilib/docs/development/java/edu/wpi/first/math/kinematics/ChassisSpeeds.html#discretize(double,double,double,double)
-	/**
-	 * Credit: WPILib 2024 and 4738. <br>
-	 * <p>
-	 * When we are commanding motors in our code, we typically do not account for
-	 * the delay in the motors receiving inputs. However, for Swerve, we want to
-	 * account for this delay, especially when we are turning. "Discretizing" a
-	 * ChassisSpeed means that take what we would have inputted and account for the
-	 * time period being discrete (not continuous).
-	 * </p>
-	 *
-	 * @param speeds
-	 *            The speeds about to be inputted into the robot.
-	 * @return The same desired speeds, but adjusted to our current location.
-	 */
-	public ChassisSpeeds discretize(ChassisSpeeds speeds) {
-		double dt = 0.02;
-
-		var desiredDeltaPose = new Pose2d(speeds.vxMetersPerSecond * dt, speeds.vyMetersPerSecond * dt,
-				new Rotation2d(speeds.omegaRadiansPerSecond * dt * 4));
-
-		var twist = new Pose2d().log(desiredDeltaPose);
-
-		return new ChassisSpeeds((twist.dx / dt), (twist.dy / dt), (speeds.omegaRadiansPerSecond));
+		SwerveModuleState[] desiredModuleStates = swerveKinematics
+				.toSwerveModuleStates(ChassisSpeeds.discretize(chassisSpeeds, timeFromLastUpdate));
+		setModuleStates(desiredModuleStates, true);
 	}
 
 	/**
@@ -394,10 +377,8 @@ public class SN_SuperSwerve extends SubsystemBase {
 	 */
 	public Rotation2d getRotation() {
 		if (isSimulation && lastDesiredStates != null) {
-			timeFromLastUpdate = simTimer.get() - lastSimTime;
-			lastSimTime = simTimer.get();
 			simAngle += swerveKinematics.toChassisSpeeds(lastDesiredStates).omegaRadiansPerSecond * timeFromLastUpdate;
-			return new Rotation2d(simAngle);
+			return Rotation2d.fromRadians(simAngle);
 		}
 		return Rotation2d.fromDegrees(pigeon.getYaw().getValue());
 	}
@@ -419,29 +400,21 @@ public class SN_SuperSwerve extends SubsystemBase {
 		pigeon.setYaw(yaw);
 	}
 
+	/**
+	 * <p>
+	 * <b>Must be run periodically in order to function properly!</b>
+	 * </p>
+	 * Updates the values based on the current timestamp of the robot. Mainly
+	 * required for simulation and discretize
+	 */
+	public void updateTimer() {
+		timeFromLastUpdate = Timer.getFPGATimestamp() - lastSimTime;
+		lastSimTime = Timer.getFPGATimestamp();
+	}
+
 	@Override
 	public void periodic() {
+		updateTimer();
 		updatePoseEstimator();
-		SmartDashboard.putNumber("Drivetrain/Yaw Degrees", getRotation().getDegrees());
-		SmartDashboard.putBoolean("Drivetrain/Is Field Relative", isFieldRelative);
-		for (SN_SwerveModule mod : modules) {
-			SmartDashboard.putNumber("Drivetrain/Module " + mod.moduleNumber + "/Speed",
-					Units.metersToFeet(mod.getModuleState().speedMetersPerSecond));
-			SmartDashboard.putNumber("Drivetrain/Module " + mod.moduleNumber + "/Distance",
-					Units.metersToFeet(mod.getModulePosition().distanceMeters));
-			SmartDashboard.putNumber("Drivetrain/Module " + mod.moduleNumber + "/Angle",
-					mod.getModuleState().angle.getDegrees());
-			SmartDashboard.putNumber("Drivetrain/Module " + mod.moduleNumber + "/Desired Angle Degrees",
-					lastDesiredStates[mod.moduleNumber].angle.getDegrees());
-			SmartDashboard.putNumber("Drivetrain/Module " + mod.moduleNumber + "/Absolute Encoder Angle (WITH OFFSET)",
-					mod.getAbsoluteEncoder());
-			SmartDashboard.putNumber("Drivetrain/Module " + mod.moduleNumber + "/Absolute Encoder Raw Value",
-					mod.getRawAbsoluteEncoder());
-
-		}
-
-		field.setRobotPose(getPose());
-		SmartDashboard.putData(field);
-
 	}
 }

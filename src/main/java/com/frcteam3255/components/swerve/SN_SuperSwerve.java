@@ -170,6 +170,7 @@ public class SN_SuperSwerve extends SubsystemBase {
 
 		SN_SwerveModule.steerInversion = steerInversion;
 		SN_SwerveModule.steerNeutralMode = steerNeutralMode;
+		SN_SwerveModule.cancoderInversion = cancoderInversion;
 
 		driveBaseRadius = Math.sqrt(Math.pow((wheelbase / 2), 2) + Math.pow((trackWidth / 2), 2));
 		pigeon = new Pigeon2(pigeonCANId, CANBusName);
@@ -311,7 +312,7 @@ public class SN_SuperSwerve extends SubsystemBase {
 	public void driveAutonomous(ChassisSpeeds chassisSpeeds) {
 		SwerveModuleState[] desiredModuleStates = swerveKinematics
 				.toSwerveModuleStates(ChassisSpeeds.discretize(chassisSpeeds, timeFromLastUpdate));
-		setModuleStates(desiredModuleStates, false);
+		setModuleStates(desiredModuleStates, true);
 	}
 
 	/**

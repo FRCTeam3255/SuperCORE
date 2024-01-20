@@ -9,7 +9,7 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.NeutralOut;
 import com.ctre.phoenix6.controls.PositionVoltage;
-import com.ctre.phoenix6.controls.VelocityVoltage;
+import com.ctre.phoenix6.controls.VelocityDutyCycle;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
@@ -18,7 +18,6 @@ import com.ctre.phoenix6.signals.SensorDirectionValue;
 import com.frcteam3255.utils.CTREModuleState;
 import com.frcteam3255.utils.SN_Math;
 
-import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -41,10 +40,9 @@ public class SN_SwerveModule extends SubsystemBase {
 	public static TalonFXConfiguration driveConfiguration;
 	public static TalonFXConfiguration steerConfiguration;
 	public static CANcoderConfiguration cancoderConfiguration;
-	public static SimpleMotorFeedforward driveFeedForward;
 
 	private DutyCycleOut driveMotorControllerOpen;
-	private VelocityVoltage driveMotorControllerClosed;
+	private VelocityDutyCycle driveMotorControllerClosed;
 	private PositionVoltage steerMotorController;
 
 	public static NeutralModeValue driveNeutralMode = NeutralModeValue.Brake;
@@ -97,7 +95,7 @@ public class SN_SwerveModule extends SubsystemBase {
 
 		driveMotor = new TalonFX(driveMotorID, CANBusName);
 		steerMotor = new TalonFX(steerMotorID, CANBusName);
-		driveMotorControllerClosed = new VelocityVoltage(0);
+		driveMotorControllerClosed = new VelocityDutyCycle(0);
 		driveMotorControllerOpen = new DutyCycleOut(0);
 		steerMotorController = new PositionVoltage(0);
 
@@ -106,7 +104,7 @@ public class SN_SwerveModule extends SubsystemBase {
 
 		driveConfiguration = new TalonFXConfiguration();
 		steerConfiguration = new TalonFXConfiguration();
-		driveFeedForward = new SimpleMotorFeedforward(0, 0, 0);
+		cancoderConfiguration = new CANcoderConfiguration();
 	}
 
 	public void configure() {
@@ -242,8 +240,6 @@ public class SN_SwerveModule extends SubsystemBase {
 		} else {
 			driveMotorControllerClosed.Velocity = SN_Math.metersToRotations(state.speedMetersPerSecond,
 					wheelCircumference, 1);
-			driveMotorControllerClosed.FeedForward = driveFeedForward.calculate(desiredState.speedMetersPerSecond);
-
 			driveMotor.setControl(driveMotorControllerClosed);
 		}
 

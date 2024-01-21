@@ -175,13 +175,22 @@ public class SN_SwerveModule extends SubsystemBase {
 	 *
 	 * @return Module's SwerveModuleState (velocity, angle)
 	 */
-	public SwerveModuleState getModuleState() {
+	public SwerveModuleState getActualModuleState() {
 
 		double velocity = SN_Math.rotationsToMeters(driveMotor.getVelocity().getValue(), wheelCircumference, 1);
 
 		Rotation2d angle = Rotation2d.fromDegrees(Units.rotationsToDegrees(steerMotor.getPosition().getValue()));
 
 		return new SwerveModuleState(velocity, angle);
+	}
+
+	/**
+	 * Get the last desired state (velocity, angle) of the module.
+	 *
+	 * @return Module's Desired SwerveModuleState (velocity, angle)
+	 */
+	public SwerveModuleState getDesiredModuleState() {
+		return lastDesiredSwerveModuleState;
 	}
 
 	/**
@@ -225,10 +234,9 @@ public class SN_SwerveModule extends SubsystemBase {
 	 *
 	 */
 	public void setModuleState(SwerveModuleState desiredState, boolean isOpenLoop) {
-		lastDesiredSwerveModuleState = desiredState;
-
 		// Optimize explanation: https://youtu.be/0Xi9yb1IMyA?t=226
-		SwerveModuleState state = CTREModuleState.optimize(desiredState, getModuleState().angle);
+		SwerveModuleState state = CTREModuleState.optimize(desiredState, getActualModuleState().angle);
+		lastDesiredSwerveModuleState = state;
 		// -*- Setting the Drive Motor -*-
 
 		if (isOpenLoop) {

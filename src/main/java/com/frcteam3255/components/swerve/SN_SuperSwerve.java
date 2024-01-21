@@ -229,7 +229,7 @@ public class SN_SuperSwerve extends SubsystemBase {
 		SwerveModuleState[] states = new SwerveModuleState[4];
 
 		for (SN_SwerveModule mod : modules) {
-			states[mod.moduleNumber] = mod.getModuleState();
+			states[mod.moduleNumber] = mod.getActualModuleState();
 		}
 
 		return states;
@@ -241,6 +241,12 @@ public class SN_SuperSwerve extends SubsystemBase {
 	 * @return An Array of Swerve module states (velocity, angle)
 	 */
 	public SwerveModuleState[] getDesiredModuleStates() {
+		SwerveModuleState[] states = new SwerveModuleState[4];
+
+		for (SN_SwerveModule mod : modules) {
+			states[mod.moduleNumber] = mod.getDesiredModuleState();
+		}
+
 		return lastDesiredStates;
 	}
 

@@ -44,7 +44,7 @@ public class SN_SwerveConstants {
 		this.driveGearRatio = driveGearRatio;
 		this.maxSpeedMeters = maxSpeedMeters;
 	}
-	public static class M4KI {
+	public static class MK4I {
 		/**
 		 * Constants for modules that have a Kraken as the drive motor (the steer motor
 		 * type doesn't matter here)

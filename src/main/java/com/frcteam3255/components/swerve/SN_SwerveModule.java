@@ -55,10 +55,10 @@ public class SN_SwerveModule extends SubsystemBase {
 
 	// -*- Static Physical Constants -*-
 	// These default to L2s, but should be overridden
-	public static double driveGearRatio = SN_SwerveConstants.MK4I_L2.driveGearRatio;
-	public static double steerGearRatio = SN_SwerveConstants.MK4I_L2.steerGearRatio;
-	public static double wheelCircumference = SN_SwerveConstants.MK4I_L2.wheelCircumference;
-	public static double maxModuleSpeedMeters = SN_SwerveConstants.MK4I_L2.maxSpeedMeters;
+	public static double driveGearRatio = SN_SwerveConstants.MK4I.FALCON.L2.driveGearRatio;
+	public static double steerGearRatio = SN_SwerveConstants.MK4I.FALCON.L2.steerGearRatio;
+	public static double wheelCircumference = SN_SwerveConstants.MK4I.FALCON.L2.wheelCircumference;
+	public static double maxModuleSpeedMeters = SN_SwerveConstants.MK4I.FALCON.L2.maxSpeedMeters;
 
 	// -*- Sim -*-
 	public static boolean isSimulation = false;

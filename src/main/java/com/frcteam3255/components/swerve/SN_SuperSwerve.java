@@ -277,7 +277,7 @@ public class SN_SuperSwerve extends SubsystemBase {
 		lastDesiredStates = desiredModuleStates;
 
 		for (SN_SwerveModule mod : modules) {
-			mod.setModuleState(desiredModuleStates[mod.moduleNumber], isOpenLoop);
+			mod.setModuleState(desiredModuleStates[mod.moduleNumber], isOpenLoop, false);
 		}
 	}
 

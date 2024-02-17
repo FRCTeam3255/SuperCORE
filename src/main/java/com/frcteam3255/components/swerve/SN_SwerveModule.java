@@ -232,8 +232,10 @@ public class SN_SwerveModule extends SubsystemBase {
 	 * @param isOpenLoop
 	 *            Is the module being set based on open loop or closed loop control
 	 *
+	 * @param steerInPlace
+	 *            If the module can be rotated in place
 	 */
-	public void setModuleState(SwerveModuleState desiredState, boolean isOpenLoop) {
+	public void setModuleState(SwerveModuleState desiredState, boolean isOpenLoop, boolean steerInPlace) {
 		// Optimize explanation: https://youtu.be/0Xi9yb1IMyA?t=226
 		SwerveModuleState state = CTREModuleState.optimize(desiredState, getActualModuleState().angle);
 		lastDesiredSwerveModuleState = state;
@@ -257,7 +259,7 @@ public class SN_SwerveModule extends SubsystemBase {
 
 		// If the requested speed is lower than a relevant steering speed,
 		// don't turn the motor. Set it to whatever it's previous angle was.
-		if (Math.abs(state.speedMetersPerSecond) < (minimumSteerSpeedPercent * maxModuleSpeedMeters)) {
+		if (Math.abs(state.speedMetersPerSecond) < (minimumSteerSpeedPercent * maxModuleSpeedMeters) && !steerInPlace) {
 			return;
 		}
 

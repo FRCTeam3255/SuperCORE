@@ -5,6 +5,7 @@
 package com.frcteam3255.components.swerve;
 
 import java.util.HashMap;
+import java.util.function.BooleanSupplier;
 
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.ctre.phoenix6.signals.InvertedValue;
@@ -50,7 +51,7 @@ public class SN_SuperSwerve extends SubsystemBase {
 	private Matrix<N3, N1> visionStdDevs;
 	public HashMap<String, Command> autoEventMap = new HashMap<>();
 	public ReplanningConfig autoReplanningConfig;
-	public boolean autoFlipPaths;
+	public BooleanSupplier autoFlipPaths;
 
 	public PathPlannerTrajectory exampleAuto;
 
@@ -135,7 +136,7 @@ public class SN_SuperSwerve extends SubsystemBase {
 			InvertedValue driveInversion, InvertedValue steerInversion, SensorDirectionValue cancoderInversion,
 			NeutralModeValue driveNeutralMode, NeutralModeValue steerNeutralMode, Matrix<N3, N1> stateStdDevs,
 			Matrix<N3, N1> visionStdDevs, PIDConstants autoDrivePID, PIDConstants autoSteerPID,
-			ReplanningConfig autoReplanningConfig, boolean autoFlipPaths, boolean isSimulation) {
+			ReplanningConfig autoReplanningConfig, BooleanSupplier autoFlipPaths, boolean isSimulation) {
 
 		isFieldRelative = true;
 		field = new Field2d();
@@ -183,7 +184,7 @@ public class SN_SuperSwerve extends SubsystemBase {
 		AutoBuilder.configureHolonomic(this::getPose, this::resetPoseToPose, this::getChassisSpeeds,
 				this::driveAutonomous, new HolonomicPathFollowerConfig(autoDrivePID, autoSteerPID,
 						swerveConstants.maxSpeedMeters, driveBaseRadius, autoReplanningConfig),
-				() -> autoFlipPaths, this);
+				autoFlipPaths, this);
 	}
 
 	public void configure() {

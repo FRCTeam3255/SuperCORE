@@ -376,7 +376,7 @@ public class SN_SuperSwerve extends SubsystemBase {
 
 	/**
 	 * Get the rotation of the drivetrain using the Pigeon. In simulation, this will
-	 * return a simulated value.
+	 * return a simulated value. The rotation will wrap from 0 to 360 degrees.
 	 *
 	 * @return Rotation of drivetrain. The Rotation2d object will deal with units
 	 *         for you as long as you specify your desired unit (ex.
@@ -385,9 +385,10 @@ public class SN_SuperSwerve extends SubsystemBase {
 	public Rotation2d getRotation() {
 		if (isSimulation && lastDesiredStates != null) {
 			simAngle += swerveKinematics.toChassisSpeeds(lastDesiredStates).omegaRadiansPerSecond * timeFromLastUpdate;
+			simAngle = simAngle % (2 * Math.PI);
 			return Rotation2d.fromRadians(simAngle);
 		}
-		return Rotation2d.fromDegrees(pigeon.getYaw().getValue());
+		return Rotation2d.fromDegrees(pigeon.getYaw().getValue() % 360);
 	}
 
 	/**

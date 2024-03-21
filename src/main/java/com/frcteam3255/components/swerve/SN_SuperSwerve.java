@@ -319,7 +319,7 @@ public class SN_SuperSwerve extends SubsystemBase {
 	public void driveAutonomous(ChassisSpeeds chassisSpeeds) {
 		SwerveModuleState[] desiredModuleStates = swerveKinematics
 				.toSwerveModuleStates(ChassisSpeeds.discretize(chassisSpeeds, timeFromLastUpdate));
-		setModuleStates(desiredModuleStates, true);
+		setModuleStates(desiredModuleStates, false);
 	}
 
 	/**

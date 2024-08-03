@@ -28,6 +28,7 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -400,6 +401,10 @@ public class SN_SuperSwerve extends SubsystemBase {
 	 * Resets the Yaw of the Pigeon to 0
 	 */
 	public void resetYaw() {
+		if (isSimulation) {
+			simAngle = 0;
+		}
+
 		pigeon.setYaw(0);
 	}
 
@@ -410,6 +415,10 @@ public class SN_SuperSwerve extends SubsystemBase {
 	 *            The yaw (in degrees) to reset the Pigeon to
 	 */
 	public void resetYaw(double yaw) {
+		if (isSimulation) {
+			simAngle = Units.degreesToRadians(yaw);
+		}
+
 		pigeon.setYaw(yaw);
 	}
 

@@ -372,6 +372,7 @@ public class SN_SuperSwerve extends SubsystemBase {
 	 *            The pose you would like to reset the pose estimator to
 	 */
 	public void resetPoseToPose(Pose2d pose) {
+		resetYaw(pose.getRotation().getDegrees());
 		swervePoseEstimator.resetPosition(getRotation(), getModulePositions(), pose);
 	}
 

@@ -1,4 +1,5 @@
-//LimelightHelpers v1.6 (April 9, 2024)
+// LimelightHelpers v1.6 (April 9, 2024)
+// Credit: https://github.com/LimelightVision/limelightlib-wpijava :3
 
 package com.frcteam3255.utils;
 

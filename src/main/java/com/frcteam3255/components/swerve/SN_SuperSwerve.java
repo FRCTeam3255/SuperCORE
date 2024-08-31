@@ -28,8 +28,6 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
-import edu.wpi.first.units.Angle;
-import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -394,7 +392,7 @@ public class SN_SuperSwerve extends SubsystemBase {
 	 *         for you as long as you specify your desired unit (ex.
 	 *         rotation.getDegrees)
 	 */
-	public Rotation2d getGyroRotation() {
+	private Rotation2d getGyroRotation() {
 		if (isSimulation && lastDesiredStates != null) {
 			simAngle += swerveKinematics.toChassisSpeeds(lastDesiredStates).omegaRadiansPerSecond * timeFromLastUpdate;
 
@@ -406,16 +404,6 @@ public class SN_SuperSwerve extends SubsystemBase {
 		}
 		double yaw = pigeon.getYaw().getValueAsDouble() % 360;
 		return (yaw < 0) ? Rotation2d.fromDegrees(yaw + 360) : Rotation2d.fromDegrees(yaw);
-	}
-
-	/**
-	 * Get the rotation of the drivetrain using the Pigeon. In simulation, this will
-	 * return a simulated value. The rotation will wrap from 0 to 360 degrees.
-	 *
-	 * @return Rotation of drivetrain as a Measure
-	 */
-	public Measure<Angle> getGyroRotationMeasure() {
-		return Units.Degrees.of(getGyroRotation().getDegrees());
 	}
 
 	/**
@@ -432,7 +420,7 @@ public class SN_SuperSwerve extends SubsystemBase {
 	 * @param yaw
 	 *            The yaw (in degrees) to reset the Pigeon to
 	 */
-	public void resetYaw(double yaw) {
+	private void resetYaw(double yaw) {
 		if (isSimulation) {
 			simAngle = Units.Radians.convertFrom(yaw, Units.Degrees);
 		}

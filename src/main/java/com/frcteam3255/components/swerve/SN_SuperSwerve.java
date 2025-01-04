@@ -12,10 +12,8 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.path.PathPlannerTrajectory;
-import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
-import com.pathplanner.lib.util.PIDConstants;
-import com.pathplanner.lib.util.ReplanningConfig;
+import com.pathplanner.lib.config.PIDConstants;
+import com.pathplanner.lib.trajectory.PathPlannerTrajectory;
 
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
@@ -51,7 +49,6 @@ public class SN_SuperSwerve extends SubsystemBase {
 	private Matrix<N3, N1> stateStdDevs;
 	private Matrix<N3, N1> visionStdDevs;
 	public HashMap<String, Command> autoEventMap = new HashMap<>();
-	public ReplanningConfig autoReplanningConfig;
 	public BooleanSupplier autoFlipPaths;
 
 	public PathPlannerTrajectory exampleAuto;
@@ -182,7 +179,7 @@ public class SN_SuperSwerve extends SubsystemBase {
 		resetModulesToAbsolute();
 		configure();
 
-		AutoBuilder.configureHolonomic(this::getPose, this::resetPoseToPose, this::getChassisSpeeds,
+		AutoBuilder.configure(this::getPose, this::resetPoseToPose, this::getChassisSpeeds,
 				this::driveAutonomous, new HolonomicPathFollowerConfig(autoDrivePID, autoSteerPID,
 						swerveConstants.maxSpeedMeters, driveBaseRadius, autoReplanningConfig),
 				autoFlipPaths, this);

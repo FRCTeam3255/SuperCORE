@@ -16,8 +16,8 @@ public class SN_XboxController extends XboxController {
 	public Trigger btn_X = new Trigger(super::getXButton);
 	public Trigger btn_Y = new Trigger(super::getYButton);
 
-	public Trigger btn_LeftBumper = new Trigger(super::getLeftBumper);
-	public Trigger btn_RightBumper = new Trigger(super::getRightBumper);
+	public Trigger btn_LeftBumper = new Trigger(super::getLeftBumperButton);
+	public Trigger btn_RightBumper = new Trigger(super::getRightBumperButton);
 
 	public Trigger btn_Start = new Trigger(super::getStartButton);
 	public Trigger btn_Back = new Trigger(super::getBackButton);

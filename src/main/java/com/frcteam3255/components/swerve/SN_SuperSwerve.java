@@ -13,6 +13,8 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.PIDConstants;
+import com.pathplanner.lib.config.RobotConfig;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.trajectory.PathPlannerTrajectory;
 
 import edu.wpi.first.math.Matrix;
@@ -26,7 +28,10 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
-import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.AngleUnit;
+import edu.wpi.first.units.DistanceUnit;
+import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -40,10 +45,6 @@ public class SN_SuperSwerve extends SubsystemBase {
 	public boolean isFieldRelative;
 
 	public SN_SwerveConstants swerveConstants;
-	/**
-	 * Drive base radius in meters. Distance from robot center to furthest module.
-	 */
-	private double driveBaseRadius;
 	public PIDConstants autoDrivePID;
 	public PIDConstants autoSteerPID;
 	private Matrix<N3, N1> stateStdDevs;
@@ -81,10 +82,10 @@ public class SN_SuperSwerve extends SubsystemBase {
 	 *            An array of SN_SwerveModules.
 	 * @param wheelbase
 	 *            Physically measured distance (center to center) between the Left
-	 *            and Right wheels in meters
+	 *            and Right wheels.
 	 * @param trackWidth
 	 *            Physically measured distance (center to center) between the Front
-	 *            and Back wheels in meters
+	 *            and Back wheels.
 	 * @param CANBusName
 	 *            The name of the CANBus that all of the swerve components are on
 	 * @param pigeonCANId
@@ -97,7 +98,7 @@ public class SN_SuperSwerve extends SubsystemBase {
 	 * @param steerInversion
 	 *            The direction that is positive for steer motors
 	 * @param cancoderInversion
-	 *            The direction that is positive for Cancoders
+	 *            The direction that is positive for CANcoders
 	 * @param driveNeutralMode
 	 *            The behavior of every drive motor when set to neutral-output
 	 * @param steerNeutralMode
@@ -116,11 +117,8 @@ public class SN_SuperSwerve extends SubsystemBase {
 	 * @param autoSteerPID
 	 *            The rotational PID constants applied to the entire Drivetrain
 	 *            during autonomous in order to reach the correct pose
-	 * @param autoReplanningConfig
-	 *            The configuration for replanning paths in autonomous. See the
-	 *            <a href=
-	 *            "https://mjansen4857.com/pathplanner/docs/java/com/pathplanner/lib/util/ReplanningConfig.html">PathPlanner
-	 *            API</a> for more information
+	 * @param robotConfig
+	 *            The robot configuration used by PathPlanner.
 	 * @param autoFlipPaths
 	 *            Determines if paths should be flipped to the other side of the
 	 *            field. This will maintain a global blue alliance origin. Used for
@@ -129,21 +127,23 @@ public class SN_SuperSwerve extends SubsystemBase {
 	 *            If your robot is running in Simulation. As of 2023, you can supply
 	 *            this with Robot.isSimulation();
 	 */
-	public SN_SuperSwerve(SN_SwerveConstants swerveConstants, SN_SwerveModule[] modules, double wheelbase,
-			double trackWidth, String CANBusName, int pigeonCANId, double minimumSteerPercent,
-			InvertedValue driveInversion, InvertedValue steerInversion, SensorDirectionValue cancoderInversion,
-			NeutralModeValue driveNeutralMode, NeutralModeValue steerNeutralMode, Matrix<N3, N1> stateStdDevs,
-			Matrix<N3, N1> visionStdDevs, PIDConstants autoDrivePID, PIDConstants autoSteerPID,
-			ReplanningConfig autoReplanningConfig, BooleanSupplier autoFlipPaths, boolean isSimulation) {
+	public SN_SuperSwerve(SN_SwerveConstants swerveConstants, SN_SwerveModule[] modules,
+			Measure<DistanceUnit> wheelbase, Measure<DistanceUnit> trackWidth, String CANBusName, int pigeonCANId,
+			double minimumSteerPercent, InvertedValue driveInversion, InvertedValue steerInversion,
+			SensorDirectionValue cancoderInversion, NeutralModeValue driveNeutralMode,
+			NeutralModeValue steerNeutralMode, Matrix<N3, N1> stateStdDevs, Matrix<N3, N1> visionStdDevs,
+			PIDConstants autoDrivePID, PIDConstants autoSteerPID, RobotConfig robotConfig,
+			BooleanSupplier autoFlipPaths, boolean isSimulation) {
 
 		isFieldRelative = true;
 		field = new Field2d();
 
+		double modXPos = wheelbase.in(Units.Meters) / 2.0;
+		double modYPos = trackWidth.in(Units.Meters) / 2.0;
 		// Location of all modules in the WPILib robot coordinate system
-		swerveKinematics = new SwerveDriveKinematics(new Translation2d(wheelbase / 2.0, trackWidth / 2.0),
-				new Translation2d(wheelbase / 2.0, -trackWidth / 2.0),
-				new Translation2d(-wheelbase / 2.0, trackWidth / 2.0),
-				new Translation2d(-wheelbase / 2.0, -trackWidth / 2.0));
+		swerveKinematics = new SwerveDriveKinematics(new Translation2d(modXPos, modYPos),
+				new Translation2d(modXPos, -modYPos), new Translation2d(-modXPos, modYPos),
+				new Translation2d(-modXPos, -modYPos));
 
 		this.modules = modules;
 		this.stateStdDevs = stateStdDevs;
@@ -152,7 +152,6 @@ public class SN_SuperSwerve extends SubsystemBase {
 		this.autoDrivePID = autoDrivePID;
 		this.autoSteerPID = autoSteerPID;
 		this.isSimulation = isSimulation;
-		this.autoReplanningConfig = autoReplanningConfig;
 		this.autoFlipPaths = autoFlipPaths;
 
 		SN_SwerveModule.isSimulation = isSimulation;
@@ -171,7 +170,6 @@ public class SN_SuperSwerve extends SubsystemBase {
 		SN_SwerveModule.steerNeutralMode = steerNeutralMode;
 		SN_SwerveModule.cancoderInversion = cancoderInversion;
 
-		driveBaseRadius = Math.sqrt(Math.pow((wheelbase / 2), 2) + Math.pow((trackWidth / 2), 2));
 		pigeon = new Pigeon2(pigeonCANId, CANBusName);
 
 		// The absolute encoders need time to initialize
@@ -179,10 +177,8 @@ public class SN_SuperSwerve extends SubsystemBase {
 		resetModulesToAbsolute();
 		configure();
 
-		AutoBuilder.configure(this::getPose, this::resetPoseToPose, this::getChassisSpeeds,
-				this::driveAutonomous, new HolonomicPathFollowerConfig(autoDrivePID, autoSteerPID,
-						swerveConstants.maxSpeedMeters, driveBaseRadius, autoReplanningConfig),
-				autoFlipPaths, this);
+		AutoBuilder.configure(this::getPose, this::resetPoseToPose, this::getChassisSpeeds, this::driveAutonomous,
+				new PPHolonomicDriveController(autoDrivePID, autoSteerPID), robotConfig, autoFlipPaths, this);
 	}
 
 	public void configure() {
@@ -369,7 +365,7 @@ public class SN_SuperSwerve extends SubsystemBase {
 	 *            The pose you would like to reset the pose estimator to
 	 */
 	public void resetPoseToPose(Pose2d pose) {
-		resetYaw(pose.getRotation().getDegrees());
+		resetYaw(Units.Degrees.of(pose.getRotation().getDegrees()));
 		swervePoseEstimator.resetPosition(getRotation(), getModulePositions(), pose);
 	}
 
@@ -410,14 +406,14 @@ public class SN_SuperSwerve extends SubsystemBase {
 	 * Resets the Yaw of the Pigeon to the given value
 	 *
 	 * @param yaw
-	 *            The yaw (in degrees) to reset the Pigeon to
+	 *            The yaw to reset the Pigeon to
 	 */
-	public void resetYaw(double yaw) {
+	public void resetYaw(Measure<AngleUnit> yaw) {
 		if (isSimulation) {
-			simAngle = Units.degreesToRadians(yaw);
+			simAngle = yaw.in(Units.Radians);
 		}
 
-		pigeon.setYaw(yaw);
+		pigeon.setYaw(yaw.in(Units.Degrees));
 	}
 
 	/**

@@ -2,7 +2,7 @@
     "fileName": "SuperCORE.json",
     "name": "SuperCORE",
     "version": "${pubVersion}",
-    "frcYear": 2024,
+    "frcYear": 2025,
     "uuid": "f82a9412-6f53-4bc0-960c-6895a5236f57",
     "mavenUrls": [
         "http://127.0.0.1:5500/releases/"

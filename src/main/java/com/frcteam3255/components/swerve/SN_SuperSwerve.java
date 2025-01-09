@@ -12,10 +12,10 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.path.PathPlannerTrajectory;
-import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
-import com.pathplanner.lib.util.PIDConstants;
-import com.pathplanner.lib.util.ReplanningConfig;
+import com.pathplanner.lib.config.PIDConstants;
+import com.pathplanner.lib.config.RobotConfig;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import com.pathplanner.lib.trajectory.PathPlannerTrajectory;
 
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
@@ -42,16 +42,11 @@ public class SN_SuperSwerve extends SubsystemBase {
 	public boolean isFieldRelative;
 
 	public SN_SwerveConstants swerveConstants;
-	/**
-	 * Drive base radius in meters. Distance from robot center to furthest module.
-	 */
-	private double driveBaseRadius;
 	public PIDConstants autoDrivePID;
 	public PIDConstants autoSteerPID;
 	private Matrix<N3, N1> stateStdDevs;
 	private Matrix<N3, N1> visionStdDevs;
 	public HashMap<String, Command> autoEventMap = new HashMap<>();
-	public ReplanningConfig autoReplanningConfig;
 	public BooleanSupplier autoFlipPaths;
 
 	public PathPlannerTrajectory exampleAuto;
@@ -119,11 +114,8 @@ public class SN_SuperSwerve extends SubsystemBase {
 	 * @param autoSteerPID
 	 *            The rotational PID constants applied to the entire Drivetrain
 	 *            during autonomous in order to reach the correct pose
-	 * @param autoReplanningConfig
-	 *            The configuration for replanning paths in autonomous. See the
-	 *            <a href=
-	 *            "https://mjansen4857.com/pathplanner/docs/java/com/pathplanner/lib/util/ReplanningConfig.html">PathPlanner
-	 *            API</a> for more information
+	 * @param robotConfig
+	 *            The robot configuration used by PathPlanner.
 	 * @param autoFlipPaths
 	 *            Determines if paths should be flipped to the other side of the
 	 *            field. This will maintain a global blue alliance origin. Used for
@@ -136,8 +128,8 @@ public class SN_SuperSwerve extends SubsystemBase {
 			double trackWidth, String CANBusName, int pigeonCANId, double minimumSteerPercent,
 			InvertedValue driveInversion, InvertedValue steerInversion, SensorDirectionValue cancoderInversion,
 			NeutralModeValue driveNeutralMode, NeutralModeValue steerNeutralMode, Matrix<N3, N1> stateStdDevs,
-			Matrix<N3, N1> visionStdDevs, PIDConstants autoDrivePID, PIDConstants autoSteerPID,
-			ReplanningConfig autoReplanningConfig, BooleanSupplier autoFlipPaths, boolean isSimulation) {
+			Matrix<N3, N1> visionStdDevs, PIDConstants autoDrivePID, PIDConstants autoSteerPID, RobotConfig robotConfig,
+			BooleanSupplier autoFlipPaths, boolean isSimulation) {
 
 		isFieldRelative = true;
 		field = new Field2d();
@@ -155,7 +147,6 @@ public class SN_SuperSwerve extends SubsystemBase {
 		this.autoDrivePID = autoDrivePID;
 		this.autoSteerPID = autoSteerPID;
 		this.isSimulation = isSimulation;
-		this.autoReplanningConfig = autoReplanningConfig;
 		this.autoFlipPaths = autoFlipPaths;
 
 		SN_SwerveModule.isSimulation = isSimulation;
@@ -174,7 +165,6 @@ public class SN_SuperSwerve extends SubsystemBase {
 		SN_SwerveModule.steerNeutralMode = steerNeutralMode;
 		SN_SwerveModule.cancoderInversion = cancoderInversion;
 
-		driveBaseRadius = Math.sqrt(Math.pow((wheelbase / 2), 2) + Math.pow((trackWidth / 2), 2));
 		pigeon = new Pigeon2(pigeonCANId, CANBusName);
 
 		// The absolute encoders need time to initialize
@@ -182,10 +172,8 @@ public class SN_SuperSwerve extends SubsystemBase {
 		resetModulesToAbsolute();
 		configure();
 
-		AutoBuilder.configureHolonomic(this::getPose, this::resetPoseToPose, this::getChassisSpeeds,
-				this::driveAutonomous, new HolonomicPathFollowerConfig(autoDrivePID, autoSteerPID,
-						swerveConstants.maxSpeedMeters, driveBaseRadius, autoReplanningConfig),
-				autoFlipPaths, this);
+		AutoBuilder.configure(this::getPose, this::resetPoseToPose, this::getChassisSpeeds, this::driveAutonomous,
+				new PPHolonomicDriveController(autoDrivePID, autoSteerPID), robotConfig, autoFlipPaths, this);
 	}
 
 	public void configure() {

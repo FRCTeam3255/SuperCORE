@@ -135,7 +135,8 @@ public class SN_SwerveModule extends SubsystemBase {
 	 * @return Position in rotations
 	 */
 	public double getRawAbsoluteEncoder() {
-		return absoluteEncoder.getAbsolutePosition().getValue();
+		// TODO: change to units using .getValue
+		return absoluteEncoder.getAbsolutePosition().getValueAsDouble(); 
 	}
 
 	/**
@@ -176,10 +177,11 @@ public class SN_SwerveModule extends SubsystemBase {
 	 * @return Module's SwerveModuleState (velocity, angle)
 	 */
 	public SwerveModuleState getActualModuleState() {
-
-		double velocity = SN_Math.rotationsToMeters(driveMotor.getVelocity().getValue(), wheelCircumference, 1);
-
-		Rotation2d angle = Rotation2d.fromDegrees(Units.rotationsToDegrees(steerMotor.getPosition().getValue()));
+		// TODO: change to units using .getValue
+		double velocity = SN_Math.rotationsToMeters(driveMotor.getVelocity().getValueAsDouble(), wheelCircumference, 1);
+		
+		// TODO: change to units using .getValue
+		Rotation2d angle = Rotation2d.fromDegrees(Units.rotationsToDegrees(steerMotor.getPosition().getValueAsDouble()));
 
 		return new SwerveModuleState(velocity, angle);
 	}
@@ -207,10 +209,10 @@ public class SN_SwerveModule extends SubsystemBase {
 
 			return new SwerveModulePosition(desiredDrivePosition, lastDesiredSwerveModuleState.angle);
 		}
-
-		double distance = SN_Math.rotationsToMeters(driveMotor.getPosition().getValue(), wheelCircumference, 1);
-
-		Rotation2d angle = Rotation2d.fromDegrees(Units.rotationsToDegrees(steerMotor.getPosition().getValue()));
+		// TODO: change to units using .getValue
+		double distance = SN_Math.rotationsToMeters(driveMotor.getPosition().getValueAsDouble(), wheelCircumference, 1);
+		// TODO: change to units using .getValue
+		Rotation2d angle = Rotation2d.fromDegrees(Units.rotationsToDegrees(steerMotor.getPosition().getValueAsDouble()));
 
 		return new SwerveModulePosition(distance, angle);
 	}

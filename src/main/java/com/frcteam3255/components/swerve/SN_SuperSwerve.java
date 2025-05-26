@@ -125,7 +125,7 @@ public class SN_SuperSwerve extends SubsystemBase {
 	 *            The rotational PID constants applied to the entire Drivetrain
 	 *            during autonomous in order to reach the correct pose
 	 * @param teleopAutoDriveController
-	 *            The PID controller used to control rotational snapping & auto
+	 *            The PID controller used to control rotational snapping and auto
 	 *            driving during Teleoperated.
 	 * @param turnSpeed
 	 *            The turning speed of the robot.

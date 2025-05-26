@@ -17,7 +17,9 @@ import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.trajectory.PathPlannerTrajectory;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -30,7 +32,9 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -60,9 +64,10 @@ public class SN_SuperSwerve extends SubsystemBase {
 	public double timeFromLastUpdate = 0;
 	public double lastSimTime = Timer.getFPGATimestamp();
 	public Field2d field;
-	public Pose2d desiredAlignmentPose = new Pose2d();
 	public TalonFXConfiguration driveConfig, steerConfig;
 	public CANcoderConfiguration cancoderConfig;
+	public HolonomicDriveController teleopAutoDriveController;
+	public AngularVelocity turnSpeed;
 
 	/**
 	 * <p>
@@ -119,6 +124,11 @@ public class SN_SuperSwerve extends SubsystemBase {
 	 * @param autoSteerPID
 	 *            The rotational PID constants applied to the entire Drivetrain
 	 *            during autonomous in order to reach the correct pose
+	 * @param teleopAutoDriveController
+	 *            The PID controller used to control rotational snapping & auto
+	 *            driving during Teleoperated.
+	 * @param turnSpeed
+	 *            The turning speed of the robot.
 	 * @param robotConfig
 	 *            The robot configuration used by PathPlanner.
 	 * @param autoFlipPaths
@@ -133,7 +143,8 @@ public class SN_SuperSwerve extends SubsystemBase {
 			double trackWidth, String CANBusName, int pigeonCANId, double minimumSteerPercent,
 			TalonFXConfiguration driveConfig, TalonFXConfiguration steerConfig, CANcoderConfiguration cancoderConfig,
 			Matrix<N3, N1> stateStdDevs, Matrix<N3, N1> visionStdDevs, PIDConstants autoDrivePID,
-			PIDConstants autoSteerPID, RobotConfig robotConfig, BooleanSupplier autoFlipPaths, boolean isSimulation) {
+			PIDConstants autoSteerPID, HolonomicDriveController teleopAutoDriveController, AngularVelocity turnSpeed,
+			RobotConfig robotConfig, BooleanSupplier autoFlipPaths, boolean isSimulation) {
 
 		isFieldRelative = true;
 		field = new Field2d();
@@ -152,6 +163,8 @@ public class SN_SuperSwerve extends SubsystemBase {
 		this.autoSteerPID = autoSteerPID;
 		this.isSimulation = isSimulation;
 		this.autoFlipPaths = autoFlipPaths;
+		this.teleopAutoDriveController = teleopAutoDriveController;
+		this.turnSpeed = turnSpeed;
 
 		SN_SwerveModule.isSimulation = isSimulation;
 		SN_SwerveModule.wheelCircumference = swerveConstants.wheelCircumference;
@@ -297,6 +310,22 @@ public class SN_SuperSwerve extends SubsystemBase {
 	}
 
 	/**
+	 * Drive the drivetrain with pre-calculated ChassisSpeeds
+	 *
+	 * @param chassisSpeeds
+	 *            Desired ChassisSpeeds
+	 * @param isOpenLoop
+	 *            Are the modules being set based on open loop or closed loop
+	 *            control
+	 *
+	 */
+	public void drive(ChassisSpeeds chassisSpeeds, boolean isOpenLoop) {
+		SwerveModuleState[] desiredModuleStates = swerveKinematics
+				.toSwerveModuleStates(ChassisSpeeds.discretize(chassisSpeeds, timeFromLastUpdate));
+		setModuleStates(desiredModuleStates, isOpenLoop);
+	}
+
+	/**
 	 * Drive the drivetrain in autonomous. Autonomous driving is always closed loop.
 	 *
 	 * @param chassisSpeeds
@@ -304,9 +333,7 @@ public class SN_SuperSwerve extends SubsystemBase {
 	 *
 	 */
 	public void driveAutonomous(ChassisSpeeds chassisSpeeds) {
-		SwerveModuleState[] desiredModuleStates = swerveKinematics
-				.toSwerveModuleStates(ChassisSpeeds.discretize(chassisSpeeds, timeFromLastUpdate));
-		setModuleStates(desiredModuleStates, false);
+		drive(chassisSpeeds, false);
 	}
 
 	/**
@@ -441,83 +468,84 @@ public class SN_SuperSwerve extends SubsystemBase {
 		lastSimTime = Timer.getFPGATimestamp();
 	}
 
-	// /**
-	// * Returns the rotational velocity calculated with PID control to reach the
-	// * given rotation. This must be called every loop until you reach the given
-	// * rotation.
-	// *
-	// * @param desiredYaw
-	// * The desired yaw to rotate to
-	// * @return The desired velocity needed to rotate to that position.
-	// */
-	// public AngularVelocity getVelocityToRotate(Rotation2d desiredYaw) {
-	// double yawSetpoint =
-	// constDrivetrain.TELEOP_AUTO_ALIGN.TELEOP_AUTO_ALIGN_CONTROLLER.getThetaController()
-	// .calculate(getRotation().getRadians(), desiredYaw.getRadians());
+	/**
+	 * Returns the rotational velocity calculated with PID control to reach the
+	 * given rotation. This must be called every loop until you reach the given
+	 * rotation.
+	 *
+	 * @param desiredYaw
+	 *            The desired yaw to rotate to
+	 * @return The desired velocity needed to rotate to that position.
+	 */
+	public AngularVelocity getVelocityToRotate(Rotation2d desiredYaw) {
+		double yawSetpoint = teleopAutoDriveController.getThetaController().calculate(getRotation().getRadians(),
+				desiredYaw.getRadians());
 
-	// // limit the PID output to our maximum rotational speed
-	// yawSetpoint = MathUtil.clamp(yawSetpoint,
-	// -constDrivetrain.TURN_SPEED.in(Units.RadiansPerSecond),
-	// constDrivetrain.TURN_SPEED.in(Units.RadiansPerSecond));
+		// limit the PID output to our maximum rotational speed
+		yawSetpoint = MathUtil.clamp(yawSetpoint, -turnSpeed.in(Units.RadiansPerSecond),
+				turnSpeed.in(Units.RadiansPerSecond));
 
-	// return Units.RadiansPerSecond.of(yawSetpoint);
-	// }
+		return Units.RadiansPerSecond.of(yawSetpoint);
+	}
 
-	// /**
-	// * Aligns the drivetrain to a desired rotation.
-	// *
-	// */
-	// public void rotationalAlign(boolean isRedAlliance, Pose2d desiredTarget,
-	// LinearVelocity xVelocity,
-	// LinearVelocity yVelocity, boolean isOpenLoop) {
-	// int redAllianceMultiplier = isRedAlliance ? -1 : 1;
-	// // Rotational-only auto-align
-	// drive(new
-	// Translation2d(xVelocity.times(redAllianceMultiplier).in(Units.MetersPerSecond),
-	// yVelocity.times(redAllianceMultiplier).in(Units.MetersPerSecond)),
-	// getVelocityToRotate(desiredTarget.getRotation()).in(Units.RadiansPerSecond),
-	// isOpenLoop);
-	// }
+	// I would write "field relative" or "robot relative" somewhere here but I genuinely don't know if its robot relative (i think it is?)
+	/**
+	 * Aligns the drivetrain rotationally while still allowing for translational
+	 * inputs from the driver.
+	 *
+	 * @param isRedAlliance
+	 *            If we are a red robot this match
+	 * @param desiredTarget
+	 *            The desired rotation to reach
+	 * @param xVelocity
+	 *            The manual translational velocity on the X axis 
+	 * @param yVelocity
+	 *            The manual translational velocity on the Y axis 
+	 * @param isOpenLoop
+	 *            If we are driving using OpenLoop control
+	 */
+	public void rotationalAlign(boolean isRedAlliance, Pose2d desiredTarget, LinearVelocity xVelocity,
+			LinearVelocity yVelocity, boolean isOpenLoop) {
+		int redAllianceMultiplier = isRedAlliance ? -1 : 1;
+		// Rotational-only auto-align
+		drive(new Translation2d(xVelocity.times(redAllianceMultiplier).in(Units.MetersPerSecond),
+				yVelocity.times(redAllianceMultiplier).in(Units.MetersPerSecond)),
+				getVelocityToRotate(desiredTarget.getRotation()).in(Units.RadiansPerSecond), isOpenLoop);
+	}
 
-	// /**
-	// * Contains logic for automatically aligning & automatically driving to a
-	// pose.
-	// * May align only rotationally or automatically drive to the pose.
-	// */
-	// public void autoAlign(boolean isRedAlliance, Distance distanceFromTarget,
-	// Pose2d desiredTarget,
-	// LinearVelocity xVelocity, LinearVelocity yVelocity, AngularVelocity
-	// rVelocity, boolean isOpenLoop,
-	// Distance maxAutoDriveDistance, boolean lockX, boolean lockY) {
+	/**
+			
+	 * Automatically drives to a pose during the teleoperated period. 
+	 * If an axis is locked, it will override the automatically calculated input with the driver's input.
+	 * 
+	 * @param isRedAlliance If we are a red robot this match
+	 * @param desiredTarget The desired pose to drive to
+	 * @param xVelocity The manual translational velocity on the X axis
+ 
+	 * @param yVelocity The manual translational velocity on the Y axis
+	 * @param isOpenLoop  If we are driving using OpenLoop control
+	 * @param lockX If manual velocities should be used on the X axis
+	 * @param lockY If manual velocities should be used on the Y axis
+	 */
+	public void autoAlign(boolean isRedAlliance, Pose2d desiredTarget,
+			LinearVelocity xVelocity, LinearVelocity yVelocity, boolean isOpenLoop, boolean lockX, boolean lockY) {
 
-	// desiredAlignmentPose = desiredTarget;
-	// int redAllianceMultiplier = isRedAlliance ? -1 : 1;
-	// double manualXVelocity =
-	// xVelocity.times(redAllianceMultiplier).in(Units.MetersPerSecond);
-	// double manualYVelocity =
-	// yVelocity.times(redAllianceMultiplier).in(Units.MetersPerSecond);
-	// if (distanceFromTarget.gte(maxAutoDriveDistance)) {
-	// // Rotational-only auto-align
-	// rotationalAlign(desiredTarget, xVelocity, yVelocity, isOpenLoop);
-	// } else {
-	// // Full auto-align
-	// ChassisSpeeds automatedDTVelocity =
-	// constDrivetrain.TELEOP_AUTO_ALIGN.TELEOP_AUTO_ALIGN_CONTROLLER
-	// .calculate(getPose(), desiredTarget, 0, desiredTarget.getRotation());
+		int redAllianceMultiplier = isRedAlliance ? -1 : 1;
+		double manualXVelocity = xVelocity.times(redAllianceMultiplier).in(Units.MetersPerSecond);
+		double manualYVelocity = yVelocity.times(redAllianceMultiplier).in(Units.MetersPerSecond);
+			// Full auto-align
+			ChassisSpeeds automatedDTVelocity = teleopAutoDriveController.calculate(getPose(), desiredTarget, 0,
+					desiredTarget.getRotation());
 
-	// // Speed limit based on elevator height
-	// LinearVelocity linearSpeedLimit = constDrivetrain.OBSERVED_DRIVE_SPEED;
-	// AngularVelocity angularSpeedLimit = constDrivetrain.TURN_SPEED;
-
-	// if (lockX) {
-	// automatedDTVelocity.vxMetersPerSecond = manualXVelocity;
-	// }
-	// if (lockY) {
-	// automatedDTVelocity.vyMetersPerSecond = manualYVelocity;
-	// }
-	// drive(automatedDTVelocity, isOpenLoop);
-	// }
-	// }
+			if (lockX) {
+				automatedDTVelocity.vxMetersPerSecond = manualXVelocity;
+			}
+			if (lockY) {
+				automatedDTVelocity.vyMetersPerSecond = manualYVelocity;
+			}
+			drive(automatedDTVelocity, isOpenLoop);
+		}
+	}
 
 	public boolean isAtRotation(Rotation2d desiredRotation, Angle tolerance) {
 		return (getRotation().getMeasure().compareTo(desiredRotation.getMeasure().minus(tolerance)) > 0)

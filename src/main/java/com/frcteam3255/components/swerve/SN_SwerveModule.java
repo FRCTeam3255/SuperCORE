@@ -12,7 +12,6 @@ import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityDutyCycle;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.frcteam3255.utils.CTREModuleState;
 import com.frcteam3255.utils.SN_Math;
 
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -215,30 +214,29 @@ public class SN_SwerveModule extends SubsystemBase {
 	 *            If the module can be rotated in place
 	 */
 	public void setModuleState(SwerveModuleState desiredState, boolean isOpenLoop, boolean steerInPlace) {
-		// Optimize explanation: https://youtu.be/0Xi9yb1IMyA?t=226
-		SwerveModuleState state = CTREModuleState.optimize(desiredState, getActualModuleState().angle);
-		lastDesiredSwerveModuleState = state;
+		lastDesiredSwerveModuleState = desiredState;
 		// -*- Setting the Drive Motor -*-
 
 		if (isOpenLoop) {
 			// The output is from -1 to 1. Essentially a percentage
 			// So, the requested speed divided by it's max speed.
-			driveMotorControllerOpen.Output = (state.speedMetersPerSecond / maxModuleSpeedMeters);
+			driveMotorControllerOpen.Output = (desiredState.speedMetersPerSecond / maxModuleSpeedMeters);
 			driveMotor.setControl(driveMotorControllerOpen);
 
 		} else {
-			driveMotorControllerClosed.Velocity = SN_Math.metersToRotations(state.speedMetersPerSecond,
+			driveMotorControllerClosed.Velocity = SN_Math.metersToRotations(desiredState.speedMetersPerSecond,
 					wheelCircumference, 1);
 			driveMotor.setControl(driveMotorControllerClosed);
 		}
 
 		// -*- Setting the Steer Motor -*-
 
-		double rotation = state.angle.getRotations();
+		double rotation = desiredState.angle.getRotations();
 
 		// If the requested speed is lower than a relevant steering speed,
 		// don't turn the motor. Set it to whatever it's previous angle was.
-		if (Math.abs(state.speedMetersPerSecond) < (minimumSteerSpeedPercent * maxModuleSpeedMeters) && !steerInPlace) {
+		if (Math.abs(desiredState.speedMetersPerSecond) < (minimumSteerSpeedPercent * maxModuleSpeedMeters)
+				&& !steerInPlace) {
 			return;
 		}
 

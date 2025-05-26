@@ -488,7 +488,8 @@ public class SN_SuperSwerve extends SubsystemBase {
 		return Units.RadiansPerSecond.of(yawSetpoint);
 	}
 
-	// I would write "field relative" or "robot relative" somewhere here but I genuinely don't know if its robot relative (i think it is?)
+	// I would write "field relative" or "robot relative" somewhere here but I
+	// genuinely don't know if its robot relative (i think it is?)
 	/**
 	 * Aligns the drivetrain rotationally while still allowing for translational
 	 * inputs from the driver.
@@ -498,9 +499,9 @@ public class SN_SuperSwerve extends SubsystemBase {
 	 * @param desiredTarget
 	 *            The desired rotation to reach
 	 * @param xVelocity
-	 *            The manual translational velocity on the X axis 
+	 *            The manual translational velocity on the X axis
 	 * @param yVelocity
-	 *            The manual translational velocity on the Y axis 
+	 *            The manual translational velocity on the Y axis
 	 * @param isOpenLoop
 	 *            If we are driving using OpenLoop control
 	 */
@@ -514,37 +515,44 @@ public class SN_SuperSwerve extends SubsystemBase {
 	}
 
 	/**
-			
-	 * Automatically drives to a pose during the teleoperated period. 
-	 * If an axis is locked, it will override the automatically calculated input with the driver's input.
-	 * 
-	 * @param isRedAlliance If we are a red robot this match
-	 * @param desiredTarget The desired pose to drive to
-	 * @param xVelocity The manual translational velocity on the X axis
- 
-	 * @param yVelocity The manual translational velocity on the Y axis
-	 * @param isOpenLoop  If we are driving using OpenLoop control
-	 * @param lockX If manual velocities should be used on the X axis
-	 * @param lockY If manual velocities should be used on the Y axis
+	 *
+	 * Automatically drives to a pose during the teleoperated period. If an axis is
+	 * locked, it will override the automatically calculated input with the driver's
+	 * input.
+	 *
+	 * @param isRedAlliance
+	 *            If we are a red robot this match
+	 * @param desiredTarget
+	 *            The desired pose to drive to
+	 * @param xVelocity
+	 *            The manual translational velocity on the X axis
+	 *
+	 * @param yVelocity
+	 *            The manual translational velocity on the Y axis
+	 * @param isOpenLoop
+	 *            If we are driving using OpenLoop control
+	 * @param lockX
+	 *            If manual velocities should be used on the X axis
+	 * @param lockY
+	 *            If manual velocities should be used on the Y axis
 	 */
-	public void autoAlign(boolean isRedAlliance, Pose2d desiredTarget,
-			LinearVelocity xVelocity, LinearVelocity yVelocity, boolean isOpenLoop, boolean lockX, boolean lockY) {
+	public void autoAlign(boolean isRedAlliance, Pose2d desiredTarget, LinearVelocity xVelocity,
+			LinearVelocity yVelocity, boolean isOpenLoop, boolean lockX, boolean lockY) {
 
 		int redAllianceMultiplier = isRedAlliance ? -1 : 1;
 		double manualXVelocity = xVelocity.times(redAllianceMultiplier).in(Units.MetersPerSecond);
 		double manualYVelocity = yVelocity.times(redAllianceMultiplier).in(Units.MetersPerSecond);
-			// Full auto-align
-			ChassisSpeeds automatedDTVelocity = teleopAutoDriveController.calculate(getPose(), desiredTarget, 0,
-					desiredTarget.getRotation());
+		// Full auto-align
+		ChassisSpeeds automatedDTVelocity = teleopAutoDriveController.calculate(getPose(), desiredTarget, 0,
+				desiredTarget.getRotation());
 
-			if (lockX) {
-				automatedDTVelocity.vxMetersPerSecond = manualXVelocity;
-			}
-			if (lockY) {
-				automatedDTVelocity.vyMetersPerSecond = manualYVelocity;
-			}
-			drive(automatedDTVelocity, isOpenLoop);
+		if (lockX) {
+			automatedDTVelocity.vxMetersPerSecond = manualXVelocity;
 		}
+		if (lockY) {
+			automatedDTVelocity.vyMetersPerSecond = manualYVelocity;
+		}
+		drive(automatedDTVelocity, isOpenLoop);
 	}
 
 	public boolean isAtRotation(Rotation2d desiredRotation, Angle tolerance) {

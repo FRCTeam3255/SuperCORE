@@ -8,10 +8,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.function.BooleanSupplier;
 
+import com.ctre.phoenix6.configs.CANcoderConfiguration;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.Pigeon2;
-import com.ctre.phoenix6.signals.InvertedValue;
-import com.ctre.phoenix6.signals.NeutralModeValue;
-import com.ctre.phoenix6.signals.SensorDirectionValue;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
@@ -62,6 +61,8 @@ public class SN_SuperSwerve extends SubsystemBase {
 	public double lastSimTime = Timer.getFPGATimestamp();
 	public Field2d field;
 	public Pose2d desiredAlignmentPose = new Pose2d();
+	public TalonFXConfiguration driveConfig, steerConfig;
+	public CANcoderConfiguration cancoderConfig;
 
 	/**
 	 * <p>
@@ -94,16 +95,16 @@ public class SN_SuperSwerve extends SubsystemBase {
 	 *            the modules
 	 * @param minimumSteerPercent
 	 *            The minimum PercentOutput required to make the steer motor move
-	 * @param driveInversion
-	 *            The direction that is positive for drive motors
-	 * @param steerInversion
-	 *            The direction that is positive for steer motors
-	 * @param cancoderInversion
-	 *            The direction that is positive for Cancoders
-	 * @param driveNeutralMode
-	 *            The behavior of every drive motor when set to neutral-output
-	 * @param steerNeutralMode
-	 *            The behavior of every steer motor when set to neutral-output
+	 * @param driveConfig
+	 *            The configuration for each drive motor. Make sure you set the
+	 *            inversion, neutral mode, and sensor to mechanism ratio!
+	 * @param steerConfig
+	 *            The configuration for each steer motor. Make sure you set the
+	 *            inversion, neutral mode, sensor to mechanism ratio, and continuous
+	 *            wrap!
+	 * @param cancoderConfig
+	 *            The configuration for each CANCoder. Make sure you set the sensor
+	 *            direction!
 	 * @param stateStdDevs
 	 *            Standard deviations of the pose estimate (x position in meters, y
 	 *            position in meters, and heading in radians). Increase these
@@ -130,10 +131,9 @@ public class SN_SuperSwerve extends SubsystemBase {
 	 */
 	public SN_SuperSwerve(SN_SwerveConstants swerveConstants, SN_SwerveModule[] modules, double wheelbase,
 			double trackWidth, String CANBusName, int pigeonCANId, double minimumSteerPercent,
-			InvertedValue driveInversion, InvertedValue steerInversion, SensorDirectionValue cancoderInversion,
-			NeutralModeValue driveNeutralMode, NeutralModeValue steerNeutralMode, Matrix<N3, N1> stateStdDevs,
-			Matrix<N3, N1> visionStdDevs, PIDConstants autoDrivePID, PIDConstants autoSteerPID, RobotConfig robotConfig,
-			BooleanSupplier autoFlipPaths, boolean isSimulation) {
+			TalonFXConfiguration driveConfig, TalonFXConfiguration steerConfig, CANcoderConfiguration cancoderConfig,
+			Matrix<N3, N1> stateStdDevs, Matrix<N3, N1> visionStdDevs, PIDConstants autoDrivePID,
+			PIDConstants autoSteerPID, RobotConfig robotConfig, BooleanSupplier autoFlipPaths, boolean isSimulation) {
 
 		isFieldRelative = true;
 		field = new Field2d();
@@ -156,18 +156,9 @@ public class SN_SuperSwerve extends SubsystemBase {
 		SN_SwerveModule.isSimulation = isSimulation;
 		SN_SwerveModule.wheelCircumference = swerveConstants.wheelCircumference;
 		SN_SwerveModule.maxModuleSpeedMeters = swerveConstants.maxSpeedMeters;
-		SN_SwerveModule.driveGearRatio = swerveConstants.driveGearRatio;
-		SN_SwerveModule.steerGearRatio = swerveConstants.steerGearRatio;
 
 		SN_SwerveModule.CANBusName = CANBusName;
 		SN_SwerveModule.minimumSteerSpeedPercent = minimumSteerPercent;
-
-		SN_SwerveModule.driveInversion = driveInversion;
-		SN_SwerveModule.driveNeutralMode = driveNeutralMode;
-
-		SN_SwerveModule.steerInversion = steerInversion;
-		SN_SwerveModule.steerNeutralMode = steerNeutralMode;
-		SN_SwerveModule.cancoderInversion = cancoderInversion;
 
 		pigeon = new Pigeon2(pigeonCANId, CANBusName);
 
@@ -181,6 +172,9 @@ public class SN_SuperSwerve extends SubsystemBase {
 	}
 
 	public void configure() {
+		SN_SwerveModule.driveConfiguration = driveConfig;
+		SN_SwerveModule.steerConfiguration = steerConfig;
+		SN_SwerveModule.cancoderConfiguration = cancoderConfig;
 		for (SN_SwerveModule mod : modules) {
 			mod.configure();
 		}
@@ -403,7 +397,7 @@ public class SN_SuperSwerve extends SubsystemBase {
 	 *         per Second
 	 */
 	public double getGyroRate() {
-		return pigeon.getRate();
+		return pigeon.getAngularVelocityZWorld().getValueAsDouble();
 	}
 
 	/**

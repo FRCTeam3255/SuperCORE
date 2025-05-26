@@ -12,9 +12,6 @@ import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityDutyCycle;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.signals.InvertedValue;
-import com.ctre.phoenix6.signals.NeutralModeValue;
-import com.ctre.phoenix6.signals.SensorDirectionValue;
 import com.frcteam3255.utils.CTREModuleState;
 import com.frcteam3255.utils.SN_Math;
 
@@ -37,26 +34,19 @@ public class SN_SwerveModule extends SubsystemBase {
 	public int moduleNumber;
 
 	// -*- Static Motor Config -*-
-	public static TalonFXConfiguration driveConfiguration;
-	public static TalonFXConfiguration steerConfiguration;
+	public static TalonFXConfiguration driveConfiguration = new TalonFXConfiguration();
+	public static TalonFXConfiguration steerConfiguration = new TalonFXConfiguration();
 	public static CANcoderConfiguration cancoderConfiguration;
 
 	private DutyCycleOut driveMotorControllerOpen;
 	private VelocityDutyCycle driveMotorControllerClosed;
 	private PositionVoltage steerMotorController;
 
-	public static NeutralModeValue driveNeutralMode = NeutralModeValue.Brake;
-	public static NeutralModeValue steerNeutralMode = NeutralModeValue.Coast;
-	public static InvertedValue driveInversion = InvertedValue.CounterClockwise_Positive;
-	public static InvertedValue steerInversion = InvertedValue.Clockwise_Positive;
-	public static SensorDirectionValue cancoderInversion = SensorDirectionValue.CounterClockwise_Positive;
 	public static String CANBusName = "Swerve";
 	public static double minimumSteerSpeedPercent = 0.01;
 
 	// -*- Static Physical Constants -*-
 	// These default to L2s, but should be overridden
-	public static double driveGearRatio = SN_SwerveConstants.MK4I.FALCON.L2.driveGearRatio;
-	public static double steerGearRatio = SN_SwerveConstants.MK4I.FALCON.L2.steerGearRatio;
 	public static double wheelCircumference = SN_SwerveConstants.MK4I.FALCON.L2.wheelCircumference;
 	public static double maxModuleSpeedMeters = SN_SwerveConstants.MK4I.FALCON.L2.maxSpeedMeters;
 
@@ -108,23 +98,8 @@ public class SN_SwerveModule extends SubsystemBase {
 	}
 
 	public void configure() {
-		// -*- Drive Motor Config -*
-		driveConfiguration.MotorOutput.Inverted = driveInversion;
-		driveConfiguration.MotorOutput.NeutralMode = driveNeutralMode;
-		driveConfiguration.Feedback.SensorToMechanismRatio = driveGearRatio;
-
 		driveMotor.getConfigurator().apply(driveConfiguration);
-
-		// -*- Steer Motor Config -*-
-		steerConfiguration.MotorOutput.Inverted = steerInversion;
-		steerConfiguration.MotorOutput.NeutralMode = steerNeutralMode;
-		steerConfiguration.Feedback.SensorToMechanismRatio = steerGearRatio;
-		steerConfiguration.ClosedLoopGeneral.ContinuousWrap = true;
-
 		steerMotor.getConfigurator().apply(steerConfiguration);
-
-		// -*- Absolute Encoder Config -*-
-		cancoderConfiguration.MagnetSensor.SensorDirection = cancoderInversion;
 		absoluteEncoder.getConfigurator().apply(cancoderConfiguration);
 	}
 
@@ -136,7 +111,7 @@ public class SN_SwerveModule extends SubsystemBase {
 	 */
 	public double getRawAbsoluteEncoder() {
 		// TODO: change to units using .getValue
-		return absoluteEncoder.getAbsolutePosition().getValueAsDouble(); 
+		return absoluteEncoder.getAbsolutePosition().getValueAsDouble();
 	}
 
 	/**
@@ -179,9 +154,10 @@ public class SN_SwerveModule extends SubsystemBase {
 	public SwerveModuleState getActualModuleState() {
 		// TODO: change to units using .getValue
 		double velocity = SN_Math.rotationsToMeters(driveMotor.getVelocity().getValueAsDouble(), wheelCircumference, 1);
-		
+
 		// TODO: change to units using .getValue
-		Rotation2d angle = Rotation2d.fromDegrees(Units.rotationsToDegrees(steerMotor.getPosition().getValueAsDouble()));
+		Rotation2d angle = Rotation2d
+				.fromDegrees(Units.rotationsToDegrees(steerMotor.getPosition().getValueAsDouble()));
 
 		return new SwerveModuleState(velocity, angle);
 	}
@@ -212,7 +188,8 @@ public class SN_SwerveModule extends SubsystemBase {
 		// TODO: change to units using .getValue
 		double distance = SN_Math.rotationsToMeters(driveMotor.getPosition().getValueAsDouble(), wheelCircumference, 1);
 		// TODO: change to units using .getValue
-		Rotation2d angle = Rotation2d.fromDegrees(Units.rotationsToDegrees(steerMotor.getPosition().getValueAsDouble()));
+		Rotation2d angle = Rotation2d
+				.fromDegrees(Units.rotationsToDegrees(steerMotor.getPosition().getValueAsDouble()));
 
 		return new SwerveModulePosition(distance, angle);
 	}

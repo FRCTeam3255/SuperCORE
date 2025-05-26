@@ -5,6 +5,7 @@
 package com.frcteam3255.components.swerve;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.function.BooleanSupplier;
 
 import com.ctre.phoenix6.hardware.Pigeon2;
@@ -29,6 +30,8 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.units.Units;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -58,6 +61,7 @@ public class SN_SuperSwerve extends SubsystemBase {
 	public double timeFromLastUpdate = 0;
 	public double lastSimTime = Timer.getFPGATimestamp();
 	public Field2d field;
+	public Pose2d desiredAlignmentPose = new Pose2d();
 
 	/**
 	 * <p>
@@ -441,6 +445,114 @@ public class SN_SuperSwerve extends SubsystemBase {
 	public void updateTimer() {
 		timeFromLastUpdate = Timer.getFPGATimestamp() - lastSimTime;
 		lastSimTime = Timer.getFPGATimestamp();
+	}
+
+	// /**
+	// * Returns the rotational velocity calculated with PID control to reach the
+	// * given rotation. This must be called every loop until you reach the given
+	// * rotation.
+	// *
+	// * @param desiredYaw
+	// * The desired yaw to rotate to
+	// * @return The desired velocity needed to rotate to that position.
+	// */
+	// public AngularVelocity getVelocityToRotate(Rotation2d desiredYaw) {
+	// double yawSetpoint =
+	// constDrivetrain.TELEOP_AUTO_ALIGN.TELEOP_AUTO_ALIGN_CONTROLLER.getThetaController()
+	// .calculate(getRotation().getRadians(), desiredYaw.getRadians());
+
+	// // limit the PID output to our maximum rotational speed
+	// yawSetpoint = MathUtil.clamp(yawSetpoint,
+	// -constDrivetrain.TURN_SPEED.in(Units.RadiansPerSecond),
+	// constDrivetrain.TURN_SPEED.in(Units.RadiansPerSecond));
+
+	// return Units.RadiansPerSecond.of(yawSetpoint);
+	// }
+
+	// /**
+	// * Aligns the drivetrain to a desired rotation.
+	// *
+	// */
+	// public void rotationalAlign(boolean isRedAlliance, Pose2d desiredTarget,
+	// LinearVelocity xVelocity,
+	// LinearVelocity yVelocity, boolean isOpenLoop) {
+	// int redAllianceMultiplier = isRedAlliance ? -1 : 1;
+	// // Rotational-only auto-align
+	// drive(new
+	// Translation2d(xVelocity.times(redAllianceMultiplier).in(Units.MetersPerSecond),
+	// yVelocity.times(redAllianceMultiplier).in(Units.MetersPerSecond)),
+	// getVelocityToRotate(desiredTarget.getRotation()).in(Units.RadiansPerSecond),
+	// isOpenLoop);
+	// }
+
+	// /**
+	// * Contains logic for automatically aligning & automatically driving to a
+	// pose.
+	// * May align only rotationally or automatically drive to the pose.
+	// */
+	// public void autoAlign(boolean isRedAlliance, Distance distanceFromTarget,
+	// Pose2d desiredTarget,
+	// LinearVelocity xVelocity, LinearVelocity yVelocity, AngularVelocity
+	// rVelocity, boolean isOpenLoop,
+	// Distance maxAutoDriveDistance, boolean lockX, boolean lockY) {
+
+	// desiredAlignmentPose = desiredTarget;
+	// int redAllianceMultiplier = isRedAlliance ? -1 : 1;
+	// double manualXVelocity =
+	// xVelocity.times(redAllianceMultiplier).in(Units.MetersPerSecond);
+	// double manualYVelocity =
+	// yVelocity.times(redAllianceMultiplier).in(Units.MetersPerSecond);
+	// if (distanceFromTarget.gte(maxAutoDriveDistance)) {
+	// // Rotational-only auto-align
+	// rotationalAlign(desiredTarget, xVelocity, yVelocity, isOpenLoop);
+	// } else {
+	// // Full auto-align
+	// ChassisSpeeds automatedDTVelocity =
+	// constDrivetrain.TELEOP_AUTO_ALIGN.TELEOP_AUTO_ALIGN_CONTROLLER
+	// .calculate(getPose(), desiredTarget, 0, desiredTarget.getRotation());
+
+	// // Speed limit based on elevator height
+	// LinearVelocity linearSpeedLimit = constDrivetrain.OBSERVED_DRIVE_SPEED;
+	// AngularVelocity angularSpeedLimit = constDrivetrain.TURN_SPEED;
+
+	// if (lockX) {
+	// automatedDTVelocity.vxMetersPerSecond = manualXVelocity;
+	// }
+	// if (lockY) {
+	// automatedDTVelocity.vyMetersPerSecond = manualYVelocity;
+	// }
+	// drive(automatedDTVelocity, isOpenLoop);
+	// }
+	// }
+
+	public boolean isAtRotation(Rotation2d desiredRotation, Angle tolerance) {
+		return (getRotation().getMeasure().compareTo(desiredRotation.getMeasure().minus(tolerance)) > 0)
+				&& getRotation().getMeasure().compareTo(desiredRotation.getMeasure().plus(tolerance)) < 0;
+	}
+
+	public boolean isAtPosition(Pose2d desiredPose2d, Distance tolerance) {
+		return Units.Meters.of(getPose().getTranslation().getDistance(desiredPose2d.getTranslation())).lte(tolerance);
+	}
+	/**
+	 * Calculate which pose from an array has the closest rotation to the robot's
+	 * current pose. If multiple poses have the same rotation, the last one in the
+	 * list will be returned.
+	 *
+	 * @param poses
+	 *            The list of poses to check
+	 * @return The last pose in the list with the closest rotation
+	 */
+	public Pose2d getClosestPoseByRotation(List<Pose2d> poses) {
+		Pose2d closestPose = poses.get(0);
+		double smallestDifference = Math.abs(getRotation().minus(closestPose.getRotation()).getRadians());
+		for (Pose2d pose : poses) {
+			double difference = Math.abs(getRotation().minus(pose.getRotation()).getRadians());
+			if (difference < smallestDifference) {
+				smallestDifference = difference;
+				closestPose = pose;
+			}
+		}
+		return closestPose;
 	}
 
 	@Override

@@ -50,7 +50,6 @@ public class SN_SwerveModule extends SubsystemBase {
 	public static InvertedValue driveInversion = InvertedValue.CounterClockwise_Positive;
 	public static InvertedValue steerInversion = InvertedValue.Clockwise_Positive;
 	public static SensorDirectionValue cancoderInversion = SensorDirectionValue.CounterClockwise_Positive;
-	public static String CANBusName = "Swerve";
 	public static double minimumSteerSpeedPercent = 0.01;
 
 	// -*- Static Physical Constants -*-
@@ -85,9 +84,11 @@ public class SN_SwerveModule extends SubsystemBase {
 	 *            The offset of the CANcoder in rotations. This is typically
 	 *            obtained by aligning all of the wheels in the appropriate
 	 *            direction and then copying the Raw Absolute encoder value.
+	 * @param CANBusName
+	 *            The name of the CANBus that the module is connected to.
 	 */
 	public SN_SwerveModule(int moduleNumber, int driveMotorID, int steerMotorID, int absoluteEncoderID,
-			double absoluteEncoderOffset) {
+			double absoluteEncoderOffset, String CANBusName) {
 
 		simTimer.start();
 

@@ -12,10 +12,6 @@ import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityDutyCycle;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.signals.InvertedValue;
-import com.ctre.phoenix6.signals.NeutralModeValue;
-import com.ctre.phoenix6.signals.SensorDirectionValue;
-import com.frcteam3255.utils.CTREModuleState;
 import com.frcteam3255.utils.SN_Math;
 
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -37,25 +33,18 @@ public class SN_SwerveModule extends SubsystemBase {
 	public int moduleNumber;
 
 	// -*- Static Motor Config -*-
-	public static TalonFXConfiguration driveConfiguration;
-	public static TalonFXConfiguration steerConfiguration;
+	public static TalonFXConfiguration driveConfiguration = new TalonFXConfiguration();
+	public static TalonFXConfiguration steerConfiguration = new TalonFXConfiguration();
 	public static CANcoderConfiguration cancoderConfiguration;
 
 	private DutyCycleOut driveMotorControllerOpen;
 	private VelocityDutyCycle driveMotorControllerClosed;
 	private PositionVoltage steerMotorController;
 
-	public static NeutralModeValue driveNeutralMode = NeutralModeValue.Brake;
-	public static NeutralModeValue steerNeutralMode = NeutralModeValue.Coast;
-	public static InvertedValue driveInversion = InvertedValue.CounterClockwise_Positive;
-	public static InvertedValue steerInversion = InvertedValue.Clockwise_Positive;
-	public static SensorDirectionValue cancoderInversion = SensorDirectionValue.CounterClockwise_Positive;
 	public static double minimumSteerSpeedPercent = 0.01;
 
 	// -*- Static Physical Constants -*-
 	// These default to L2s, but should be overridden
-	public static double driveGearRatio = SN_SwerveConstants.MK4I.FALCON.L2.driveGearRatio;
-	public static double steerGearRatio = SN_SwerveConstants.MK4I.FALCON.L2.steerGearRatio;
 	public static double wheelCircumference = SN_SwerveConstants.MK4I.FALCON.L2.wheelCircumference;
 	public static double maxModuleSpeedMeters = SN_SwerveConstants.MK4I.FALCON.L2.maxSpeedMeters;
 
@@ -109,23 +98,8 @@ public class SN_SwerveModule extends SubsystemBase {
 	}
 
 	public void configure() {
-		// -*- Drive Motor Config -*
-		driveConfiguration.MotorOutput.Inverted = driveInversion;
-		driveConfiguration.MotorOutput.NeutralMode = driveNeutralMode;
-		driveConfiguration.Feedback.SensorToMechanismRatio = driveGearRatio;
-
 		driveMotor.getConfigurator().apply(driveConfiguration);
-
-		// -*- Steer Motor Config -*-
-		steerConfiguration.MotorOutput.Inverted = steerInversion;
-		steerConfiguration.MotorOutput.NeutralMode = steerNeutralMode;
-		steerConfiguration.Feedback.SensorToMechanismRatio = steerGearRatio;
-		steerConfiguration.ClosedLoopGeneral.ContinuousWrap = true;
-
 		steerMotor.getConfigurator().apply(steerConfiguration);
-
-		// -*- Absolute Encoder Config -*-
-		cancoderConfiguration.MagnetSensor.SensorDirection = cancoderInversion;
 		absoluteEncoder.getConfigurator().apply(cancoderConfiguration);
 	}
 
@@ -241,30 +215,29 @@ public class SN_SwerveModule extends SubsystemBase {
 	 *            If the module can be rotated in place
 	 */
 	public void setModuleState(SwerveModuleState desiredState, boolean isOpenLoop, boolean steerInPlace) {
-		// Optimize explanation: https://youtu.be/0Xi9yb1IMyA?t=226
-		SwerveModuleState state = CTREModuleState.optimize(desiredState, getActualModuleState().angle);
-		lastDesiredSwerveModuleState = state;
+		lastDesiredSwerveModuleState = desiredState;
 		// -*- Setting the Drive Motor -*-
 
 		if (isOpenLoop) {
 			// The output is from -1 to 1. Essentially a percentage
 			// So, the requested speed divided by it's max speed.
-			driveMotorControllerOpen.Output = (state.speedMetersPerSecond / maxModuleSpeedMeters);
+			driveMotorControllerOpen.Output = (desiredState.speedMetersPerSecond / maxModuleSpeedMeters);
 			driveMotor.setControl(driveMotorControllerOpen);
 
 		} else {
-			driveMotorControllerClosed.Velocity = SN_Math.metersToRotations(state.speedMetersPerSecond,
+			driveMotorControllerClosed.Velocity = SN_Math.metersToRotations(desiredState.speedMetersPerSecond,
 					wheelCircumference, 1);
 			driveMotor.setControl(driveMotorControllerClosed);
 		}
 
 		// -*- Setting the Steer Motor -*-
 
-		double rotation = state.angle.getRotations();
+		double rotation = desiredState.angle.getRotations();
 
 		// If the requested speed is lower than a relevant steering speed,
 		// don't turn the motor. Set it to whatever it's previous angle was.
-		if (Math.abs(state.speedMetersPerSecond) < (minimumSteerSpeedPercent * maxModuleSpeedMeters) && !steerInPlace) {
+		if (Math.abs(desiredState.speedMetersPerSecond) < (minimumSteerSpeedPercent * maxModuleSpeedMeters)
+				&& !steerInPlace) {
 			return;
 		}
 

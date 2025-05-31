@@ -155,7 +155,6 @@ public class SN_SuperSwerve extends SubsystemBase {
 		SN_SwerveModule.driveGearRatio = swerveConstants.driveGearRatio;
 		SN_SwerveModule.steerGearRatio = swerveConstants.steerGearRatio;
 
-		SN_SwerveModule.CANBusName = CANBusName;
 		SN_SwerveModule.minimumSteerSpeedPercent = minimumSteerPercent;
 
 		SN_SwerveModule.driveInversion = driveInversion;

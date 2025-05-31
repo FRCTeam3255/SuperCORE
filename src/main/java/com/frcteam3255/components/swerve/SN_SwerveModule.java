@@ -50,7 +50,6 @@ public class SN_SwerveModule extends SubsystemBase {
 	public static InvertedValue driveInversion = InvertedValue.CounterClockwise_Positive;
 	public static InvertedValue steerInversion = InvertedValue.Clockwise_Positive;
 	public static SensorDirectionValue cancoderInversion = SensorDirectionValue.CounterClockwise_Positive;
-	public static String CANBusName = "Swerve";
 	public static double minimumSteerSpeedPercent = 0.01;
 
 	// -*- Static Physical Constants -*-
@@ -85,9 +84,11 @@ public class SN_SwerveModule extends SubsystemBase {
 	 *            The offset of the CANcoder in rotations. This is typically
 	 *            obtained by aligning all of the wheels in the appropriate
 	 *            direction and then copying the Raw Absolute encoder value.
+	 * @param CANBusName
+	 *            The name of the CANBus that the module is connected to.
 	 */
 	public SN_SwerveModule(int moduleNumber, int driveMotorID, int steerMotorID, int absoluteEncoderID,
-			double absoluteEncoderOffset) {
+			double absoluteEncoderOffset, String CANBusName) {
 
 		simTimer.start();
 
@@ -136,7 +137,7 @@ public class SN_SwerveModule extends SubsystemBase {
 	 */
 	public double getRawAbsoluteEncoder() {
 		// TODO: change to units using .getValue
-		return absoluteEncoder.getAbsolutePosition().getValueAsDouble(); 
+		return absoluteEncoder.getAbsolutePosition().getValueAsDouble();
 	}
 
 	/**
@@ -179,9 +180,10 @@ public class SN_SwerveModule extends SubsystemBase {
 	public SwerveModuleState getActualModuleState() {
 		// TODO: change to units using .getValue
 		double velocity = SN_Math.rotationsToMeters(driveMotor.getVelocity().getValueAsDouble(), wheelCircumference, 1);
-		
+
 		// TODO: change to units using .getValue
-		Rotation2d angle = Rotation2d.fromDegrees(Units.rotationsToDegrees(steerMotor.getPosition().getValueAsDouble()));
+		Rotation2d angle = Rotation2d
+				.fromDegrees(Units.rotationsToDegrees(steerMotor.getPosition().getValueAsDouble()));
 
 		return new SwerveModuleState(velocity, angle);
 	}
@@ -212,7 +214,8 @@ public class SN_SwerveModule extends SubsystemBase {
 		// TODO: change to units using .getValue
 		double distance = SN_Math.rotationsToMeters(driveMotor.getPosition().getValueAsDouble(), wheelCircumference, 1);
 		// TODO: change to units using .getValue
-		Rotation2d angle = Rotation2d.fromDegrees(Units.rotationsToDegrees(steerMotor.getPosition().getValueAsDouble()));
+		Rotation2d angle = Rotation2d
+				.fromDegrees(Units.rotationsToDegrees(steerMotor.getPosition().getValueAsDouble()));
 
 		return new SwerveModulePosition(distance, angle);
 	}

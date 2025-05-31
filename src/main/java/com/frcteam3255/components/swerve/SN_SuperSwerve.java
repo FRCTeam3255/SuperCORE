@@ -94,10 +94,9 @@ public class SN_SuperSwerve extends SubsystemBase {
 	 *            Physically measured distance (center to center) between the Front
 	 *            and Back wheels in meters
 	 * @param CANBusName
-	 *            The name of the CANBus that all of the swerve components are on
+	 *            The name of the CANBus that the Pigeon is on.
 	 * @param pigeonCANId
-	 *            The CAN id of the Pigeon. The Pigeon MUST be on the same CANBus as
-	 *            the modules
+	 *            The CAN id of the Pigeon.
 	 * @param minimumSteerPercent
 	 *            The minimum PercentOutput required to make the steer motor move
 	 * @param driveConfig

@@ -170,7 +170,6 @@ public class SN_SuperSwerve extends SubsystemBase {
 		SN_SwerveModule.wheelCircumference = swerveConstants.wheelCircumference;
 		SN_SwerveModule.maxModuleSpeedMeters = swerveConstants.maxSpeedMeters;
 
-		SN_SwerveModule.CANBusName = CANBusName;
 		SN_SwerveModule.minimumSteerSpeedPercent = minimumSteerPercent;
 
 		pigeon = new Pigeon2(pigeonCANId, CANBusName);

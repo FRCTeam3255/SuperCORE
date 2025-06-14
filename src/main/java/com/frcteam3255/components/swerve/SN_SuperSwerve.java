@@ -5,19 +5,21 @@
 package com.frcteam3255.components.swerve;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.function.BooleanSupplier;
 
+import com.ctre.phoenix6.configs.CANcoderConfiguration;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.Pigeon2;
-import com.ctre.phoenix6.signals.InvertedValue;
-import com.ctre.phoenix6.signals.NeutralModeValue;
-import com.ctre.phoenix6.signals.SensorDirectionValue;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.trajectory.PathPlannerTrajectory;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -29,6 +31,10 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.units.Units;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -58,6 +64,10 @@ public class SN_SuperSwerve extends SubsystemBase {
 	public double timeFromLastUpdate = 0;
 	public double lastSimTime = Timer.getFPGATimestamp();
 	public Field2d field;
+	public TalonFXConfiguration driveConfig, steerConfig;
+	public CANcoderConfiguration cancoderConfig;
+	public HolonomicDriveController teleopAutoDriveController;
+	public AngularVelocity turnSpeed;
 
 	/**
 	 * <p>
@@ -84,22 +94,21 @@ public class SN_SuperSwerve extends SubsystemBase {
 	 *            Physically measured distance (center to center) between the Front
 	 *            and Back wheels in meters
 	 * @param CANBusName
-	 *            The name of the CANBus that all of the swerve components are on
+	 *            The name of the CANBus that the Pigeon is on.
 	 * @param pigeonCANId
-	 *            The CAN id of the Pigeon. The Pigeon MUST be on the same CANBus as
-	 *            the modules
+	 *            The CAN id of the Pigeon.
 	 * @param minimumSteerPercent
 	 *            The minimum PercentOutput required to make the steer motor move
-	 * @param driveInversion
-	 *            The direction that is positive for drive motors
-	 * @param steerInversion
-	 *            The direction that is positive for steer motors
-	 * @param cancoderInversion
-	 *            The direction that is positive for Cancoders
-	 * @param driveNeutralMode
-	 *            The behavior of every drive motor when set to neutral-output
-	 * @param steerNeutralMode
-	 *            The behavior of every steer motor when set to neutral-output
+	 * @param driveConfig
+	 *            The configuration for each drive motor. Make sure you set the
+	 *            inversion, neutral mode, and sensor to mechanism ratio!
+	 * @param steerConfig
+	 *            The configuration for each steer motor. Make sure you set the
+	 *            inversion, neutral mode, sensor to mechanism ratio, and continuous
+	 *            wrap!
+	 * @param cancoderConfig
+	 *            The configuration for each CANCoder. Make sure you set the sensor
+	 *            direction!
 	 * @param stateStdDevs
 	 *            Standard deviations of the pose estimate (x position in meters, y
 	 *            position in meters, and heading in radians). Increase these
@@ -114,6 +123,11 @@ public class SN_SuperSwerve extends SubsystemBase {
 	 * @param autoSteerPID
 	 *            The rotational PID constants applied to the entire Drivetrain
 	 *            during autonomous in order to reach the correct pose
+	 * @param teleopAutoDriveController
+	 *            The PID controller used to control rotational snapping and auto
+	 *            driving during Teleoperated.
+	 * @param turnSpeed
+	 *            The turning speed of the robot.
 	 * @param robotConfig
 	 *            The robot configuration used by PathPlanner.
 	 * @param autoFlipPaths
@@ -126,10 +140,10 @@ public class SN_SuperSwerve extends SubsystemBase {
 	 */
 	public SN_SuperSwerve(SN_SwerveConstants swerveConstants, SN_SwerveModule[] modules, double wheelbase,
 			double trackWidth, String CANBusName, int pigeonCANId, double minimumSteerPercent,
-			InvertedValue driveInversion, InvertedValue steerInversion, SensorDirectionValue cancoderInversion,
-			NeutralModeValue driveNeutralMode, NeutralModeValue steerNeutralMode, Matrix<N3, N1> stateStdDevs,
-			Matrix<N3, N1> visionStdDevs, PIDConstants autoDrivePID, PIDConstants autoSteerPID, RobotConfig robotConfig,
-			BooleanSupplier autoFlipPaths, boolean isSimulation) {
+			TalonFXConfiguration driveConfig, TalonFXConfiguration steerConfig, CANcoderConfiguration cancoderConfig,
+			Matrix<N3, N1> stateStdDevs, Matrix<N3, N1> visionStdDevs, PIDConstants autoDrivePID,
+			PIDConstants autoSteerPID, HolonomicDriveController teleopAutoDriveController, AngularVelocity turnSpeed,
+			RobotConfig robotConfig, BooleanSupplier autoFlipPaths, boolean isSimulation) {
 
 		isFieldRelative = true;
 		field = new Field2d();
@@ -148,21 +162,14 @@ public class SN_SuperSwerve extends SubsystemBase {
 		this.autoSteerPID = autoSteerPID;
 		this.isSimulation = isSimulation;
 		this.autoFlipPaths = autoFlipPaths;
+		this.teleopAutoDriveController = teleopAutoDriveController;
+		this.turnSpeed = turnSpeed;
 
 		SN_SwerveModule.isSimulation = isSimulation;
 		SN_SwerveModule.wheelCircumference = swerveConstants.wheelCircumference;
 		SN_SwerveModule.maxModuleSpeedMeters = swerveConstants.maxSpeedMeters;
-		SN_SwerveModule.driveGearRatio = swerveConstants.driveGearRatio;
-		SN_SwerveModule.steerGearRatio = swerveConstants.steerGearRatio;
 
 		SN_SwerveModule.minimumSteerSpeedPercent = minimumSteerPercent;
-
-		SN_SwerveModule.driveInversion = driveInversion;
-		SN_SwerveModule.driveNeutralMode = driveNeutralMode;
-
-		SN_SwerveModule.steerInversion = steerInversion;
-		SN_SwerveModule.steerNeutralMode = steerNeutralMode;
-		SN_SwerveModule.cancoderInversion = cancoderInversion;
 
 		pigeon = new Pigeon2(pigeonCANId, CANBusName);
 
@@ -176,6 +183,9 @@ public class SN_SuperSwerve extends SubsystemBase {
 	}
 
 	public void configure() {
+		SN_SwerveModule.driveConfiguration = driveConfig;
+		SN_SwerveModule.steerConfiguration = steerConfig;
+		SN_SwerveModule.cancoderConfiguration = cancoderConfig;
 		for (SN_SwerveModule mod : modules) {
 			mod.configure();
 		}
@@ -298,6 +308,22 @@ public class SN_SuperSwerve extends SubsystemBase {
 	}
 
 	/**
+	 * Drive the drivetrain with pre-calculated ChassisSpeeds
+	 *
+	 * @param chassisSpeeds
+	 *            Desired ChassisSpeeds
+	 * @param isOpenLoop
+	 *            Are the modules being set based on open loop or closed loop
+	 *            control
+	 *
+	 */
+	public void drive(ChassisSpeeds chassisSpeeds, boolean isOpenLoop) {
+		SwerveModuleState[] desiredModuleStates = swerveKinematics
+				.toSwerveModuleStates(ChassisSpeeds.discretize(chassisSpeeds, timeFromLastUpdate));
+		setModuleStates(desiredModuleStates, isOpenLoop);
+	}
+
+	/**
 	 * Drive the drivetrain in autonomous. Autonomous driving is always closed loop.
 	 *
 	 * @param chassisSpeeds
@@ -305,9 +331,7 @@ public class SN_SuperSwerve extends SubsystemBase {
 	 *
 	 */
 	public void driveAutonomous(ChassisSpeeds chassisSpeeds) {
-		SwerveModuleState[] desiredModuleStates = swerveKinematics
-				.toSwerveModuleStates(ChassisSpeeds.discretize(chassisSpeeds, timeFromLastUpdate));
-		setModuleStates(desiredModuleStates, false);
+		drive(chassisSpeeds, false);
 	}
 
 	/**
@@ -398,7 +422,7 @@ public class SN_SuperSwerve extends SubsystemBase {
 	 *         per Second
 	 */
 	public double getGyroRate() {
-		return pigeon.getRate();
+		return pigeon.getAngularVelocityZWorld().getValueAsDouble();
 	}
 
 	/**
@@ -440,6 +464,123 @@ public class SN_SuperSwerve extends SubsystemBase {
 	public void updateTimer() {
 		timeFromLastUpdate = Timer.getFPGATimestamp() - lastSimTime;
 		lastSimTime = Timer.getFPGATimestamp();
+	}
+
+	/**
+	 * Returns the rotational velocity calculated with PID control to reach the
+	 * given rotation. This must be called every loop until you reach the given
+	 * rotation.
+	 *
+	 * @param desiredYaw
+	 *            The desired yaw to rotate to
+	 * @return The desired velocity needed to rotate to that position.
+	 */
+	public AngularVelocity getVelocityToRotate(Rotation2d desiredYaw) {
+		double yawSetpoint = teleopAutoDriveController.getThetaController().calculate(getRotation().getRadians(),
+				desiredYaw.getRadians());
+
+		// limit the PID output to our maximum rotational speed
+		yawSetpoint = MathUtil.clamp(yawSetpoint, -turnSpeed.in(Units.RadiansPerSecond),
+				turnSpeed.in(Units.RadiansPerSecond));
+
+		return Units.RadiansPerSecond.of(yawSetpoint);
+	}
+
+	// I would write "field relative" or "robot relative" somewhere here but I
+	// genuinely don't know if its robot relative (i think it is?)
+	/**
+	 * Aligns the drivetrain rotationally while still allowing for translational
+	 * inputs from the driver.
+	 *
+	 * @param isRedAlliance
+	 *            If we are a red robot this match
+	 * @param desiredTarget
+	 *            The desired rotation to reach
+	 * @param xVelocity
+	 *            The manual translational velocity on the X axis
+	 * @param yVelocity
+	 *            The manual translational velocity on the Y axis
+	 * @param isOpenLoop
+	 *            If we are driving using OpenLoop control
+	 */
+	public void rotationalAlign(boolean isRedAlliance, Pose2d desiredTarget, LinearVelocity xVelocity,
+			LinearVelocity yVelocity, boolean isOpenLoop) {
+		int redAllianceMultiplier = isRedAlliance ? -1 : 1;
+		// Rotational-only auto-align
+		drive(new Translation2d(xVelocity.times(redAllianceMultiplier).in(Units.MetersPerSecond),
+				yVelocity.times(redAllianceMultiplier).in(Units.MetersPerSecond)),
+				getVelocityToRotate(desiredTarget.getRotation()).in(Units.RadiansPerSecond), isOpenLoop);
+	}
+
+	/**
+	 *
+	 * Automatically drives to a pose during the teleoperated period. If an axis is
+	 * locked, it will override the automatically calculated input with the driver's
+	 * input.
+	 *
+	 * @param isRedAlliance
+	 *            If we are a red robot this match
+	 * @param desiredTarget
+	 *            The desired pose to drive to
+	 * @param xVelocity
+	 *            The manual translational velocity on the X axis
+	 *
+	 * @param yVelocity
+	 *            The manual translational velocity on the Y axis
+	 * @param isOpenLoop
+	 *            If we are driving using OpenLoop control
+	 * @param lockX
+	 *            If manual velocities should be used on the X axis
+	 * @param lockY
+	 *            If manual velocities should be used on the Y axis
+	 */
+	public void autoAlign(boolean isRedAlliance, Pose2d desiredTarget, LinearVelocity xVelocity,
+			LinearVelocity yVelocity, boolean isOpenLoop, boolean lockX, boolean lockY) {
+
+		int redAllianceMultiplier = isRedAlliance ? -1 : 1;
+		double manualXVelocity = xVelocity.times(redAllianceMultiplier).in(Units.MetersPerSecond);
+		double manualYVelocity = yVelocity.times(redAllianceMultiplier).in(Units.MetersPerSecond);
+		// Full auto-align
+		ChassisSpeeds automatedDTVelocity = teleopAutoDriveController.calculate(getPose(), desiredTarget, 0,
+				desiredTarget.getRotation());
+
+		if (lockX) {
+			automatedDTVelocity.vxMetersPerSecond = manualXVelocity;
+		}
+		if (lockY) {
+			automatedDTVelocity.vyMetersPerSecond = manualYVelocity;
+		}
+		drive(automatedDTVelocity, isOpenLoop);
+	}
+
+	public boolean isAtRotation(Rotation2d desiredRotation, Angle tolerance) {
+		return (getRotation().getMeasure().compareTo(desiredRotation.getMeasure().minus(tolerance)) > 0)
+				&& getRotation().getMeasure().compareTo(desiredRotation.getMeasure().plus(tolerance)) < 0;
+	}
+
+	public boolean isAtPosition(Pose2d desiredPose2d, Distance tolerance) {
+		return Units.Meters.of(getPose().getTranslation().getDistance(desiredPose2d.getTranslation())).lte(tolerance);
+	}
+	/**
+	 * Calculate which pose from an array has the closest rotation to the robot's
+	 * current pose. If multiple poses have the same rotation, the last one in the
+	 * list will be returned.
+	 *
+	 * @param poses
+	 *            The list of poses to check
+	 * @return The last pose in the list with the closest rotation
+	 */
+	public Pose2d getClosestPoseByRotation(List<Pose2d> poses) {
+		Pose2d closestPose = poses.get(0);
+		double smallestDifference = Math.abs(getRotation().minus(closestPose.getRotation()).getRadians());
+		for (Pose2d pose : poses) {
+			double difference = Math.abs(getRotation().minus(pose.getRotation()).getRadians());
+			if (difference < smallestDifference) {
+				smallestDifference = difference;
+				closestPose = pose;
+			}
+		}
+		return closestPose;
 	}
 
 	@Override

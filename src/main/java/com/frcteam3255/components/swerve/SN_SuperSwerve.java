@@ -164,6 +164,9 @@ public class SN_SuperSwerve extends SubsystemBase {
 		this.autoFlipPaths = autoFlipPaths;
 		this.teleopAutoDriveController = teleopAutoDriveController;
 		this.turnSpeed = turnSpeed;
+		this.driveConfig = driveConfig;
+		this.steerConfig = steerConfig;
+		this.cancoderConfig = cancoderConfig;
 
 		SN_SwerveModule.isSimulation = isSimulation;
 		SN_SwerveModule.wheelCircumference = swerveConstants.wheelCircumference;

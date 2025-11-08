@@ -534,21 +534,21 @@ public class SN_SuperSwerve extends SubsystemBase {
 		boolean lockX,
 		boolean lockY,
 		boolean invertRotation) {
-  
-	  // Full auto-align
-	  ChassisSpeeds automatedDTVelocity = teleopAutoDriveController.calculate(getPose(), desiredTarget, 0,
-		  desiredTarget.getRotation());
-  
-	  if (lockX) {
+	
+	// Full auto-align
+	ChassisSpeeds automatedDTVelocity = teleopAutoDriveController.calculate(getPose(), desiredTarget, 0,
+		desiredTarget.getRotation());
+	
+	if (lockX) {
 		automatedDTVelocity.vxMetersPerSecond = manualVelocities.vxMetersPerSecond;
-	  }
-	  if (lockY) {
+	}
+	if (lockY) {
 		automatedDTVelocity.vyMetersPerSecond = manualVelocities.vyMetersPerSecond;
-	  }
-	  if (invertRotation) {
+	}
+	if (invertRotation) {
 		automatedDTVelocity.omegaRadiansPerSecond = -automatedDTVelocity.omegaRadiansPerSecond;
-	  }
-	  drive(automatedDTVelocity, isOpenLoop);
+	}
+	drive(automatedDTVelocity, isOpenLoop);
 	}
 
 	public boolean isAtRotation(Rotation2d desiredRotation, Angle tolerance) {

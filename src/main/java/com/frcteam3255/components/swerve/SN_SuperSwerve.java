@@ -510,7 +510,7 @@ public class SN_SuperSwerve extends SubsystemBase {
 		// Rotational-only auto-align
 		drive(new Translation2d(velocities.vxMetersPerSecond, velocities.vyMetersPerSecond),
 			getVelocityToRotate(desiredTarget.getRotation()).in(Units.RadiansPerSecond), isOpenLoop);
-	  }
+	}
 
 
 	/**

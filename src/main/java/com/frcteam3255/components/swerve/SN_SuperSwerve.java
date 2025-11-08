@@ -594,28 +594,28 @@ public class SN_SuperSwerve extends SubsystemBase {
 	 * @param TURN_SPEED          The maximum angular velocity of the robot in radians per second.
 	 * @return A ChassisSpeeds object containing the calculated x, y, and rotational velocities.
 	 */
-	  public ChassisSpeeds calculateVelocitiesFromInput(
-	  	DoubleSupplier xAxisSupplier, 
-	  	DoubleSupplier yAxisSupplier,
-      	DoubleSupplier rotationAxisSupplier, 
-	  	BooleanSupplier slowMode, 
-	  	boolean isRed, 
-	  	double SLOW_MODE_MULTIPLIER, 
-	  	LinearVelocity REAL_DRIVE_SPEED, 
-	  	AngularVelocity TURN_SPEED) {
+	public ChassisSpeeds calculateVelocitiesFromInput(
+		DoubleSupplier xAxisSupplier, 
+		DoubleSupplier yAxisSupplier,
+		DoubleSupplier rotationAxisSupplier, 
+		BooleanSupplier slowMode, 
+		boolean isRed, 
+		double SLOW_MODE_MULTIPLIER, 
+		LinearVelocity REAL_DRIVE_SPEED, 
+		AngularVelocity TURN_SPEED) {
 
-    double redAllianceMultiplier = isRed ? -1 : 1;
-    double slowModeMultiplier = slowMode.getAsBoolean() ? SLOW_MODE_MULTIPLIER : 1.0;
+		double redAllianceMultiplier = isRed ? -1 : 1;
+		double slowModeMultiplier = slowMode.getAsBoolean() ? SLOW_MODE_MULTIPLIER : 1.0;
 
-    double xVelocity = xAxisSupplier.getAsDouble() * REAL_DRIVE_SPEED.in(Units.MetersPerSecond)
-        * redAllianceMultiplier * slowModeMultiplier;
-    double yVelocity = -yAxisSupplier.getAsDouble() * REAL_DRIVE_SPEED.in(Units.MetersPerSecond)
-        * redAllianceMultiplier * slowModeMultiplier;
-    double rotationVelocity = rotationAxisSupplier.getAsDouble()
-        * TURN_SPEED.in(Units.RadiansPerSecond);
+		double xVelocity = xAxisSupplier.getAsDouble() * REAL_DRIVE_SPEED.in(Units.MetersPerSecond)
+			* redAllianceMultiplier * slowModeMultiplier;
+		double yVelocity = -yAxisSupplier.getAsDouble() * REAL_DRIVE_SPEED.in(Units.MetersPerSecond)
+			* redAllianceMultiplier * slowModeMultiplier;
+		double rotationVelocity = rotationAxisSupplier.getAsDouble()
+			* TURN_SPEED.in(Units.RadiansPerSecond);
 
-    return new ChassisSpeeds(xVelocity, yVelocity, rotationVelocity);
-  }
+		return new ChassisSpeeds(xVelocity, yVelocity, rotationVelocity);
+	}
 
 	@Override
 	public void periodic() {

@@ -7,6 +7,7 @@ package com.frcteam3255.components.swerve;
 import java.util.HashMap;
 import java.util.List;
 import java.util.function.BooleanSupplier;
+import java.util.function.DoubleSupplier;
 
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -491,69 +492,63 @@ public class SN_SuperSwerve extends SubsystemBase {
 
 	// I would write "field relative" or "robot relative" somewhere here but I
 	// genuinely don't know if its robot relative (i think it is?)
+
 	/**
-	 * Aligns the drivetrain rotationally while still allowing for translational
-	 * inputs from the driver.
+	 * Aligns the robot's rotation to a desired target while maintaining the given
+	 * translational velocities. This method is typically used for rotational-only
+	 * auto-alignment during swerve drive operations.
 	 *
-	 * @param isRedAlliance
-	 *            If we are a red robot this match
-	 * @param desiredTarget
-	 *            The desired rotation to reach
-	 * @param xVelocity
-	 *            The manual translational velocity on the X axis
-	 * @param yVelocity
-	 *            The manual translational velocity on the Y axis
-	 * @param isOpenLoop
-	 *            If we are driving using OpenLoop control
+	 * @param desiredTarget The desired pose to align the robot's rotation to. Only
+	 *                      the rotation component of the pose is used.
+	 * @param velocities    The translational velocities (vx and vy) to maintain
+	 *                      while aligning the rotation.
+	 * @param isOpenLoop    If true, the drive system operates in open-loop mode;
+	 *                      otherwise, it operates in closed-loop mode.
 	 */
-	public void rotationalAlign(boolean isRedAlliance, Pose2d desiredTarget, LinearVelocity xVelocity,
-			LinearVelocity yVelocity, boolean isOpenLoop) {
-		int redAllianceMultiplier = isRedAlliance ? -1 : 1;
+
+	public void rotationalAlign(Pose2d desiredTarget, ChassisSpeeds velocities, boolean isOpenLoop) {
 		// Rotational-only auto-align
-		drive(new Translation2d(xVelocity.times(redAllianceMultiplier).in(Units.MetersPerSecond),
-				yVelocity.times(redAllianceMultiplier).in(Units.MetersPerSecond)),
-				getVelocityToRotate(desiredTarget.getRotation()).in(Units.RadiansPerSecond), isOpenLoop);
+		drive(new Translation2d(velocities.vxMetersPerSecond, velocities.vyMetersPerSecond),
+			getVelocityToRotate(desiredTarget.getRotation()).in(Units.RadiansPerSecond), isOpenLoop);
 	}
 
+
 	/**
+	 * Automatically aligns the robot to a desired target pose while allowing for
+	 * manual adjustments and additional control options.
 	 *
-	 * Automatically drives to a pose during the teleoperated period. If an axis is
-	 * locked, it will override the automatically calculated input with the driver's
-	 * input.
-	 *
-	 * @param isRedAlliance
-	 *            If we are a red robot this match
-	 * @param desiredTarget
-	 *            The desired pose to drive to
-	 * @param xVelocity
-	 *            The manual translational velocity on the X axis
-	 *
-	 * @param yVelocity
-	 *            The manual translational velocity on the Y axis
-	 * @param isOpenLoop
-	 *            If we are driving using OpenLoop control
-	 * @param lockX
-	 *            If manual velocities should be used on the X axis
-	 * @param lockY
-	 *            If manual velocities should be used on the Y axis
+	 * @param desiredTarget   The target pose (position and orientation) to align to.
+	 * @param manualVelocities The manually controlled velocities to be applied, used
+	 *                         when locking X or Y axes.
+	 * @param isOpenLoop      Whether the drive system should operate in open-loop mode.
+	 * @param lockX           If true, the X-axis velocity will be locked to the manual
+	 *                         velocity.
+	 * @param lockY           If true, the Y-axis velocity will be locked to the manual
+	 *                         velocity.
+	 * @param invertRotation  If true, the rotational velocity will be inverted.
 	 */
-	public void autoAlign(boolean isRedAlliance, Pose2d desiredTarget, LinearVelocity xVelocity,
-			LinearVelocity yVelocity, boolean isOpenLoop, boolean lockX, boolean lockY) {
-
-		int redAllianceMultiplier = isRedAlliance ? -1 : 1;
-		double manualXVelocity = xVelocity.times(redAllianceMultiplier).in(Units.MetersPerSecond);
-		double manualYVelocity = yVelocity.times(redAllianceMultiplier).in(Units.MetersPerSecond);
-		// Full auto-align
-		ChassisSpeeds automatedDTVelocity = teleopAutoDriveController.calculate(getPose(), desiredTarget, 0,
-				desiredTarget.getRotation());
-
-		if (lockX) {
-			automatedDTVelocity.vxMetersPerSecond = manualXVelocity;
-		}
-		if (lockY) {
-			automatedDTVelocity.vyMetersPerSecond = manualYVelocity;
-		}
-		drive(automatedDTVelocity, isOpenLoop);
+	public void autoAlign(
+		Pose2d desiredTarget,
+		ChassisSpeeds manualVelocities,
+		boolean isOpenLoop,
+		boolean lockX,
+		boolean lockY,
+		boolean invertRotation) {
+	
+	// Full auto-align
+	ChassisSpeeds automatedDTVelocity = teleopAutoDriveController.calculate(getPose(), desiredTarget, 0,
+		desiredTarget.getRotation());
+	
+	if (lockX) {
+		automatedDTVelocity.vxMetersPerSecond = manualVelocities.vxMetersPerSecond;
+	}
+	if (lockY) {
+		automatedDTVelocity.vyMetersPerSecond = manualVelocities.vyMetersPerSecond;
+	}
+	if (invertRotation) {
+		automatedDTVelocity.omegaRadiansPerSecond = -automatedDTVelocity.omegaRadiansPerSecond;
+	}
+	drive(automatedDTVelocity, isOpenLoop);
 	}
 
 	public boolean isAtRotation(Rotation2d desiredRotation, Angle tolerance) {
@@ -584,6 +579,42 @@ public class SN_SuperSwerve extends SubsystemBase {
 			}
 		}
 		return closestPose;
+	}
+
+	/**
+	 * Calculates the chassis velocities based on joystick inputs and other parameters.
+	 *
+	 * @param xAxisSupplier       A DoubleSupplier providing the x-axis input for forward/backward movement.
+	 * @param yAxisSupplier       A DoubleSupplier providing the y-axis input for left/right movement.
+	 * @param rotationAxisSupplier A DoubleSupplier providing the rotation input for turning.
+	 * @param slowMode            A BooleanSupplier indicating whether the slow mode is active.
+	 * @param isRed               A boolean indicating if the robot is on the red alliance (reverses controls if true).
+	 * @param SLOW_MODE_MULTIPLIER A multiplier applied to velocities when slow mode is active.
+	 * @param REAL_DRIVE_SPEED    The maximum linear velocity of the robot in meters per second.
+	 * @param TURN_SPEED          The maximum angular velocity of the robot in radians per second.
+	 * @return A ChassisSpeeds object containing the calculated x, y, and rotational velocities.
+	 */
+	public ChassisSpeeds calculateVelocitiesFromInput(
+		DoubleSupplier xAxisSupplier, 
+		DoubleSupplier yAxisSupplier,
+		DoubleSupplier rotationAxisSupplier, 
+		BooleanSupplier slowMode, 
+		boolean isRed, 
+		double SLOW_MODE_MULTIPLIER, 
+		LinearVelocity REAL_DRIVE_SPEED, 
+		AngularVelocity TURN_SPEED) {
+
+		double redAllianceMultiplier = isRed ? -1 : 1;
+		double slowModeMultiplier = slowMode.getAsBoolean() ? SLOW_MODE_MULTIPLIER : 1.0;
+
+		double xVelocity = xAxisSupplier.getAsDouble() * REAL_DRIVE_SPEED.in(Units.MetersPerSecond)
+			* redAllianceMultiplier * slowModeMultiplier;
+		double yVelocity = -yAxisSupplier.getAsDouble() * REAL_DRIVE_SPEED.in(Units.MetersPerSecond)
+			* redAllianceMultiplier * slowModeMultiplier;
+		double rotationVelocity = rotationAxisSupplier.getAsDouble()
+			* TURN_SPEED.in(Units.RadiansPerSecond);
+
+		return new ChassisSpeeds(xVelocity, yVelocity, rotationVelocity);
 	}
 
 	@Override

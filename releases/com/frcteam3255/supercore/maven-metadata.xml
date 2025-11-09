@@ -3,8 +3,8 @@
   <groupId>com.frcteam3255</groupId>
   <artifactId>supercore</artifactId>
   <versioning>
-    <latest>2025.3.1</latest>
-    <release>2025.3.1</release>
+    <latest>2025.4.0</latest>
+    <release>2025.4.0</release>
     <versions>
       <version>0.0.1</version>
       <version>0.0.2</version>
@@ -44,7 +44,8 @@
       <version>2025.2.0</version>
       <version>2025.3.0</version>
       <version>2025.3.1</version>
+      <version>2025.4.0</version>
     </versions>
-    <lastUpdated>20250614151113</lastUpdated>
+    <lastUpdated>20251109012104</lastUpdated>
   </versioning>
 </metadata>

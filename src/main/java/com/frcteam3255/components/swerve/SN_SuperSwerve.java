@@ -108,19 +108,11 @@ public class SN_SuperSwerve extends SubsystemBase {
 	 *            Standard deviations of vision pose measurements (x position in
 	 *            meters, y position in meters, and heading in radians). Increase
 	 *            these numbers to trust the vision pose measurement less.
-	 * @param autoDrivePID
-	 *            The translational PID constants applied to the entire Drivetrain
-	 *            during autonomous in order to reach the correct pose
-	 * @param autoSteerPID
-	 *            The rotational PID constants applied to the entire Drivetrain
-	 *            during autonomous in order to reach the correct pose
 	 * @param teleopAutoDriveController
 	 *            The PID controller used to control rotational snapping and auto
 	 *            driving during Teleoperated.
 	 * @param turnSpeed
 	 *            The turning speed of the robot.
-	 * @param robotConfig
-	 *            The robot configuration used by PathPlanner.
 	 * @param autoFlipPaths
 	 *            Determines if paths should be flipped to the other side of the
 	 *            field. This will maintain a global blue alliance origin. Used for

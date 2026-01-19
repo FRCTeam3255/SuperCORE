@@ -4,7 +4,10 @@
 
 package com.frcteam3255.components.swerve;
 
+import static edu.wpi.first.units.Units.Inches;
+
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.Distance;
 
 /**
  * <p>
@@ -44,91 +47,51 @@ public class SN_SwerveConstants {
 		this.driveGearRatio = driveGearRatio;
 		this.maxSpeedMeters = maxSpeedMeters;
 	}
-	public static class MK4I {
-		/**
-		 * Constants for modules that have a Kraken as the drive motor (the steer motor
-		 * type doesn't matter here)
-		 */
-		public static class KRAKEN {
-			/**
-			 * Preset Constants for a MK4I with L1 gearing and a Kraken Drive motor
-			 */
-			public static final SN_SwerveConstants L1 = new SN_SwerveConstants(STEER_GEAR_RATIO, WHEEL_CIRCUMFERENCE,
-					8.14, Units.feetToMeters(12.9));
 
-			/**
-			 * Preset Constants for a MK4I with L2 gearing and a Kraken Drive motor
-			 */
-			public static final SN_SwerveConstants L2 = new SN_SwerveConstants(STEER_GEAR_RATIO, WHEEL_CIRCUMFERENCE,
-					6.75, Units.feetToMeters(15.5));
+	public static class ModuleLocations {
+		public static final Distance frame25x25 = Inches.of(19.75).div(2);
+		public static final Distance frame29x29 = Inches.of(23.75).div(2);
+	}
 
-			/**
-			 * Preset Constants for a MK4I with L3 gearing and a Kraken Drive motor
-			 */
-			public static final SN_SwerveConstants L3 = new SN_SwerveConstants(STEER_GEAR_RATIO, WHEEL_CIRCUMFERENCE,
-					6.12, Units.feetToMeters(17.1));
+	public static class Ratios {
+		private final double steer;
+		private final double drive;
+		private final double couple;
 
-			/**
-			 * Preset Constants for a MK4I with L1 gearing, a Kraken Drive motor, and FOC
-			 * (Field Oriented Control, a Phoenix Pro Feature) enabled
-			 */
-			public static final SN_SwerveConstants L1_FOC = new SN_SwerveConstants(STEER_GEAR_RATIO,
-					WHEEL_CIRCUMFERENCE, 8.14, Units.feetToMeters(12.4));
-			/**
-			 * Preset Constants for a MK4I with L2 gearing, a Kraken Drive motor, and FOC
-			 * (Field Oriented Control, a Phoenix Pro Feature) enabled
-			 */
-			public static final SN_SwerveConstants L2_FOC = new SN_SwerveConstants(STEER_GEAR_RATIO,
-					WHEEL_CIRCUMFERENCE, 6.75, Units.feetToMeters(15.0));
-			/**
-			 * Preset Constants for a MK4I with L3 gearing, a Kraken Drive motor, and FOC
-			 * (Field Oriented Control, a Phoenix Pro Feature) enabled
-			 */
-			public static final SN_SwerveConstants L3_FOC = new SN_SwerveConstants(STEER_GEAR_RATIO,
-					WHEEL_CIRCUMFERENCE, 6.12, Units.feetToMeters(16.5));
+		public Ratios(double steer, double drive, double couple) {
+			this.steer = steer;
+			this.drive = drive;
+			this.couple = couple;
 		}
 
-		/**
-		 * Constants for modules that have a Falcon as the drive motor (the steer motor
-		 * type doesn't matter here)
-		 */
-		public static class FALCON {
-			/**
-			 * Preset Constants for a MK4I with L1 gearing and a Falcon 500 Motor
-			 */
-			public static final SN_SwerveConstants L1 = new SN_SwerveConstants(STEER_GEAR_RATIO, WHEEL_CIRCUMFERENCE,
-					8.14, Units.feetToMeters(13.7));
+		public double getSteer() {
+			return steer;
+		}
 
-			/**
-			 * Preset Constants for a MK4I with L2 gearing and a Falcon 500 Motor
-			 */
-			public static final SN_SwerveConstants L2 = new SN_SwerveConstants(STEER_GEAR_RATIO, WHEEL_CIRCUMFERENCE,
-					6.75, Units.feetToMeters(16.5));
+		public double getDrive() {
+			return drive;
+		}
 
-			/**
-			 * Preset Constants for a MK4I with L3 gearing and a Falcon 500 Motor
-			 */
-			public static final SN_SwerveConstants L3 = new SN_SwerveConstants(STEER_GEAR_RATIO, WHEEL_CIRCUMFERENCE,
-					6.12, Units.feetToMeters(18.2));
+		public double getCouple() {
+			return couple;
+		}
 
-			/**
-			 * Preset Constants for a MK4I with L1 gearing, a Falcon 500 Motor, and FOC
-			 * (Field Oriented Control, a Phoenix Pro Feature) enabled
-			 */
-			public static final SN_SwerveConstants L1_FOC = new SN_SwerveConstants(STEER_GEAR_RATIO,
-					WHEEL_CIRCUMFERENCE, 8.14, Units.feetToMeters(13.0));
-			/**
-			 * Preset Constants for a MK4I with L2 gearing, a Falcon 500 Motor, and FOC
-			 * (Field Oriented Control, a Phoenix Pro Feature) enabled
-			 */
-			public static final SN_SwerveConstants L2_FOC = new SN_SwerveConstants(STEER_GEAR_RATIO,
-					WHEEL_CIRCUMFERENCE, 6.75, Units.feetToMeters(15.7));
-			/**
-			 * Preset Constants for a MK4I with L3 gearing, a Falcon 500 Motor, and FOC
-			 * (Field Oriented Control, a Phoenix Pro Feature) enabled
-			 */
-			public static final SN_SwerveConstants L3_FOC = new SN_SwerveConstants(STEER_GEAR_RATIO,
-					WHEEL_CIRCUMFERENCE, 6.12, Units.feetToMeters(17.3));
+		public static class MK4I {
+			private static final double stage1 = 1. / (14. / 50.);
+			private static final double stage2L1 = 1. / (25. / 19.);
+			private static final double stage2L2 = 1. / (27. / 17.);
+			private static final double stage2L3 = 1. / (28. / 16.);
+			private static final double stage3 = 1. / (15. / 45.);
+			private static final double steer = 150. / 7.;
+
+			private static final double driveL1 = stage1 * stage2L1 * stage3;
+			private static final double driveL2 = stage1 * stage2L2 * stage3;
+			private static final double driveL3 = stage1 * stage2L3 * stage3;
+			private static final double couple = stage1;
+
+			public static final Ratios L1 = new Ratios(steer, driveL1, couple);
+			public static final Ratios L2 = new Ratios(steer, driveL2, couple);
+			public static final Ratios L3 = new Ratios(steer, driveL3, couple);
 		}
 	}
 }

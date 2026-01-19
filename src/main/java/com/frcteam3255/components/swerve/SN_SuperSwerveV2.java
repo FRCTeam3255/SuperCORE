@@ -1,6 +1,5 @@
 package com.frcteam3255.components.swerve;
 
-import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Volts;
 

@@ -254,7 +254,7 @@ public class SN_SuperSwerveV2 extends SwerveDrivetrain<TalonFX, TalonFX, CANcode
 			}, null, this));
 
 	/* The SysId routine to test */
-	private SysIdRoutine m_sysIdRoutineToApply = m_sysIdRoutineTranslation;
+	public SysIdRoutine m_sysIdRoutineToApply = m_sysIdRoutineTranslation;
 
 	/**
 	 * Runs the SysId Quasistatic test in the given direction for the routine

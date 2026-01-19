@@ -45,8 +45,8 @@ public class SN_SwerveModule extends SubsystemBase {
 
 	// -*- Static Physical Constants -*-
 	// These default to L2s, but should be overridden
-	public static double wheelCircumference = SN_SwerveConstants.MK4I.FALCON.L2.wheelCircumference;
-	public static double maxModuleSpeedMeters = SN_SwerveConstants.MK4I.FALCON.L2.maxSpeedMeters;
+	public static double wheelCircumference = Units.inchesToMeters(3.8) * Math.PI;
+	public static double maxModuleSpeedMeters = Units.feetToMeters(15.5);
 
 	// -*- Sim -*-
 	public static boolean isSimulation = false;

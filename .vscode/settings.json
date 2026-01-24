@@ -1,5 +1,6 @@
 {
   "java.configuration.updateBuildConfiguration": "automatic",
+  "java.server.launchMode": "Standard",
   "files.exclude": {
     "**/.git": true,
     "**/.svn": true,
@@ -7,18 +8,25 @@
     "**/CVS": true,
     "**/.DS_Store": true,
     "bin/": true,
-    ".classpath": true,
-    ".project": true
+    "**/.classpath": true,
+    "**/.project": true,
+    "**/.settings": true,
+    "**/.factorypath": true,
+    "**/*~": true
   },
-  "[java]": {
-    "spotlessGradle.format.enable": true,
-    "spotlessGradle.diagnostics.enable": true,
-    "editor.codeActionsOnSave": {
-      "source.fixAll.spotlessGradle": "explicit"
+  "java.test.config": [
+    {
+      "name": "WPIlibUnitTests",
+      "workingDirectory": "${workspaceFolder}/build/jni/release",
+      "vmargs": [ "-Djava.library.path=${workspaceFolder}/build/jni/release" ],
+      "env": {
+        "LD_LIBRARY_PATH": "${workspaceFolder}/build/jni/release" ,
+        "DYLD_LIBRARY_PATH": "${workspaceFolder}/build/jni/release"
+      }
     },
-    "editor.defaultFormatter": "richardwillis.vscode-spotless-gradle",
-    "files.trimTrailingWhitespace": false
-  },
+  ],
+  "java.test.defaultConfig": "WPIlibUnitTests",
+  "java.import.gradle.annotationProcessing.enabled": false,
   "java.completion.favoriteStaticMembers": [
     "org.junit.Assert.*",
     "org.junit.Assume.*",
@@ -48,5 +56,15 @@
     "edu.wpi.first.math.proto.*",
     "edu.wpi.first.math.**.proto.*",
     "edu.wpi.first.math.**.struct.*",
-  ]
+  ],
+    "[java]": {
+    "spotlessGradle.format.enable": true,
+    "spotlessGradle.diagnostics.enable": true,
+    "editor.codeActionsOnSave": {
+      "source.fixAll.spotlessGradle": "explicit"
+    },
+    "editor.defaultFormatter": "richardwillis.vscode-spotless-gradle",
+    "files.trimTrailingWhitespace": false
+  },"java.dependency.enableDependencyCheckup": false
 }
+

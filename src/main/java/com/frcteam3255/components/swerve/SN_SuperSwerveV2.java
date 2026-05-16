@@ -434,7 +434,7 @@ public class SN_SuperSwerveV2 extends SwerveDrivetrain<TalonFX, TalonFX, CANcode
 	 * Returns whether the current angle lies strictly within the tolerance window around the target angle.
 	 *
 	 * The check performed is:
-	 *   (target - tolerance) < current < (target + tolerance)
+	 *   (target - tolerance) LT current LT (target + tolerance)
 	 * Comparisons are strict: equality with either boundary returns false.
 	 *
 	 * This method relies on Angle.minus, Angle.plus and Angle.compareTo. It does not perform any additional

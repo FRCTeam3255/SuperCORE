@@ -388,23 +388,28 @@ public class SN_SuperSwerveV2 extends SwerveDrivetrain<TalonFX, TalonFX, CANcode
 	}
 
 	/**
-	 * Determines whether the drivetrain's facing is within a given angular tolerance
-	 * of a desired rotation.
+	 * Determines whether the drivetrain's facing is within a given angular
+	 * tolerance of a desired rotation.
 	 *
-	 * The check is performed by comparing the underlying angle measures:
-	 * it returns true when the current rotation measure is strictly greater than
-	 * (desiredRotation - tolerance) and strictly less than (desiredRotation + tolerance).
-	 * In other words, the method tests membership in the open interval
+	 * The check is performed by comparing the underlying angle measures: it returns
+	 * true when the current rotation measure is strictly greater than
+	 * (desiredRotation - tolerance) and strictly less than (desiredRotation +
+	 * tolerance). In other words, the method tests membership in the open interval
 	 * (desiredRotation - tolerance, desiredRotation + tolerance).
 	 *
-	 * Note: comparisons are done on the raw values returned by Rotation2d.getMeasure().
-	 * This method does not perform any additional angle wrapping or normalization beyond
-	 * what Rotation2d.getMeasure() provides.
+	 * Note: comparisons are done on the raw values returned by
+	 * Rotation2d.getMeasure(). This method does not perform any additional angle
+	 * wrapping or normalization beyond what Rotation2d.getMeasure() provides.
 	 *
-	 * @param desiredRotation the target rotation to compare against (must not be null)
-	 * @param tolerance the allowed deviation from the target rotation (must not be null; expected non-negative)
-	 * @return true if the current rotation is strictly within the specified tolerance of the desired rotation; false otherwise
-	 * @throws NullPointerException if desiredRotation or tolerance is null
+	 * @param desiredRotation
+	 *            the target rotation to compare against (must not be null)
+	 * @param tolerance
+	 *            the allowed deviation from the target rotation (must not be null;
+	 *            expected non-negative)
+	 * @return true if the current rotation is strictly within the specified
+	 *         tolerance of the desired rotation; false otherwise
+	 * @throws NullPointerException
+	 *             if desiredRotation or tolerance is null
 	 */
 	public boolean isAtPosition(Rotation2d desiredRotation, Angle tolerance) {
 		return (this.getPose().getRotation().getMeasure().compareTo(desiredRotation.getMeasure().minus(tolerance)) > 0)
@@ -413,17 +418,26 @@ public class SN_SuperSwerveV2 extends SwerveDrivetrain<TalonFX, TalonFX, CANcode
 	}
 
 	/**
-	 * Checks whether the robot's current pose is within a specified translational tolerance of a desired pose.
+	 * Checks whether the robot's current pose is within a specified translational
+	 * tolerance of a desired pose.
 	 *
-	 * <p>This method compares only the 2D translation (x, y) components of the poses and computes the Euclidean
-	 * (straight-line) distance between the current pose and the desired pose. The rotational component (heading)
-	 * of the poses is ignored. The comparison is inclusive: returns true when the distance is less than or equal
-	 * to the provided tolerance.</p>
+	 * <p>
+	 * This method compares only the 2D translation (x, y) components of the poses
+	 * and computes the Euclidean (straight-line) distance between the current pose
+	 * and the desired pose. The rotational component (heading) of the poses is
+	 * ignored. The comparison is inclusive: returns true when the distance is less
+	 * than or equal to the provided tolerance.
+	 * </p>
 	 *
-	 * @param desiredPose2d the target Pose2d to compare against (must be in the same coordinate frame as getPose())
-	 * @param tolerance a Distance representing the allowable translational error; the method returns true if the
-	 *                  straight-line distance to desiredPose2d is less than or equal to this tolerance
-	 * @return true if the current translation is within the given tolerance of desiredPose2d, false otherwise
+	 * @param desiredPose2d
+	 *            the target Pose2d to compare against (must be in the same
+	 *            coordinate frame as getPose())
+	 * @param tolerance
+	 *            a Distance representing the allowable translational error; the
+	 *            method returns true if the straight-line distance to desiredPose2d
+	 *            is less than or equal to this tolerance
+	 * @return true if the current translation is within the given tolerance of
+	 *         desiredPose2d, false otherwise
 	 */
 	public boolean isAtPosition(Pose2d desiredPose2d, Distance tolerance) {
 		return Units.Meters.of(this.getPose().getTranslation().getDistance(desiredPose2d.getTranslation()))
@@ -431,42 +445,52 @@ public class SN_SuperSwerveV2 extends SwerveDrivetrain<TalonFX, TalonFX, CANcode
 	}
 
 	/**
-	 * Returns whether the current angle lies strictly within the tolerance window around the target angle.
+	 * Returns whether the current angle lies strictly within the tolerance window
+	 * around the target angle.
 	 *
-	 * The check performed is:
-	 *   (target - tolerance) LT current LT (target + tolerance)
-	 * Comparisons are strict: equality with either boundary returns false.
+	 * The check performed is: (target - tolerance) LT current LT (target +
+	 * tolerance) Comparisons are strict: equality with either boundary returns
+	 * false.
 	 *
-	 * This method relies on Angle.minus, Angle.plus and Angle.compareTo. It does not perform any additional
-	 * normalization or wrap-around handling, so callers should ensure angles are expressed in a consistent
-	 * range (for example, normalized to [-180,180) or [0,360)) when necessary.
+	 * This method relies on Angle.minus, Angle.plus and Angle.compareTo. It does
+	 * not perform any additional normalization or wrap-around handling, so callers
+	 * should ensure angles are expressed in a consistent range (for example,
+	 * normalized to [-180,180) or [0,360)) when necessary.
 	 *
-	 * @param target the desired angle to compare against
-	 * @param current the current angle value to test
-	 * @param tolerance the allowed deviation from the target (expected to be non-negative)
-	 * @return true if current is strictly within the tolerance window around target; false otherwise
+	 * @param target
+	 *            the desired angle to compare against
+	 * @param current
+	 *            the current angle value to test
+	 * @param tolerance
+	 *            the allowed deviation from the target (expected to be
+	 *            non-negative)
+	 * @return true if current is strictly within the tolerance window around
+	 *         target; false otherwise
 	 */
-    public boolean isAtDesiredPosition(Angle target, Angle current, Angle tolerance) {
-		return (current.compareTo(target.minus(tolerance)) > 0)
-				&& current.compareTo(target.plus(tolerance)) < 0;
+	public boolean isAtDesiredPosition(Angle target, Angle current, Angle tolerance) {
+		return (current.compareTo(target.minus(tolerance)) > 0) && current.compareTo(target.plus(tolerance)) < 0;
 	}
 
 	/**
 	 * Determines whether the robot is at (or sufficiently close to) a desired pose.
 	 *
-	 * <p>This evaluates the Euclidean distance between the translations (x/y) of the provided
-	 * target and current poses and returns true when that distance is less than or equal to the
-	 * supplied tolerance.
+	 * <p>
+	 * This evaluates the Euclidean distance between the translations (x/y) of the
+	 * provided target and current poses and returns true when that distance is less
+	 * than or equal to the supplied tolerance.
 	 *
-	 * @param target the desired Pose2d to reach (must not be null)
-	 * @param current the current Pose2d of the robot (must not be null)
-	 * @param tolerance the maximum allowable translational error as a Distance (must not be null)
-	 * @return true if the translational distance between current and target is within tolerance,
-	 *         false otherwise
+	 * @param target
+	 *            the desired Pose2d to reach (must not be null)
+	 * @param current
+	 *            the current Pose2d of the robot (must not be null)
+	 * @param tolerance
+	 *            the maximum allowable translational error as a Distance (must not
+	 *            be null)
+	 * @return true if the translational distance between current and target is
+	 *         within tolerance, false otherwise
 	 */
 	public boolean isAtDesiredPosition(Pose2d target, Pose2d current, Distance tolerance) {
-		Distance distance = Units.Meters
-				.of(current.getTranslation().getDistance(target.getTranslation()));
+		Distance distance = Units.Meters.of(current.getTranslation().getDistance(target.getTranslation()));
 		return distance.lte(tolerance);
 	}
 
@@ -479,19 +503,26 @@ public class SN_SuperSwerveV2 extends SwerveDrivetrain<TalonFX, TalonFX, CANcode
 	}
 
 	/**
-	 * Computes the angle of the stick input in radians when the stick is "hit" (i.e. when the magnitude of the stick input is within a specified tolerance of 1).
-	 * The angle is calculated using atan2 of the Y and X stick inputs, and then adjusted by subtracting the provided offset. If the stick input magnitude is outside the tolerance range, this method returns 0.
-	 * 
-	 * @param rotationXAxis supplier for the stick X axis
-	 * @param rotationYAxis supplier for the stick Y axis
-	 * @param tolerance allowed deviation from unit magnitude to consider the
-	 *                  stick "hit"
-	 * @param offset an additional angle in radians to subtract from the computed
-	 *               stick angle when the stick is "hit". This allows for adjusting
-	 *               the reference frame or compensating for calibration offsets.
+	 * Computes the angle of the stick input in radians when the stick is "hit"
+	 * (i.e. when the magnitude of the stick input is within a specified tolerance
+	 * of 1). The angle is calculated using atan2 of the Y and X stick inputs, and
+	 * then adjusted by subtracting the provided offset. If the stick input
+	 * magnitude is outside the tolerance range, this method returns 0.
+	 *
+	 * @param rotationXAxis
+	 *            supplier for the stick X axis
+	 * @param rotationYAxis
+	 *            supplier for the stick Y axis
+	 * @param tolerance
+	 *            allowed deviation from unit magnitude to consider the stick "hit"
+	 * @param offset
+	 *            an additional angle in radians to subtract from the computed stick
+	 *            angle when the stick is "hit". This allows for adjusting the
+	 *            reference frame or compensating for calibration offsets.
 	 * @return angle in radians when stick is within tolerance, otherwise 0
 	 */
-	public double getStickRadians(DoubleSupplier rotationXAxis, DoubleSupplier rotationYAxis, double tolerance, double offset) {
+	public double getStickRadians(DoubleSupplier rotationXAxis, DoubleSupplier rotationYAxis, double tolerance,
+			double offset) {
 		double rightStickX = rotationXAxis.getAsDouble();
 		double rightStickY = rotationYAxis.getAsDouble();
 		double manualDriveRotation = 0;
@@ -502,16 +533,16 @@ public class SN_SuperSwerveV2 extends SwerveDrivetrain<TalonFX, TalonFX, CANcode
 	}
 
 	/**
-	 * Computes the heading (as an {@link Angle}) from the robot's current pose
-	 * to the provided target pose. The returned angle points from the robot's
-	 * current position toward the target, using the field coordinate frame.
+	 * Computes the heading (as an {@link Angle}) from the robot's current pose to
+	 * the provided target pose. The returned angle points from the robot's current
+	 * position toward the target, using the field coordinate frame.
 	 *
 	 * The computed angle is derived from atan2(dy, dx) where dx = target.x -
-	 * robot.x and dy = target.y - robot.y and converted from radians to
-	 * degrees before being wrapped in a Units {@link Angle} via
-	 * {@code Degrees.of(...)}.
+	 * robot.x and dy = target.y - robot.y and converted from radians to degrees
+	 * before being wrapped in a Units {@link Angle} via {@code Degrees.of(...)}.
 	 *
-	 * @param targetPose goal pose to snap toward
+	 * @param targetPose
+	 *            goal pose to snap toward
 	 * @return target heading as an {@link Angle} (degrees)
 	 */
 	public Angle snapToTarget(Pose2d targetPose) {
@@ -522,24 +553,27 @@ public class SN_SuperSwerveV2 extends SwerveDrivetrain<TalonFX, TalonFX, CANcode
 	}
 
 	/**
-	 * Checks whether the robot is "behind" a horizontal field line defined by
-	 * a distance from the blue alliance wall.
+	 * Checks whether the robot is "behind" a horizontal field line defined by a
+	 * distance from the blue alliance wall.
 	 *
-	 * For the blue alliance (isRed == false) this returns true when the robot's
-	 * X position is less than {@code blueXValueInMeters}. For the red alliance
-	 * (isRed == true) the field is mirrored, so the equivalent line is at
-	 * {@code fieldLength - blueXValueInMeters} and we return true when the
-	 * robot's X is greater than that mirrored value.
+	 * For the blue alliance (isRed == false) this returns true when the robot's X
+	 * position is less than {@code blueXValueInMeters}. For the red alliance (isRed
+	 * == true) the field is mirrored, so the equivalent line is at
+	 * {@code fieldLength - blueXValueInMeters} and we return true when the robot's
+	 * X is greater than that mirrored value.
 	 *
-	 * Coordinates and units: this method uses the drivetrain pose's measured
-	 * X coordinate (a {@link Distance}). The parameters must be supplied in the
-	 * same units / measurement system (typically meters) and are compared using
-	 * the Units API (e.g. {@code Distance.lt} and {@code Distance.gt}).
+	 * Coordinates and units: this method uses the drivetrain pose's measured X
+	 * coordinate (a {@link Distance}). The parameters must be supplied in the same
+	 * units / measurement system (typically meters) and are compared using the
+	 * Units API (e.g. {@code Distance.lt} and {@code Distance.gt}).
 	 *
-	 * @param blueXValueInMeters X offset from the blue alliance wall representing
-	 *                           the horizontal line
-	 * @param isRed              whether the robot is on the red alliance (mirror)
-	 * @param fieldLength         total field length (used to compute mirrored line)
+	 * @param blueXValueInMeters
+	 *            X offset from the blue alliance wall representing the horizontal
+	 *            line
+	 * @param isRed
+	 *            whether the robot is on the red alliance (mirror)
+	 * @param fieldLength
+	 *            total field length (used to compute mirrored line)
 	 * @return true if the robot is behind the specified horizontal line for the
 	 *         current alliance perspective
 	 */
@@ -548,25 +582,27 @@ public class SN_SuperSwerveV2 extends SwerveDrivetrain<TalonFX, TalonFX, CANcode
 			boolean isDTBehindHorizontalLine = getPose().getMeasureX().lt(blueXValueInMeters);
 			return isDTBehindHorizontalLine;
 		} else {
-			boolean isDTBehindHorizontalLine = getPose().getMeasureX()
-					.gt(fieldLength.minus(blueXValueInMeters));
+			boolean isDTBehindHorizontalLine = getPose().getMeasureX().gt(fieldLength.minus(blueXValueInMeters));
 			return isDTBehindHorizontalLine;
 		}
 	}
 	/**
-	 * Checks whether the robot is "behind" a vertical field line defined by
-	 * a distance from the blue alliance wall along the Y axis.
+	 * Checks whether the robot is "behind" a vertical field line defined by a
+	 * distance from the blue alliance wall along the Y axis.
 	 *
-	 * For the blue alliance (isRed == false) this returns true when the robot's
-	 * Y position is less than {@code blueYValueInMeters}. For the red alliance
-	 * (isRed == true) the equivalent line is mirrored at
-	 * {@code fieldWidth - blueYValueInMeters} and we return true when the
-	 * robot's Y is greater than that mirrored value.
+	 * For the blue alliance (isRed == false) this returns true when the robot's Y
+	 * position is less than {@code blueYValueInMeters}. For the red alliance (isRed
+	 * == true) the equivalent line is mirrored at
+	 * {@code fieldWidth - blueYValueInMeters} and we return true when the robot's Y
+	 * is greater than that mirrored value.
 	 *
-	 * @param blueYValueInMeters Y offset from the blue alliance wall representing
-	 *                           the vertical line
-	 * @param isRed              whether the robot is on the red alliance
-	 * @param fieldWidth         total field width (used to compute mirrored line)
+	 * @param blueYValueInMeters
+	 *            Y offset from the blue alliance wall representing the vertical
+	 *            line
+	 * @param isRed
+	 *            whether the robot is on the red alliance
+	 * @param fieldWidth
+	 *            total field width (used to compute mirrored line)
 	 * @return true if the robot is behind the specified vertical line for the
 	 *         current alliance perspective
 	 */
@@ -575,8 +611,7 @@ public class SN_SuperSwerveV2 extends SwerveDrivetrain<TalonFX, TalonFX, CANcode
 			boolean isDTBehindVerticalLine = getPose().getMeasureY().lt(blueYValueInMeters);
 			return isDTBehindVerticalLine;
 		} else {
-			boolean isDTBehindVerticalLine = getPose().getMeasureY()
-					.gt(fieldWidth.minus(blueYValueInMeters));
+			boolean isDTBehindVerticalLine = getPose().getMeasureY().gt(fieldWidth.minus(blueYValueInMeters));
 			return isDTBehindVerticalLine;
 		}
 	}

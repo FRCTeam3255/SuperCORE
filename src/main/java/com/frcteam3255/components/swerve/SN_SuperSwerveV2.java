@@ -56,7 +56,7 @@ public class SN_SuperSwerveV2 extends SwerveDrivetrain<TalonFX, TalonFX, CANcode
 	/* Keep track if we've ever applied the operator perspective before or not */
 	private boolean m_hasAppliedOperatorPerspective = false;
 	/* Whether we're currently applying the X-brake request (for logging purposes) */
-	private boolean isXbraking = false;
+	private boolean isCurrentlyXbraking = false;
 
 	// ==========================================================
 	// ****************** CTRE GENERATED CODE *******************
@@ -296,19 +296,23 @@ public class SN_SuperSwerveV2 extends SwerveDrivetrain<TalonFX, TalonFX, CANcode
 		setControl(fieldCentricRequest.withVelocityX(chassisSpeeds.vxMetersPerSecond)
 				.withVelocityY(chassisSpeeds.vyMetersPerSecond)
 				.withRotationalRate(chassisSpeeds.omegaRadiansPerSecond));
-		isXbraking = false;
+		isCurrentlyXbraking = false;
 	}
 
 	public void drive(ChassisSpeeds chassisSpeeds, Rotation2d facingAngle, double kP, double kI, double kD) {
 		setControl(fieldCentricFacingAngleRequest.withVelocityX(chassisSpeeds.vxMetersPerSecond)
 				.withVelocityY(chassisSpeeds.vyMetersPerSecond).withHeadingPID(kP, kI, kD)
 				.withTargetDirection(facingAngle));
-		isXbraking = false;
+		isCurrentlyXbraking = false;
 	}
 
 	public void xBrake() {
 		setControl(brakeRequest);
-		isXbraking = true;
+		isCurrentlyXbraking = true;
+	}
+
+	public boolean getIsCurrentlyXbraking() {
+		return isCurrentlyXbraking;
 	}
 
 	/**

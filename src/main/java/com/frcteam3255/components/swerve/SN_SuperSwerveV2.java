@@ -388,7 +388,7 @@ public class SN_SuperSwerveV2 extends SwerveDrivetrain<TalonFX, TalonFX, CANcode
 	}
 
 	/**
-	 * Determines whether the module's current rotation is within a given angular tolerance
+	 * Determines whether the drivetrain's facing is within a given angular tolerance
 	 * of a desired rotation.
 	 *
 	 * The check is performed by comparing the underlying angle measures:
@@ -494,9 +494,8 @@ public class SN_SuperSwerveV2 extends SwerveDrivetrain<TalonFX, TalonFX, CANcode
 	public double getStickRadians(DoubleSupplier rotationXAxis, DoubleSupplier rotationYAxis, double tolerance, double offset) {
 		double rightStickX = rotationXAxis.getAsDouble();
 		double rightStickY = rotationYAxis.getAsDouble();
-		double hypotenuse = Math.hypot(rightStickX, rightStickY);
 		double manualDriveRotation = 0;
-		if (hypotenuse < 1 + tolerance && hypotenuse > 1 - tolerance) {
+		if (isStickHit(rotationXAxis, rotationYAxis, tolerance)) {
 			manualDriveRotation = Math.atan2(rightStickY, rightStickX) - offset;
 		}
 		return manualDriveRotation;
@@ -540,17 +539,17 @@ public class SN_SuperSwerveV2 extends SwerveDrivetrain<TalonFX, TalonFX, CANcode
 	 * @param blueXValueInMeters X offset from the blue alliance wall representing
 	 *                           the horizontal line
 	 * @param isRed              whether the robot is on the red alliance (mirror)
-	 * @param fieldLenth         total field length (used to compute mirrored line)
+	 * @param fieldLength         total field length (used to compute mirrored line)
 	 * @return true if the robot is behind the specified horizontal line for the
 	 *         current alliance perspective
 	 */
-	public boolean isBehindHorizontalLine(Distance blueXValueInMeters, boolean isRed, Distance fieldLenth) {
+	public boolean isBehindHorizontalLine(Distance blueXValueInMeters, boolean isRed, Distance fieldLength) {
 		if (!isRed) {
 			boolean isDTBehindHorizontalLine = getPose().getMeasureX().lt(blueXValueInMeters);
 			return isDTBehindHorizontalLine;
 		} else {
 			boolean isDTBehindHorizontalLine = getPose().getMeasureX()
-					.gt(fieldLenth.minus(blueXValueInMeters));
+					.gt(fieldLength.minus(blueXValueInMeters));
 			return isDTBehindHorizontalLine;
 		}
 	}

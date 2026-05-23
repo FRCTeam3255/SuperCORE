@@ -494,12 +494,17 @@ public class SN_SuperSwerveV2 extends SwerveDrivetrain<TalonFX, TalonFX, CANcode
 		return distance.lte(tolerance);
 	}
 
-	public boolean isStickHit(DoubleSupplier rotationXAxis, DoubleSupplier rotationYAxis, double tolerance) {
-		double rightStickX = rotationXAxis.getAsDouble();
-		double rightStickY = rotationYAxis.getAsDouble();
+	public boolean isStickHit(DoubleSupplier xAxis, DoubleSupplier yAxis, double tolerance) {
+		double rightStickX = xAxis.getAsDouble();
+		double rightStickY = yAxis.getAsDouble();
 		double hypotenuse = Math.hypot(rightStickX, rightStickY);
 
 		return (hypotenuse < 1 + tolerance && hypotenuse > 1 - tolerance);
+	}
+
+	public boolean isStickHit(DoubleSupplier axis, double tolerance) {
+		double stickValue = axis.getAsDouble();
+		return (stickValue < 1 + tolerance && stickValue > 1 - tolerance);
 	}
 
 	/**

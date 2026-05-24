@@ -1871,7 +1871,7 @@ public class LimelightHelpers {
 	 *            Name/identifier of the Limelight
 	 * @param throttle
 	 *            Defaults to 0. Your Limelgiht will process one frame after
-	 *            skipping <throttle> frames.
+	 *            skipping throttle frames.
 	 */
 	public static void SetThrottle(String limelightName, int throttle) {
 		setLimelightNTDouble(limelightName, "throttle_set", throttle);

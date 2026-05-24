@@ -503,7 +503,7 @@ public class SN_SuperSwerveV2 extends SwerveDrivetrain<TalonFX, TalonFX, CANcode
 	}
 
 	public boolean isStickHit(DoubleSupplier axis, double tolerance) {
-		double stickValue = axis.getAsDouble();
+		double stickValue = Math.abs(axis.getAsDouble());
 		return (stickValue < 1 + tolerance && stickValue > 1 - tolerance);
 	}
 

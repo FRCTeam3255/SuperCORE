@@ -1,4 +1,3 @@
-// Credit: https://github.com/LimelightVision/limelightlib-wpijava :3
 //LimelightHelpers v1.14 (REQUIRES LLOS 2026.0 OR LATER)
 // Credit: https://github.com/LimelightVision/limelightlib-wpijava/blob/v1.14/LimelightHelpers.java :3
 

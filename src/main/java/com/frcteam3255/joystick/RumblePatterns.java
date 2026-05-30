@@ -4,19 +4,38 @@
 
 package com.frcteam3255.joystick;
 
+
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj2.command.Command;
 
 /** Add your docs here. */
 public class RumblePatterns {
-    public RumblePatterns(RumbleType rumbleType, double rumbleIntensity ){
-    double t = Timer.getFPGATimestamp(); // seconds since FPGA boot
-    boolean toggle = ((int) Math.floor(t) % 2) == 0; // toggle every 1 second
+    private final RumbleType rumbleType;
+    private final double intensity;
 
+    public RumblePatterns(RumbleType rumbleType, double intensity) {
+        this.rumbleType = rumbleType;
+        this.intensity = intensity;
+    }
 
-    final RumblePatterns steadyController = new RumblePatterns(rumbleType, 0);
-    final RumblePatterns buzzController = new RumblePatterns(rumbleType, rumbleIntensity);
-    final RumblePatterns flickerController = new RumblePatterns(rumbleType, toggle ? rumbleIntensity : 0);
+    public static RumblePatterns getRumblePattern(RumbleType rumbleType, double rumbleIntensity) {
+        // Replace this with your preference system as needed; using a plain String for compilation
+        String selectedRumble = "Steady";
+        double t = Timer.getFPGATimestamp(); // seconds since FPGA boot
+        boolean toggle = ((int) Math.floor(t) % 2) == 0; // toggle every 1 second
+        final RumblePatterns steadyController = new RumblePatterns(rumbleType, rumbleIntensity);
+        final RumblePatterns buzzController = new RumblePatterns(rumbleType, rumbleIntensity);
+        final RumblePatterns flickerController = new RumblePatterns(rumbleType, toggle ? rumbleIntensity : 0);
+
+        if ("Steady".equals(selectedRumble)) {
+            return steadyController;
+        } else if ("Buzz".equals(selectedRumble)) {
+            return buzzController;
+        } else if ("Flicker".equals(selectedRumble)) {
+            return flickerController;
+        }
+
+        // default
+        return steadyController;
     }
 }

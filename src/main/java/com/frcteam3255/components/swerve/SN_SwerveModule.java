@@ -78,18 +78,18 @@ public class SN_SwerveModule extends SubsystemBase {
 	 */
 	public SN_SwerveModule(int moduleNumber, int driveMotorID, int steerMotorID, int absoluteEncoderID,
 			double absoluteEncoderOffset, String CANBusName) {
-
+		
 		simTimer.start();
-
+		CANBus moduleCANBus = new CANBus(CANBusName);
 		this.moduleNumber = moduleNumber;
 
-		driveMotor = new TalonFX(driveMotorID, new CANBus(CANBusName));
-		steerMotor = new TalonFX(steerMotorID, new CANBus(CANBusName));
+		driveMotor = new TalonFX(driveMotorID,moduleCANBus);
+		steerMotor = new TalonFX(steerMotorID, moduleCANBus);
 		driveMotorControllerClosed = new VelocityDutyCycle(0);
 		driveMotorControllerOpen = new DutyCycleOut(0);
 		steerMotorController = new PositionVoltage(0);
 
-		absoluteEncoder = new CANcoder(absoluteEncoderID, new CANBus(CANBusName));
+		absoluteEncoder = new CANcoder(absoluteEncoderID, moduleCANBus);
 		this.absoluteEncoderOffset = absoluteEncoderOffset;
 
 		driveConfiguration = new TalonFXConfiguration();

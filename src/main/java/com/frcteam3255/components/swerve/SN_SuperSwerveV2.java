@@ -545,8 +545,8 @@ public class SN_SuperSwerveV2 extends SwerveDrivetrain<TalonFX, TalonFX, CANcode
 	 * @return true if Math.abs(axis.getAsDouble()) is strictly greater than
 	 *         tolerance; false otherwise
 	 *
-	 *         Example: - axis returns 0.15 and tolerance is 0.1 -> returns true -
-	 *         axis returns 0.1 and tolerance is 0.1 -> returns false (strict
+	 *         Example: - if axis returns 0.15 and tolerance is 0.1 -> returns true -
+	 *         but if axis returns 0.1 and tolerance is 0.1 -> returns false (strict
 	 *         greater-than)
 	 */
 	public boolean isStickHit(DoubleSupplier axis, double tolerance) {

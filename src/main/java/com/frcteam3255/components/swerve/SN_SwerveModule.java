@@ -83,7 +83,7 @@ public class SN_SwerveModule extends SubsystemBase {
 		CANBus moduleCANBus = new CANBus(CANBusName);
 		this.moduleNumber = moduleNumber;
 
-		driveMotor = new TalonFX(driveMotorID,moduleCANBus);
+		driveMotor = new TalonFX(driveMotorID, moduleCANBus);
 		steerMotor = new TalonFX(steerMotorID, moduleCANBus);
 		driveMotorControllerClosed = new VelocityDutyCycle(0);
 		driveMotorControllerOpen = new DutyCycleOut(0);

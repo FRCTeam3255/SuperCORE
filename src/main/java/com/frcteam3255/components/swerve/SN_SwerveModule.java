@@ -13,7 +13,7 @@ import com.ctre.phoenix6.controls.VelocityDutyCycle;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.frcteam3255.utils.SN_Math;
-
+import com.ctre.phoenix6.CANBus;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -78,18 +78,18 @@ public class SN_SwerveModule extends SubsystemBase {
 	 */
 	public SN_SwerveModule(int moduleNumber, int driveMotorID, int steerMotorID, int absoluteEncoderID,
 			double absoluteEncoderOffset, String CANBusName) {
-
+		
 		simTimer.start();
-
+		CANBus moduleCANBus = new CANBus(CANBusName);
 		this.moduleNumber = moduleNumber;
 
-		driveMotor = new TalonFX(driveMotorID, CANBusName);
-		steerMotor = new TalonFX(steerMotorID, CANBusName);
+		driveMotor = new TalonFX(driveMotorID, moduleCANBus);
+		steerMotor = new TalonFX(steerMotorID, moduleCANBus);
 		driveMotorControllerClosed = new VelocityDutyCycle(0);
 		driveMotorControllerOpen = new DutyCycleOut(0);
 		steerMotorController = new PositionVoltage(0);
 
-		absoluteEncoder = new CANcoder(absoluteEncoderID, CANBusName);
+		absoluteEncoder = new CANcoder(absoluteEncoderID, moduleCANBus);
 		this.absoluteEncoderOffset = absoluteEncoderOffset;
 
 		driveConfiguration = new TalonFXConfiguration();

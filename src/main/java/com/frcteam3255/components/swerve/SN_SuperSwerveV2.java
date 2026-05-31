@@ -513,12 +513,15 @@ public class SN_SuperSwerveV2 extends SwerveDrivetrain<TalonFX, TalonFX, CANcode
 	 * The magnitude is computed using Math.hypot(x, y) where x and y are obtained
 	 * from the provided DoubleSupplier instances.
 	 *
-	 * @param xAxis supplier of the joystick X-axis value; must not be null
-	 * @param yAxis supplier of the joystick Y-axis value; must not be null
-	 * @param tolerance non-negative threshold for considering the stick "hit";
-	 *                  the method returns true when hypot(x, y) > tolerance
-	 * @return true if the joystick magnitude (sqrt(x^2 + y^2)) is greater than
-	 *         the specified tolerance, false otherwise
+	 * @param xAxis
+	 *            supplier of the joystick X-axis value; must not be null
+	 * @param yAxis
+	 *            supplier of the joystick Y-axis value; must not be null
+	 * @param tolerance
+	 *            non-negative threshold for considering the stick "hit"; the method
+	 *            returns true when hypot(x, y) > tolerance
+	 * @return true if the joystick magnitude (sqrt(x^2 + y^2)) is greater than the
+	 *         specified tolerance, false otherwise
 	 */
 	public boolean isStickHit(DoubleSupplier xAxis, DoubleSupplier yAxis, double tolerance) {
 		double rightStickX = xAxis.getAsDouble();
@@ -529,16 +532,22 @@ public class SN_SuperSwerveV2 extends SwerveDrivetrain<TalonFX, TalonFX, CANcode
 	}
 
 	/**
-	 * Determines whether a joystick/axis "hit" has occurred by comparing the absolute
-	 * axis value provided by the given DoubleSupplier against a deadzone tolerance.
+	 * Determines whether a joystick/axis "hit" has occurred by comparing the
+	 * absolute axis value provided by the given DoubleSupplier against a deadzone
+	 * tolerance.
 	 *
-	 * @param axis a DoubleSupplier that returns the current axis value; must not be null
-	 * @param tolerance the deadzone threshold to consider the stick as "hit" (expected non-negative)
-	 * @return true if Math.abs(axis.getAsDouble()) is strictly greater than tolerance; false otherwise
+	 * @param axis
+	 *            a DoubleSupplier that returns the current axis value; must not be
+	 *            null
+	 * @param tolerance
+	 *            the deadzone threshold to consider the stick as "hit" (expected
+	 *            non-negative)
+	 * @return true if Math.abs(axis.getAsDouble()) is strictly greater than
+	 *         tolerance; false otherwise
 	 *
-	 * Example:
-	 * - axis returns 0.15 and tolerance is 0.1 -> returns true
-	 * - axis returns 0.1 and tolerance is 0.1 -> returns false (strict greater-than)
+	 *         Example: - if axis returns 0.15 and tolerance is 0.1 -> returns true
+	 *         - but if axis returns 0.1 and tolerance is 0.1 -> returns false
+	 *         (strict greater-than)
 	 */
 	public boolean isStickHit(DoubleSupplier axis, double tolerance) {
 		double stickValue = Math.abs(axis.getAsDouble());

@@ -3,6 +3,7 @@ package com.frcteam3255.joystick;
 import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
@@ -126,5 +127,43 @@ public class SN_XboxController extends XboxController {
 	public SN_XboxController(int port) {
 		super(port);
 	}
+
+
+public class RumblePatterns {
+    private final RumbleType rumbleType;
+    private double intensity;
+    private SelectedRumble selectedRumble;
+
+    public enum SelectedRumble {
+        Steady, Buzz, Flicker;
+    }
+
+	public RumblePatterns(RumbleType rumbleType, SelectedRumble selectedRumble) {
+        this.rumbleType = rumbleType;
+        this.selectedRumble = selectedRumble;
+        this.intensity = 0.0;
+    }
+
+    public RumblePatterns getRumblePattern() {
+        double t = Timer.getFPGATimestamp();
+        boolean toggle = ((int) Math.floor(t) % 2) == 0;
+
+        if (selectedRumble == SelectedRumble.Buzz) {
+            intensity = 1.0;
+        } else if (selectedRumble == SelectedRumble.Flicker) {
+            intensity = toggle ? 1.0 : 0.0;
+        } else {
+            intensity = 0.0;
+        }
+        return this;
+    }
+}
+
+
+    public void rumble(RumblePatterns pattern){
+        // update once, then use fields so timestamp/toggle is consistent
+        pattern.getRumblePattern();
+        setRumble(pattern.rumbleType, pattern.intensity);
+    }
 
 }

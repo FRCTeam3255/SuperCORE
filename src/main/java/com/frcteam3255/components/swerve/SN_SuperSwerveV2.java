@@ -1,8 +1,8 @@
 package com.frcteam3255.components.swerve;
 
-import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.Second;
-import static edu.wpi.first.units.Units.Volts;
+import static org.wpilib.units.Units.Degrees;
+import static org.wpilib.units.Units.Second;
+import static org.wpilib.units.Units.Volts;
 
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
@@ -16,25 +16,25 @@ import com.ctre.phoenix6.swerve.SwerveDrivetrain;
 import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.swerve.SwerveRequest;
-
-import edu.wpi.first.math.Matrix;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.numbers.N1;
-import edu.wpi.first.math.numbers.N3;
-import edu.wpi.first.units.Units;
-import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.units.measure.Distance;
-import edu.wpi.first.units.measure.LinearVelocity;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj.Notifier;
-import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Subsystem;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import org.wpilib.math.kinematics.ChassisVelocities;
+import org.wpilib.math.linalg.Matrix;
+import org.wpilib.math.geometry.Pose2d;
+import org.wpilib.math.geometry.Rotation2d;
+import org.wpilib.math.numbers.N1;
+import org.wpilib.math.numbers.N3;
+import org.wpilib.units.Units;
+import org.wpilib.units.measure.Angle;
+import org.wpilib.units.measure.AngularVelocity;
+import org.wpilib.units.measure.Distance;
+import org.wpilib.units.measure.LinearVelocity;
+import org.wpilib.system.Notifier;
+import org.wpilib.system.RobotController;
+import org.wpilib.command2.Command;
+import org.wpilib.command2.Subsystem;
+import org.wpilib.command2.sysid.SysIdRoutine;
+import org.wpilib.driverstation.Alliance;
+import org.wpilib.driverstation.MatchState;
+import org.wpilib.driverstation.RobotState;
 
 /**
  * Class that extends the Phoenix 6 SwerveDrivetrain class and implements
@@ -142,9 +142,9 @@ public class SN_SuperSwerveV2 extends SwerveDrivetrain<TalonFX, TalonFX, CANcode
 		 * is disabled. This ensures driving behavior doesn't change until an explicit
 		 * disable event occurs during testing.
 		 */
-		if (!m_hasAppliedOperatorPerspective || DriverStation.isDisabled()) {
-			DriverStation.getAlliance().ifPresent(allianceColor -> {
-				setOperatorPerspectiveForward(allianceColor == Alliance.Red
+		if (!m_hasAppliedOperatorPerspective || RobotState.isDisabled()) {
+			MatchState.getAlliance().ifPresent(allianceColor -> {
+				setOperatorPerspectiveForward(allianceColor == Alliance.RED
 						? kRedAlliancePerspectiveRotation
 						: kBlueAlliancePerspectiveRotation);
 				m_hasAppliedOperatorPerspective = true;
@@ -178,7 +178,7 @@ public class SN_SuperSwerveV2 extends SwerveDrivetrain<TalonFX, TalonFX, CANcode
 	 */
 	@Override
 	public void addVisionMeasurement(Pose2d visionRobotPoseMeters, double timestampSeconds) {
-		super.addVisionMeasurement(visionRobotPoseMeters, Utils.fpgaToCurrentTime(timestampSeconds));
+		super.addVisionMeasurement(visionRobotPoseMeters, timestampSeconds);
 	}
 
 	/**
@@ -200,8 +200,7 @@ public class SN_SuperSwerveV2 extends SwerveDrivetrain<TalonFX, TalonFX, CANcode
 	@Override
 	public void addVisionMeasurement(Pose2d visionRobotPoseMeters, double timestampSeconds,
 			Matrix<N3, N1> visionMeasurementStdDevs) {
-		super.addVisionMeasurement(visionRobotPoseMeters, Utils.fpgaToCurrentTime(timestampSeconds),
-				visionMeasurementStdDevs);
+		super.addVisionMeasurement(visionRobotPoseMeters, timestampSeconds, visionMeasurementStdDevs);
 	}
 
 	// ==========================================================
@@ -294,17 +293,15 @@ public class SN_SuperSwerveV2 extends SwerveDrivetrain<TalonFX, TalonFX, CANcode
 	private final SwerveRequest.SwerveDriveBrake brakeRequest = new SwerveRequest.SwerveDriveBrake();
 	private final SwerveRequest.FieldCentricFacingAngle fieldCentricFacingAngleRequest = new SwerveRequest.FieldCentricFacingAngle();
 
-	public void drive(ChassisSpeeds chassisSpeeds) {
-		setControl(fieldCentricRequest.withVelocityX(chassisSpeeds.vxMetersPerSecond)
-				.withVelocityY(chassisSpeeds.vyMetersPerSecond)
-				.withRotationalRate(chassisSpeeds.omegaRadiansPerSecond));
+	public void drive(ChassisVelocities ChassisVelocities) {
+		setControl(fieldCentricRequest.withVelocityX(ChassisVelocities.vx).withVelocityY(ChassisVelocities.vy)
+				.withRotationalRate(ChassisVelocities.omega));
 		isCurrentlyXbraking = false;
 	}
 
-	public void drive(ChassisSpeeds chassisSpeeds, Rotation2d facingAngle, double kP, double kI, double kD) {
-		setControl(fieldCentricFacingAngleRequest.withVelocityX(chassisSpeeds.vxMetersPerSecond)
-				.withVelocityY(chassisSpeeds.vyMetersPerSecond).withHeadingPID(kP, kI, kD)
-				.withTargetDirection(facingAngle));
+	public void drive(ChassisVelocities ChassisVelocities, Rotation2d facingAngle, double kP, double kI, double kD) {
+		setControl(fieldCentricFacingAngleRequest.withVelocityX(ChassisVelocities.vx)
+				.withVelocityY(ChassisVelocities.vy).withHeadingPID(kP, kI, kD).withTargetDirection(facingAngle));
 		isCurrentlyXbraking = false;
 	}
 
@@ -357,10 +354,10 @@ public class SN_SuperSwerveV2 extends SwerveDrivetrain<TalonFX, TalonFX, CANcode
 	 *            The maximum linear velocity of the robot in meters per second.
 	 * @param TURN_SPEED
 	 *            The maximum angular velocity of the robot in radians per second.
-	 * @return A ChassisSpeeds object containing the calculated x, y, and rotational
-	 *         velocities.
+	 * @return A ChassisVelocities object containing the calculated x, y, and
+	 *         rotational velocities.
 	 */
-	public ChassisSpeeds calculateVelocitiesFromInput(DoubleSupplier xAxisSupplier, DoubleSupplier yAxisSupplier,
+	public ChassisVelocities calculateVelocitiesFromInput(DoubleSupplier xAxisSupplier, DoubleSupplier yAxisSupplier,
 			DoubleSupplier rotationAxisSupplier, BooleanSupplier slowMode, boolean isRed, double SLOW_MODE_MULTIPLIER,
 			LinearVelocity REAL_DRIVE_SPEED, AngularVelocity TURN_SPEED) {
 
@@ -373,7 +370,7 @@ public class SN_SuperSwerveV2 extends SwerveDrivetrain<TalonFX, TalonFX, CANcode
 				* redAllianceMultiplier * slowModeMultiplier;
 		double rotationVelocity = -rotationAxisSupplier.getAsDouble() * TURN_SPEED.in(Units.RadiansPerSecond);
 
-		return new ChassisSpeeds(xVelocity, yVelocity, rotationVelocity);
+		return new ChassisVelocities(xVelocity, yVelocity, rotationVelocity);
 	}
 
 	/**

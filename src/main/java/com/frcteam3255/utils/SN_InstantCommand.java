@@ -4,8 +4,8 @@
 
 package com.frcteam3255.utils;
 
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.Subsystem;
+import org.wpilib.command2.InstantCommand;
+import org.wpilib.command2.Subsystem;
 
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more
 // information, see:

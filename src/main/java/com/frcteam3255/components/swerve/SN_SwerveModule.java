@@ -14,12 +14,12 @@ import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.frcteam3255.utils.SN_Math;
 import com.ctre.phoenix6.CANBus;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.kinematics.SwerveModulePosition;
-import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import org.wpilib.math.geometry.Rotation2d;
+import org.wpilib.math.kinematics.SwerveModulePosition;
+import org.wpilib.math.kinematics.SwerveModuleVelocity;
+import org.wpilib.math.util.Units;
+import org.wpilib.system.Timer;
+import org.wpilib.command2.SubsystemBase;
 
 public class SN_SwerveModule extends SubsystemBase {
 
@@ -50,7 +50,7 @@ public class SN_SwerveModule extends SubsystemBase {
 
 	// -*- Sim -*-
 	public static boolean isSimulation = false;
-	private SwerveModuleState lastDesiredSwerveModuleState = new SwerveModuleState(0, new Rotation2d(0));
+	private SwerveModuleVelocity lastDesiredSwerveModuleVelocity = new SwerveModuleVelocity(0, new Rotation2d(0));
 	private double desiredDrivePosition;
 	private double timeFromLastUpdate = 0;
 	private Timer simTimer = new Timer();
@@ -78,7 +78,7 @@ public class SN_SwerveModule extends SubsystemBase {
 	 */
 	public SN_SwerveModule(int moduleNumber, int driveMotorID, int steerMotorID, int absoluteEncoderID,
 			double absoluteEncoderOffset, String CANBusName) {
-		
+
 		simTimer.start();
 		CANBus moduleCANBus = new CANBus(CANBusName);
 		this.moduleNumber = moduleNumber;
@@ -149,9 +149,9 @@ public class SN_SwerveModule extends SubsystemBase {
 	/**
 	 * Get the current state (velocity, angle) of the module.
 	 *
-	 * @return Module's SwerveModuleState (velocity, angle)
+	 * @return Module's SwerveModuleVelocity (velocity, angle)
 	 */
-	public SwerveModuleState getActualModuleState() {
+	public SwerveModuleVelocity getActualModuleState() {
 		// TODO: change to units using .getValue
 		double velocity = SN_Math.rotationsToMeters(driveMotor.getVelocity().getValueAsDouble(), wheelCircumference, 1);
 
@@ -159,16 +159,16 @@ public class SN_SwerveModule extends SubsystemBase {
 		Rotation2d angle = Rotation2d
 				.fromDegrees(Units.rotationsToDegrees(steerMotor.getPosition().getValueAsDouble()));
 
-		return new SwerveModuleState(velocity, angle);
+		return new SwerveModuleVelocity(velocity, angle);
 	}
 
 	/**
 	 * Get the last desired state (velocity, angle) of the module.
 	 *
-	 * @return Module's Desired SwerveModuleState (velocity, angle)
+	 * @return Module's Desired SwerveModuleVelocity (velocity, angle)
 	 */
-	public SwerveModuleState getDesiredModuleState() {
-		return lastDesiredSwerveModuleState;
+	public SwerveModuleVelocity getDesiredModuleState() {
+		return lastDesiredSwerveModuleVelocity;
 	}
 
 	/**
@@ -181,9 +181,9 @@ public class SN_SwerveModule extends SubsystemBase {
 		if (isSimulation) {
 			timeFromLastUpdate = simTimer.get() - lastSimTime;
 			lastSimTime = simTimer.get();
-			desiredDrivePosition += (lastDesiredSwerveModuleState.speedMetersPerSecond * timeFromLastUpdate);
+			desiredDrivePosition += (lastDesiredSwerveModuleVelocity.velocity * timeFromLastUpdate);
 
-			return new SwerveModulePosition(desiredDrivePosition, lastDesiredSwerveModuleState.angle);
+			return new SwerveModulePosition(desiredDrivePosition, lastDesiredSwerveModuleVelocity.angle);
 		}
 		// TODO: change to units using .getValue
 		double distance = SN_Math.rotationsToMeters(driveMotor.getPosition().getValueAsDouble(), wheelCircumference, 1);
@@ -214,19 +214,19 @@ public class SN_SwerveModule extends SubsystemBase {
 	 * @param steerInPlace
 	 *            If the module can be rotated in place
 	 */
-	public void setModuleState(SwerveModuleState desiredState, boolean isOpenLoop, boolean steerInPlace) {
-		lastDesiredSwerveModuleState = desiredState;
+	public void setModuleState(SwerveModuleVelocity desiredState, boolean isOpenLoop, boolean steerInPlace) {
+		lastDesiredSwerveModuleVelocity = desiredState;
 		// -*- Setting the Drive Motor -*-
 
 		if (isOpenLoop) {
 			// The output is from -1 to 1. Essentially a percentage
 			// So, the requested speed divided by it's max speed.
-			driveMotorControllerOpen.Output = (desiredState.speedMetersPerSecond / maxModuleSpeedMeters);
+			driveMotorControllerOpen.Output = (desiredState.velocity / maxModuleSpeedMeters);
 			driveMotor.setControl(driveMotorControllerOpen);
 
 		} else {
-			driveMotorControllerClosed.Velocity = SN_Math.metersToRotations(desiredState.speedMetersPerSecond,
-					wheelCircumference, 1);
+			driveMotorControllerClosed.Velocity = SN_Math.metersToRotations(desiredState.velocity, wheelCircumference,
+					1);
 			driveMotor.setControl(driveMotorControllerClosed);
 		}
 
@@ -236,8 +236,7 @@ public class SN_SwerveModule extends SubsystemBase {
 
 		// If the requested speed is lower than a relevant steering speed,
 		// don't turn the motor. Set it to whatever it's previous angle was.
-		if (Math.abs(desiredState.speedMetersPerSecond) < (minimumSteerSpeedPercent * maxModuleSpeedMeters)
-				&& !steerInPlace) {
+		if (Math.abs(desiredState.velocity) < (minimumSteerSpeedPercent * maxModuleSpeedMeters) && !steerInPlace) {
 			return;
 		}
 

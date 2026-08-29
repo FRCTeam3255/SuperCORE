@@ -7,8 +7,8 @@
 
 package com.frcteam3255.joystick;
 
-import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj2.command.button.*;
+import org.wpilib.driverstation.Joystick;
+import org.wpilib.command2.button.*;
 
 /**
  * Custom 32 Button Joystick set up for the custom-made SuperNURDs Switchboard

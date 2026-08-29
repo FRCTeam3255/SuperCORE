@@ -4,10 +4,10 @@
 
 package com.frcteam3255.components.swerve;
 
-import static edu.wpi.first.units.Units.Inches;
+import static org.wpilib.units.Units.Inches;
 
-import edu.wpi.first.math.util.Units;
-import edu.wpi.first.units.measure.Distance;
+import org.wpilib.math.util.Units;
+import org.wpilib.units.measure.Distance;
 
 /**
  * <p>

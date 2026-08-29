@@ -21,11 +21,6 @@ These are tasks that need to be done every year, so instead of just rewriting al
 
 ### Supported Controllers
 
-* Logitech F310 Gamepad
-  * SN_DualActionStick
-  * SN_F310Gamepad
-* Logitech Extreme 3D Pro Joystick
-  * SN_Extreme3DStick
 * Custom Arduino Switchboard
   * SN_SwitchboardStick
 

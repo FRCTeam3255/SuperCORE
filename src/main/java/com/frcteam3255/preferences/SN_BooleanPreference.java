@@ -7,7 +7,7 @@
 
 package com.frcteam3255.preferences;
 
-import edu.wpi.first.wpilibj.Preferences;
+import org.wpilib.util.Preferences;
 
 /**
  * SuperNURDs boolean preference base class

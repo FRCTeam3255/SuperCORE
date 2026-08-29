@@ -2,53 +2,38 @@ package com.frcteam3255.joystick;
 
 import java.util.function.DoubleSupplier;
 
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
+import org.wpilib.math.util.MathUtil;
+import org.wpilib.command2.button.CommandGamepad;
+import org.wpilib.command2.button.Trigger;
 
 /**
  * Custom class for Xbox Controller use
  */
-public class SN_XboxController extends XboxController {
+public class SN_XboxController extends CommandGamepad {
 
-	public Trigger btn_A = new Trigger(super::getAButton);
-	public Trigger btn_B = new Trigger(super::getBButton);
-	public Trigger btn_X = new Trigger(super::getXButton);
-	public Trigger btn_Y = new Trigger(super::getYButton);
+	public Trigger btn_A = southFace();
+	public Trigger btn_B = eastFace();
+	public Trigger btn_X = westFace();
+	public Trigger btn_Y = northFace();
 
-	public Trigger btn_LeftBumper = new Trigger(super::getLeftBumperButton);
-	public Trigger btn_RightBumper = new Trigger(super::getRightBumperButton);
+	public Trigger btn_LeftBumper = leftBumper();
+	public Trigger btn_RightBumper = rightBumper();
 
-	public Trigger btn_Start = new Trigger(super::getStartButton);
-	public Trigger btn_Back = new Trigger(super::getBackButton);
+	public Trigger btn_Start = start();
+	public Trigger btn_Back = back();
 
-	public Trigger btn_LeftStick = new Trigger(super::getLeftStickButton);
-	public Trigger btn_RightStick = new Trigger(super::getRightStickButton);
+	public Trigger btn_LeftStick = leftStick();
+	public Trigger btn_RightStick = rightStick();
 
-	// The POV angles start at 0 in the up direction, and increase clockwise (eg
-	// right is 90, upper-left is 315).
-	private final int D_PAD_NORTH = 0;
-	private final int D_PAD_NORTH_EAST = 45;
-	private final int D_PAD_EAST = 90;
-	private final int D_PAD_SOUTH_EAST = 135;
-	private final int D_PAD_SOUTH = 180;
-	private final int D_PAD_SOUTH_WEST = 225;
-	private final int D_PAD_WEST = 270;
-	private final int D_PAD_NORTH_WEST = 315;
-
-	public Trigger btn_North = new Trigger(() -> super.getPOV() == D_PAD_NORTH);
-	public Trigger btn_NorthEast = new Trigger(() -> super.getPOV() == D_PAD_NORTH_EAST);
-	public Trigger btn_East = new Trigger(() -> super.getPOV() == D_PAD_EAST);
-	public Trigger btn_SouthEast = new Trigger(() -> super.getPOV() == D_PAD_SOUTH_EAST);
-	public Trigger btn_South = new Trigger(() -> super.getPOV() == D_PAD_SOUTH);
-	public Trigger btn_SouthWest = new Trigger(() -> super.getPOV() == D_PAD_SOUTH_WEST);
-	public Trigger btn_West = new Trigger(() -> super.getPOV() == D_PAD_WEST);
-	public Trigger btn_NorthWest = new Trigger(() -> super.getPOV() == D_PAD_NORTH_WEST);
+	public Trigger btn_North = dpadUp();
+	public Trigger btn_East = dpadRight();
+	public Trigger btn_South = dpadDown();
+	public Trigger btn_West = dpadLeft();
 
 	private double TRIGGER_PRESS_THRESHOLD = 0.5;
 
-	public Trigger btn_LeftTrigger = new Trigger(() -> super.getLeftTriggerAxis() > TRIGGER_PRESS_THRESHOLD);
-	public Trigger btn_RightTrigger = new Trigger(() -> super.getRightTriggerAxis() > TRIGGER_PRESS_THRESHOLD);
+	public Trigger btn_LeftTrigger = leftTrigger(TRIGGER_PRESS_THRESHOLD);
+	public Trigger btn_RightTrigger = rightTrigger(TRIGGER_PRESS_THRESHOLD);
 
 	private double LEFT_DEADBAND = 0.1;
 	private double RIGHT_DEADBAND = 0.1;
@@ -72,7 +57,7 @@ public class SN_XboxController extends XboxController {
 	 *            for trigger button
 	 */
 	public void setTriggerPressThreshold(double threshold) {
-		TRIGGER_PRESS_THRESHOLD = MathUtil.clamp(threshold, 0, 0.99);
+		TRIGGER_PRESS_THRESHOLD = Math.clamp(threshold, 0, 0.99);
 	}
 
 	/**
